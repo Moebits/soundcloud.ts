@@ -18,6 +18,7 @@ npm install soundcloud.ts
 
 ### Useful Links
 - [**SoundCloud API Documentation**](https://developers.soundcloud.com/docs/api/reference)
+-  [**Soundcloud.ts Documentation**](https://tenpi.github.io/soundcloud.ts/)
 
 ### Getting Started
 Authenticating with your account is **optional**, but I still recommend it. If you don't authenticate, you won't be able to use private endpoints such as `/me`. Soundcloud has closed down their API applications, but you are still able to get your 

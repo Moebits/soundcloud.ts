@@ -6,6 +6,9 @@ const webURL = "https://www.soundcloud.com/"
 export default class API {
     public constructor(private readonly clientID: string, private readonly oauthToken: string) {}
 
+    /**
+     * Gets an endpoint from the Soundcloud API.
+     */
     public get = async (endpoint: string, params?: any) => {
         if (!params) params = {}
         params.client_id = this.clientID
@@ -16,6 +19,9 @@ export default class API {
         return response
     }
 
+    /**
+     * Some endpoints use the main website as the URL.
+     */
     public getWebsite = async (endpoint: string, params?: any) => {
         if (!params) params = {}
         params.client_id = this.clientID
@@ -54,15 +60,5 @@ export default class API {
         endpoint = apiURL + endpoint
         const response = await axios.delete(endpoint, {params}).then((r) => r.data)
         return response
-    }
-
-    public resolve = async (resolvable: string | number, full?: boolean) => {
-        let id = resolvable
-        if (String(resolvable).includes("soundcloud")) {
-            const resolved = await this.get(`resolve`, {url: resolvable})
-            if (full) return resolved
-            id = resolved.id
-        }
-        return id
     }
 }

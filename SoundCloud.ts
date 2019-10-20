@@ -3,6 +3,9 @@ import {Tracks, Users, Playlists, Oembed, Resolve, Me, Comments, Apps} from "./e
 
 const publicID = "BeGVhOrGmfboy1LtiHTQF6Ejpt9ULJCI"
 
+/**
+ * The main class for interacting with the Soundcloud API.
+ */
 export default class Soundcloud {
     public static clientID: string
     public static oauthToken: string

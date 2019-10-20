@@ -1,6 +1,6 @@
 {
   "name": "soundcloud.ts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Wrapper for the Soundcloud API with typings",
   "main": "dist/soundcloud.js",
   "types": "dist/soundcloud.d.ts",
@@ -15,7 +15,7 @@
     "url": "https://github.com/Tenpi/soundcloud.ts"
   },
   "keywords": [
-    "Soundcloud",
+    "soundcloud",
     "typescript",
     "ts",
     "audio",
