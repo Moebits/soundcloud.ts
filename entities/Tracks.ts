@@ -5,7 +5,7 @@ export class Tracks {
     private readonly resolve = new Resolve(this.api)
     public constructor(private readonly api: api) {}
 
-    public search = async (params: SoundCloudTrackFilter) => {
+    public search = async (params?: SoundCloudTrackFilter) => {
         const response = await this.api.get(`/tracks`, params)
         return response
     }

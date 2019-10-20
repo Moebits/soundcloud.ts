@@ -1,4 +1,9 @@
 import {SoundCloudLicense, SoundCloudTrack, SoundCloudUserMini} from "./index"
+
+export interface SoundCloudPlaylistFilter {
+    representation?: "compact" | "id"
+    q?: string
+}
 export interface SoundCloudPlaylist {
     duration: number
     release_day: number | null

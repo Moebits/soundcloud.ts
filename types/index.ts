@@ -1,6 +1,6 @@
 export * from "./TrackTypes"
 export * from "./UserTypes"
-export * from "./FilterTypes"
 export * from "./CommentTypes"
 export * from "./APITypes"
 export * from "./PlaylistTypes"
+export * from "./MeTypes"

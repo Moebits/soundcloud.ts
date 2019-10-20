@@ -1,6 +1,7 @@
 import axios from "axios"
 
 const apiURL = "https://api.soundcloud.com/"
+const webURL = "https://www.soundcloud.com/"
 
 export default class API {
     public constructor(private readonly clientID: string, private readonly oauthToken: string) {}
@@ -11,6 +12,16 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
+        const response = await axios.get(endpoint, {params}).then((r) => r.data)
+        return response
+    }
+
+    public getWebsite = async (endpoint: string, params?: any) => {
+        if (!params) params = {}
+        params.client_id = this.clientID
+        if (this.oauthToken) params.oauth_token = this.oauthToken
+        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
+        endpoint = webURL + endpoint
         const response = await axios.get(endpoint, {params}).then((r) => r.data)
         return response
     }

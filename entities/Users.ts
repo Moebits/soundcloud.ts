@@ -1,14 +1,14 @@
 import api from "../API"
 import {SoundCloudComment, SoundCloudPlaylist, SoundCloudTrack, SoundCloudUser, SoundCloudUserCollection,
-SoundCloudWebProfile} from "../types"
+SoundCloudUserFilter, SoundCloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
 export class Users {
     private readonly resolve = new Resolve(this.api)
     constructor(private readonly api: api) {}
 
-    public search = async (query: string) => {
-        const response = await this.api.get(`/users`, {q: query})
+    public search = async (params?: SoundCloudUserFilter) => {
+        const response = await this.api.get(`/users`, params)
         return response as Promise<SoundCloudUser[]>
     }
 

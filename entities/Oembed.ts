@@ -1,10 +1,11 @@
 import api from "../API"
+import {SoundCloudOembed, SoundCloudOembedFilter} from "../types"
 
 export class Oembed {
     public constructor(private readonly api: api) {}
 
-    public get = async (params: any) => {
-        const response = await this.api.get(`/oembed`, params)
-        return response
+    public get = async (params: SoundCloudOembedFilter) => {
+        const response = await this.api.getWebsite(`/oembed`, params)
+        return response as Promise<SoundCloudOembed>
     }
 }

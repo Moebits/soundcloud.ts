@@ -1,3 +1,7 @@
+export interface SoundCloudUserFilter {
+    q?: string
+}
+
 export interface SoundCloudUserMini {
     avatar_url: string
     id: number

@@ -2,15 +2,14 @@ import {assert} from "chai"
 import "mocha"
 import {soundcloud} from "./login"
 
-assert
-describe.only("Users", async function() {
+describe("Users", async function() {
     it("should get a user", async function() {
         const response = await soundcloud.users.get("https://soundcloud.com/tenpimusic")
         assert(response.hasOwnProperty("description"))
     })
 
     it("should search for users", async function() {
-        const response = await soundcloud.users.search("virtual riot")
+        const response = await soundcloud.users.search({q: "virtual riot"})
         assert(response[0].hasOwnProperty("description"))
     })
 

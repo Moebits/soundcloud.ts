@@ -2,7 +2,6 @@ import {assert} from "chai"
 import "mocha"
 import {soundcloud} from "./login"
 
-assert
 describe("Tracks", async function() {
     it("should get a track", async function() {
         const response = await soundcloud.tracks.get("https://soundcloud.com/tenpimusic/snowflake")

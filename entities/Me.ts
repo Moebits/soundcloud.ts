@@ -1,11 +1,12 @@
 import api from "../API"
+import {SoundCloudActivityCollection, SoundCloudConnection, SoundCloudUser} from "../types"
 import {Users} from "./index"
 
 export class Me {
     private readonly users = new Users(this.api)
     public constructor(private readonly api: api) {}
 
-    public get = async (returnID?: boolean) => {
+    public get = async <B extends boolean>(returnID?: B): Promise<B extends true ? number : SoundCloudUser> => {
         const response = await this.api.get(`/me`)
         if (returnID) return response.id
         return response
@@ -13,34 +14,34 @@ export class Me {
 
     public activities = async () => {
         const response = await this.api.get(`/me/activities`)
-        return response
+        return response as Promise<SoundCloudActivityCollection>
     }
 
     public activitiesAffiliated = async () => {
-        const response = await this.api.get(`/me/activities/affiliated`)
-        return response
+        const response = await this.api.get(`/me/activities/tracks/affiliated`)
+        return response as Promise<SoundCloudActivityCollection>
     }
 
     public activitiesExclusive = async () => {
-        const response = await this.api.get(`/me/activities/exclusive`)
-        return response
+        const response = await this.api.get(`/me/activities/tracks/exclusive`)
+        return response as Promise<SoundCloudActivityCollection>
     }
 
     public activitiesOwn = async () => {
         const response = await this.api.get(`/me/activities/all/own`)
-        return response
+        return response as Promise<SoundCloudActivityCollection>
     }
 
     public connections = async () => {
         const id = await this.get(true)
-        const response = await this.api.get(`/me/${id}/connections`)
-        return response
+        const response = await this.api.get(`/me/connections`)
+        return response as Promise<SoundCloudConnection[]>
     }
 
     public connection = async (connectionID: number) => {
         const id = await this.get(true)
-        const response = await this.api.get(`/me/${id}/connections/${connectionID}`)
-        return response
+        const response = await this.api.get(`/me/connections/${connectionID}`)
+        return response as Promise<SoundCloudConnection>
     }
 
     public tracks = async () => {
