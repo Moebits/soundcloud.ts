@@ -1,0 +1,35 @@
+{
+  "name": "soundcloud.ts",
+  "version": "0.0.1",
+  "description": "Wrapper for the SoundCloud API with typings",
+  "main": "dist/SoundCloud.js",
+  "types": "dist/SoundCloud.d.ts",
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "prepublishOnly": "tsc"
+  },
+  "keywords": [
+    "Soundcloud",
+    "typescript",
+    "ts",
+    "audio",
+    "music"
+  ],
+  "author": "Tenpi",
+  "license": "MIT",
+  "devDependencies": {
+    "@tenpi/tslint": "^1.0.5",
+    "@tenpi/typedoc": "0.0.3",
+    "@types/chai": "^4.2.3",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.11.1",
+    "chai": "^4.2.0",
+    "dotenv": "^8.2.0",
+    "mocha": "^6.2.2",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
