@@ -2,11 +2,17 @@
   "name": "soundcloud.ts",
   "version": "0.0.1",
   "description": "Wrapper for the Soundcloud API with typings",
-  "main": "dist/Soundcloud.js",
-  "types": "dist/Soundcloud.d.ts",
+  "main": "dist/soundcloud.js",
+  "types": "dist/soundcloud.d.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
+    "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
+    "docs": "typedoc --out docs ./",
     "prepublishOnly": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tenpi/soundcloud.ts"
   },
   "keywords": [
     "Soundcloud",

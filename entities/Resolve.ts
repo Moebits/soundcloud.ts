@@ -4,6 +4,9 @@ export class Resolve {
     public constructor(private readonly api: api) {}
 
     public get = async (resolvable: string | number, full?: boolean) => {
+        if (!String(resolvable).match(/\d{8,}/) && !String(resolvable).includes("soundcloud")) {
+            resolvable = `https://soundcloud.com/${resolvable}`
+        }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
             const resolved = await this.api.get(`resolve`, {url: resolvable})
