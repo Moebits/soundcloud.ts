@@ -1,9 +1,9 @@
 {
   "name": "soundcloud.ts",
   "version": "0.0.1",
-  "description": "Wrapper for the SoundCloud API with typings",
-  "main": "dist/SoundCloud.js",
-  "types": "dist/SoundCloud.d.ts",
+  "description": "Wrapper for the Soundcloud API with typings",
+  "main": "dist/Soundcloud.js",
+  "types": "dist/Soundcloud.d.ts",
   "scripts": {
     "start": "tsc && node dist/index.js",
     "prepublishOnly": "tsc"

@@ -1,4 +1,4 @@
-import SoundCloud from "./SoundCloud"
+import SoundCloud from "./Soundcloud"
 
 require("dotenv").config()
 const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN);
