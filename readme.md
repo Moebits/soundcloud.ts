@@ -85,11 +85,10 @@ async function useAPI() {
 #### Downloading tracks
 ```ts
 async function useAPI() {
-  /*You can download a track as long as it has downloads enabled on Soundcloud.*/
+  /*If downloads aren't enabled, it will download the stream instead of the original file.*/
   await soundcloud.util.downloadTrack("https://soundcloud.com/tenpimusic/snowflake", "./tracks")
 
-  /*You can download multiple tracks by passing them as an array to downloadTracks(). All tracks
-  without downloads enabled will get skipped.*/
+  /*You can download multiple tracks by passing them as an array to downloadTracks().*/
   const tracks = await soundcloud.tracks.search({q: "cool track"})
   await soundcloud.util.downloadTracks(tracks, "./tracks")
 

@@ -29,14 +29,16 @@ export class Util {
         } else {
             track = await this.tracks.get(String(trackResolvable))
         }
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         if (track.downloadable === true) {
-            if (!folder) folder = "./"
-            if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
             const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
             const dest = path.join(folder, `${track.title}.${result.headers["x-amz-meta-file-type"]}`)
             fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
         } else {
-            return Promise.reject("This track doesn't have downloads enabled.")
+            const result = await axios.get(track.stream_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+            const dest = path.join(folder, `${track.title}.mp3`)
+            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
         }
     }
 
@@ -63,5 +65,19 @@ export class Util {
     public downloadPlaylist = async (playlistResolvable: string | number, dest?: string) => {
         const playlist = await this.playlists.get(playlistResolvable)
         this.downloadTracks(playlist.tracks, dest)
+    }
+
+    public streamTrack = async (trackResolvable: string | number | SoundCloudTrack) => {
+        let track: SoundCloudTrack
+        if (trackResolvable.hasOwnProperty("downloadable")) {
+            track = trackResolvable as SoundCloudTrack
+        } else {
+            track = await this.tracks.get(String(trackResolvable))
+        }
+        console.log(track.stream_url)
+
+        // const result = await axios.head(track.stream_url, {params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+        // console.log(result)
+
     }
 }
