@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SoundCloudWebProfile | soundcloud.ts</title>
+	<title>Util | soundcloud.ts</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css?family=Roboto:200,200i,300,300i,400,400i,700" rel="stylesheet">
@@ -55,10 +55,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="soundcloudwebprofile.html">SoundCloudWebProfile</a>
+					<a href="util.html">Util</a>
 				</li>
 			</ul>
-			<h1>Interface SoundCloudWebProfile</h1>
+			<h1>Class Util</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">SoundCloudWebProfile</span>
+						<span class="target">Util</span>
 					</li>
 				</ul>
 			</section>
@@ -78,91 +78,132 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="util.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#created_at" class="tsd-kind-icon">created_<wbr>at</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#kind" class="tsd-kind-icon">kind</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#service" class="tsd-kind-icon">service</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#title" class="tsd-kind-icon">title</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#url" class="tsd-kind-icon">url</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudwebprofile.html#username" class="tsd-kind-icon">username</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="util.html#api" class="tsd-kind-icon">api</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="util.html#tracks" class="tsd-kind-icon">tracks</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="util.html#awaitstream" class="tsd-kind-icon">await<wbr>Stream</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="util.html#downloadtrack" class="tsd-kind-icon">download<wbr>Track</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Util<span class="tsd-signature-symbol">(</span>api<span class="tsd-signature-symbol">: </span><a href="" class="tsd-signature-type">api</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="util.html" class="tsd-signature-type">Util</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in entities/Util.ts:9</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>api: <a href="" class="tsd-signature-type">api</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="util.html" class="tsd-signature-type">Util</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="created_at" class="tsd-anchor"></a>
-					<h3>created_<wbr>at</h3>
-					<div class="tsd-signature tsd-kind-icon">created_<wbr>at<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="api" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> api</h3>
+					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <a href="util.html#api" class="tsd-signature-type">api</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L67">types/UserTypes.ts:67</a></li>
+							<li>Defined in entities/Util.ts:10</li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="tracks" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> tracks</h3>
+					<div class="tsd-signature tsd-kind-icon">tracks<span class="tsd-signature-symbol">:</span> <a href="tracks.html" class="tsd-signature-type">Tracks</a><span class="tsd-signature-symbol"> =&nbsp;new Tracks(this.api)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L62">types/UserTypes.ts:62</a></li>
+							<li>Defined in entities/Util.ts:9</li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="kind" class="tsd-anchor"></a>
-					<h3>kind</h3>
-					<div class="tsd-signature tsd-kind-icon">kind<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"web-profile"</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L61">types/UserTypes.ts:61</a></li>
-						</ul>
-					</aside>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="awaitstream" class="tsd-anchor"></a>
+					<h3>await<wbr>Stream</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">await<wbr>Stream<span class="tsd-signature-symbol">(</span>writeStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">stream.Writable</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in entities/Util.ts:15</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Utility for awaiting a stream.Writable</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>writeStream: <span class="tsd-signature-type">stream.Writable</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="service" class="tsd-anchor"></a>
-					<h3>service</h3>
-					<div class="tsd-signature tsd-kind-icon">service<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L63">types/UserTypes.ts:63</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="title" class="tsd-anchor"></a>
-					<h3>title</h3>
-					<div class="tsd-signature tsd-kind-icon">title<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L64">types/UserTypes.ts:64</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="url" class="tsd-anchor"></a>
-					<h3>url</h3>
-					<div class="tsd-signature tsd-kind-icon">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L65">types/UserTypes.ts:65</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="username" class="tsd-anchor"></a>
-					<h3>username</h3>
-					<div class="tsd-signature tsd-kind-icon">username<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/5df72cf/types/UserTypes.ts#L66">types/UserTypes.ts:66</a></li>
-						</ul>
-					</aside>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="downloadtrack" class="tsd-anchor"></a>
+					<h3>download<wbr>Track</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">download<wbr>Track<span class="tsd-signature-symbol">(</span>trackResolvable<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/soundcloudtrack.html" class="tsd-signature-type">SoundCloudTrack</a>, folder<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in entities/Util.ts:22</li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>trackResolvable: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/soundcloudtrack.html" class="tsd-signature-type">SoundCloudTrack</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> folder: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -177,116 +218,110 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-class">
-						<a href="../classes/api.html" class="tsd-kind-icon">API</a>
+						<a href="api.html" class="tsd-kind-icon">API</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/apps.html" class="tsd-kind-icon">Apps</a>
+						<a href="apps.html" class="tsd-kind-icon">Apps</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/comments.html" class="tsd-kind-icon">Comments</a>
+						<a href="comments.html" class="tsd-kind-icon">Comments</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/me.html" class="tsd-kind-icon">Me</a>
+						<a href="me.html" class="tsd-kind-icon">Me</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/oembed.html" class="tsd-kind-icon">Oembed</a>
+						<a href="oembed.html" class="tsd-kind-icon">Oembed</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/playlists.html" class="tsd-kind-icon">Playlists</a>
+						<a href="playlists.html" class="tsd-kind-icon">Playlists</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/resolve.html" class="tsd-kind-icon">Resolve</a>
+						<a href="resolve.html" class="tsd-kind-icon">Resolve</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/soundcloud.html" class="tsd-kind-icon">Soundcloud</a>
+						<a href="soundcloud.html" class="tsd-kind-icon">Soundcloud</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/tracks.html" class="tsd-kind-icon">Tracks</a>
+						<a href="tracks.html" class="tsd-kind-icon">Tracks</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="../classes/users.html" class="tsd-kind-icon">Users</a>
-					</li>
-					<li class=" tsd-kind-class">
-						<a href="../classes/util.html" class="tsd-kind-icon">Util</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudactivity.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudactivitycollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity<wbr>Collection</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudapp.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>App</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudcomment.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Comment</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudconnection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Connection</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudoembed.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudoembedfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed<wbr>Filter</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudplaylist.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudplaylistfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist<wbr>Filter</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudsecrettoken.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Secret<wbr>Token</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudtrack.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudtrackfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track<wbr>Filter</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundclouduser.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudusercollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Collection</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundclouduserfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Filter</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="soundcloudusermini.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Mini</a>
+						<a href="users.html" class="tsd-kind-icon">Users</a>
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="soundcloudwebprofile.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Web<wbr>Profile</a>
+					<li class="current tsd-kind-class">
+						<a href="util.html" class="tsd-kind-icon">Util</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#created_at" class="tsd-kind-icon">created_<wbr>at</a>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="util.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#id" class="tsd-kind-icon">id</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="util.html#api" class="tsd-kind-icon">api</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#kind" class="tsd-kind-icon">kind</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="util.html#tracks" class="tsd-kind-icon">tracks</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#service" class="tsd-kind-icon">service</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="util.html#awaitstream" class="tsd-kind-icon">await<wbr>Stream</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#title" class="tsd-kind-icon">title</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#url" class="tsd-kind-icon">url</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudwebprofile.html#username" class="tsd-kind-icon">username</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="util.html#downloadtrack" class="tsd-kind-icon">download<wbr>Track</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudactivity.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudactivitycollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity<wbr>Collection</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudapp.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>App</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudcomment.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Comment</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudconnection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Connection</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudoembed.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudoembedfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed<wbr>Filter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudplaylist.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudplaylistfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist<wbr>Filter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudsecrettoken.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Secret<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudtrack.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudtrackfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track<wbr>Filter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundclouduser.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudusercollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Collection</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundclouduserfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Filter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudusermini.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Mini</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/soundcloudwebprofile.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Web<wbr>Profile</a>
+					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#soundcloudimageformats" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Image<wbr>Formats</a>
 					</li>

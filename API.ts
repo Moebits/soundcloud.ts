@@ -32,6 +32,16 @@ export default class API {
         return response
     }
 
+    /**
+     * Gets a URI, such as download, stream, attachment, etc.
+     */
+    public getURI = async (URI: string, params?: any) => {
+        if (!params) params = {}
+        params.client_id = this.clientID
+        if (this.oauthToken) params.oauth_token = this.oauthToken
+        return axios.get(URI, {params})
+    }
+
     public post = async (endpoint: string, params?: any) => {
         if (!params) params = {}
         params.client_id = this.clientID

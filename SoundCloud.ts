@@ -1,5 +1,5 @@
 import api from "./API"
-import {Tracks, Users, Playlists, Oembed, Resolve, Me, Comments, Apps} from "./entities/index"
+import {Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util} from "./entities/index"
 
 const publicID = "BeGVhOrGmfboy1LtiHTQF6Ejpt9ULJCI"
 
@@ -18,6 +18,7 @@ export default class Soundcloud {
     public me = new Me(this.api)
     public comments = new Comments(this.api)
     public apps = new Apps(this.api)
+    public util = new Util(this.api)
     public constructor(clientID?: string, oauthToken?: string) {
         if (clientID) {
             Soundcloud.clientID = clientID
@@ -33,7 +34,8 @@ export default class Soundcloud {
         this.resolve = new Resolve(this.api)
         this.me = new Me(this.api)
         this.comments = new Comments(this.api)
-        this.apps = new Apps(this.api)    
+        this.apps = new Apps(this.api)
+        this.util = new Util(this.api)
     }
 }
 
