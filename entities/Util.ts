@@ -42,8 +42,9 @@ export class Util {
         }
     }
 
-    public downloadTracks = (tracks: SoundCloudTrack[], dest?: string) => {
-        for (let i = 0; i < tracks.length; i++) {
+    public downloadTracks = (tracks: SoundCloudTrack[], dest?: string, limit?: number) => {
+        if (!limit) limit = tracks.length
+        for (let i = 0; i < limit; i++) {
             try {
                 this.downloadTrack(tracks[i], dest)
             } catch {
@@ -52,32 +53,33 @@ export class Util {
         }
     }
 
-    public downloadSearch = async (query: string, dest?: string) => {
+    public downloadSearch = async (query: string, dest?: string, limit?: number) => {
         const tracks = await this.tracks.search({q: query})
-        this.downloadTracks(tracks, dest)
+        this.downloadTracks(tracks, dest, limit)
     }
 
-    public downloadFavorites = async (userResolvable: string | number, dest?: string) => {
+    public downloadFavorites = async (userResolvable: string | number, dest?: string, limit?: number) => {
         const tracks = await this.users.favorites(userResolvable)
-        this.downloadTracks(tracks, dest)
+        this.downloadTracks(tracks, dest, limit)
     }
 
-    public downloadPlaylist = async (playlistResolvable: string | number, dest?: string) => {
+    public downloadPlaylist = async (playlistResolvable: string | number, dest?: string, limit?: number) => {
         const playlist = await this.playlists.get(playlistResolvable)
-        this.downloadTracks(playlist.tracks, dest)
+        this.downloadTracks(playlist.tracks, dest, limit)
     }
 
-    public streamTrack = async (trackResolvable: string | number | SoundCloudTrack) => {
+    public streamTrack = async (trackResolvable: string | number | SoundCloudTrack, folder?: string) => {
         let track: SoundCloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundCloudTrack
         } else {
             track = await this.tracks.get(String(trackResolvable))
         }
-        console.log(track.stream_url)
-
-        // const result = await axios.head(track.stream_url, {params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
-        // console.log(result)
-
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        const result = await axios.get(track.stream_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+        const dest = path.join(folder, `${track.title}.mp3`)
+        fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+        return fs.createReadStream(dest)
     }
 }

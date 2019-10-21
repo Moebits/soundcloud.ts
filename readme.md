@@ -82,20 +82,24 @@ async function useAPI() {
   const comment = await soundcloud.comments.get(577904916)
 }
 ```
-#### Downloading tracks
+#### Downloading and streaming tracks
 ```ts
 async function useAPI() {
   /*If downloads aren't enabled, it will download the stream instead of the original file.*/
   await soundcloud.util.downloadTrack("https://soundcloud.com/tenpimusic/snowflake", "./tracks")
 
-  /*You can download multiple tracks by passing them as an array to downloadTracks().*/
+  /*You can download multiple tracks by passing them as an array to downloadTracks(). The third
+  parameter is the limit of tracks to download.*/
   const tracks = await soundcloud.tracks.search({q: "cool track"})
-  await soundcloud.util.downloadTracks(tracks, "./tracks")
+  await soundcloud.util.downloadTracks(tracks, "./tracks", 10)
 
   /*In addition, there are a bunch of utilities that do the above automatically for convenience.*/
-  await soundcloud.util.downloadSearch("cool track", "./tracks")
+  await soundcloud.util.downloadSearch("virtual riot", "./tracks")
   await soundcloud.util.downloadFavorites("tenpimusic", "./tracks")
   await soundcloud.util.downloadPlaylist("https://soundcloud.com/tenpimusic/sets/my-songs", "./tracks")
+
+  /*streamTrack() will download the track and will return a stream.Readable automatically.*/
+  const readableStream = await soundcloud.util.streamTrack("https://soundcloud.com/virtual-riot/emotionalrmx")
 }
 ```
 
