@@ -132,7 +132,7 @@
 				<pre><code class="language-ts"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">useAPI</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-comment">/*Users also have a get() and search() method.*/</span>
   <span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> soundcloud.users.get(<span class="hljs-string">"https://soundcloud.com/tenpimusic"</span>)
-  <span class="hljs-keyword">const</span> userSearch = <span class="hljs-keyword">await</span> soundcloud.users.get({q: <span class="hljs-string">"some user"</span>})
+  <span class="hljs-keyword">const</span> userSearch = <span class="hljs-keyword">await</span> soundcloud.users.search({q: <span class="hljs-string">"some user"</span>})
 
   <span class="hljs-comment">/*You can get the followers and following of a user.*/</span>
   <span class="hljs-keyword">const</span> following = <span class="hljs-keyword">await</span> soundcloud.users.following(<span class="hljs-string">"https://soundcloud.com/tenpimusic"</span>)
@@ -150,6 +150,26 @@
 
   <span class="hljs-comment">/*And you can get a specific comment from its ID (must make an API call to get it).*/</span>
   <span class="hljs-keyword">const</span> comment = <span class="hljs-keyword">await</span> soundcloud.comments.get(<span class="hljs-number">577904916</span>)
+}</code></pre>
+				<a href="#downloading-and-streaming-tracks" id="downloading-and-streaming-tracks" style="color: inherit; text-decoration: none;">
+					<h4>Downloading and streaming tracks</h4>
+				</a>
+				<pre><code class="language-ts"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">useAPI</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-comment">/*If downloads aren't enabled, it will download the stream instead of the original file.*/</span>
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadTrack(<span class="hljs-string">"https://soundcloud.com/tenpimusic/snowflake"</span>, <span class="hljs-string">"./tracks"</span>)
+
+  <span class="hljs-comment">/*You can download multiple tracks by passing them as an array to downloadTracks(). The third
+  parameter is the limit of tracks to download.*/</span>
+  <span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.search({q: <span class="hljs-string">"cool track"</span>})
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadTracks(tracks, <span class="hljs-string">"./tracks"</span>, <span class="hljs-number">10</span>)
+
+  <span class="hljs-comment">/*In addition, there are a bunch of utilities that do the above automatically for convenience.*/</span>
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadSearch(<span class="hljs-string">"virtual riot"</span>, <span class="hljs-string">"./tracks"</span>)
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadFavorites(<span class="hljs-string">"tenpimusic"</span>, <span class="hljs-string">"./tracks"</span>)
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadPlaylist(<span class="hljs-string">"https://soundcloud.com/tenpimusic/sets/my-songs"</span>, <span class="hljs-string">"./tracks"</span>)
+
+  <span class="hljs-comment">/*streamTrack() will download the track and will return a stream.Readable automatically.*/</span>
+  <span class="hljs-keyword">const</span> readableStream = <span class="hljs-keyword">await</span> soundcloud.util.streamTrack(<span class="hljs-string">"https://soundcloud.com/virtual-riot/emotionalrmx"</span>)
 }</code></pre>
 				<a href="#other-endpoints" id="other-endpoints" style="color: inherit; text-decoration: none;">
 					<h3>Other Endpoints</h3>
