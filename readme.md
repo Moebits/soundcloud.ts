@@ -9,7 +9,7 @@
 
 ### About
 This is a wrapper for the Soundcloud API that includes typings and various utility functions
-to make getting tracks, users, and playlists easier!
+to make getting tracks, users, and playlists easier! You can also download single tracks, or download tracks in mass programmatically. 
 
 ### Insall
 ```ts
@@ -38,6 +38,9 @@ async function useAPI() {
 
   /*You can get tracks by URL or ID (which can only be gotten from the API)*/
   const track = await soundcloud.tracks.get("https://soundcloud.com/tenpimusic/snowflake")
+  
+  /*Worth to mention that you can omit the soundcloud.com part.*/
+  const trackShorthand = await soundcloud.tracks.get("tenpimusic/snowflake")
 
   /*To get the ID with the url of a track/playlist/user, you can use the resolve endpoint.*/
   const id = await soundcloud.resolve.get("https://soundcloud.com/tenpimusic/snowflake")
@@ -50,7 +53,7 @@ async function useAPI() {
 
   /*You can also get the super secret token that is used on private tracks. Authentication required, 
   and only works with your own tracks.*/
-  const secretToken = await soundcloud.tracks.secretToken("https://soundcloud.com/tenpimusic/kudasai")
+  const secretToken = await soundcloud.tracks.secretToken("tenpimusic/kudasai")
 
   /*Playlists are largely the same, you can use the get() and search() methods.*/
   const playlist = await soundcloud.playlists.get("https://soundcloud.com/tenpimusic/sets/my-songs")
@@ -61,22 +64,22 @@ async function useAPI() {
 ```ts
 async function useAPI() {
   /*Users also have a get() and search() method.*/
-  const user = await soundcloud.users.get("https://soundcloud.com/tenpimusic")
+  const user = await soundcloud.users.get("tenpimusic")
   const userSearch = await soundcloud.users.search({q: "some user"})
 
   /*You can get the followers and following of a user.*/
-  const following = await soundcloud.users.following("https://soundcloud.com/tenpimusic")
-  const followers = await soundcloud.users.followers("https://soundcloud.com/tenpimusic")
+  const following = await soundcloud.users.following("tenpimusic")
+  const followers = await soundcloud.users.followers("tenpimusic")
   
   /*Favorite tracks too.*/
-  const favorites = await soundcloud.users.favorites("https://soundcloud.com/tenpimusic")
+  const favorites = await soundcloud.users.favorites("tenpimusic")
 
   /*The web profiles are the social links that show on the side of a user's profile*/
-  const socialLinks = await soundcloud.users.webProfiles("https://soundcloud.com/tenpimusic")
+  const socialLinks = await soundcloud.users.webProfiles("tenpimusic")
 
   /*It's very easy to get all of the comments on a track, or all of the comments by a user.*/
-  const userComments = await soundcloud.users.comments("https://soundcloud.com/tenpimusic")
-  const trackComments = await soundcloud.tracks.comments("https://soundcloud.com/tenpimusic/moonlight")
+  const userComments = await soundcloud.users.comments("tenpimusic")
+  const trackComments = await soundcloud.tracks.comments("tenpimusic/moonlight")
 
   /*And you can get a specific comment from its ID (must make an API call to get it).*/
   const comment = await soundcloud.comments.get(577904916)
@@ -86,7 +89,7 @@ async function useAPI() {
 ```ts
 async function useAPI() {
   /*If downloads aren't enabled, it will download the stream instead of the original file.*/
-  await soundcloud.util.downloadTrack("https://soundcloud.com/tenpimusic/snowflake", "./tracks")
+  await soundcloud.util.downloadTrack("tenpimusic/snowflake", "./tracks")
 
   /*You can download multiple tracks by passing them as an array to downloadTracks(). The third
   parameter is the limit of tracks to download.*/
