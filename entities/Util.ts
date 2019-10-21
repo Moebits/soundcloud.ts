@@ -31,7 +31,7 @@ export class Util {
         }
         if (track.downloadable === true) {
             if (!folder) folder = "./"
-            if (!fs.existsSync(folder)) fs.mkdirSync(folder)
+            if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
             const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
             const dest = path.join(folder, `${track.title}.${result.headers["x-amz-meta-file-type"]}`)
             fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
@@ -62,6 +62,6 @@ export class Util {
 
     public downloadPlaylist = async (playlistResolvable: string | number, dest?: string) => {
         const playlist = await this.playlists.get(playlistResolvable)
-        this.downloadTracks(playlist.tracks)
+        this.downloadTracks(playlist.tracks, dest)
     }
 }

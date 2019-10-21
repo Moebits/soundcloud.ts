@@ -5,5 +5,5 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.
 (async () => {
     // const result = await soundcloud.tracks.search({q: "virtual riot"})
     // await soundcloud.util.downloadTrack("https://soundcloud.com/tenpimusic/snowflake", "./tracks")
-    await soundcloud.util.downloadPlaylist("tenpi", "./tracks/tenpi")
+    await soundcloud.util.downloadPlaylist("https://soundcloud.com/tenpimusic/sets/my-songs", "./tracks")
 })()
