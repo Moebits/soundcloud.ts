@@ -1,6 +1,6 @@
 {
   "name": "soundcloud.ts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Wrapper for the Soundcloud API with typings",
   "main": "dist/soundcloud.js",
   "types": "dist/soundcloud.d.ts",
@@ -36,6 +36,7 @@
     "typescript": "^3.6.4"
   },
   "dependencies": {
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "request": "^2.88.0"
   }
 }

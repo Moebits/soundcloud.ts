@@ -62,7 +62,7 @@ async function useAPI() {
 async function useAPI() {
   /*Users also have a get() and search() method.*/
   const user = await soundcloud.users.get("https://soundcloud.com/tenpimusic")
-  const userSearch = await soundcloud.users.get({q: "some user"})
+  const userSearch = await soundcloud.users.search({q: "some user"})
 
   /*You can get the followers and following of a user.*/
   const following = await soundcloud.users.following("https://soundcloud.com/tenpimusic")
@@ -82,6 +82,24 @@ async function useAPI() {
   const comment = await soundcloud.comments.get(577904916)
 }
 ```
+#### Downloading tracks
+```ts
+async function useAPI() {
+  /*You can download a track as long as it has downloads enabled on Soundcloud.*/
+  await soundcloud.util.downloadTrack("https://soundcloud.com/tenpimusic/snowflake", "./tracks")
+
+  /*You can download multiple tracks by passing them as an array to downloadTracks(). All tracks
+  without downloads enabled will get skipped.*/
+  const tracks = await soundcloud.tracks.search({q: "cool track"})
+  await soundcloud.util.downloadTracks(tracks, "./tracks")
+
+  /*In addition, there are a bunch of utilities that do the above automatically for convenience.*/
+  await soundcloud.util.downloadSearch("cool track", "./tracks")
+  await soundcloud.util.downloadFavorites("tenpimusic", "./tracks")
+  await soundcloud.util.downloadPlaylist("https://soundcloud.com/tenpimusic/sets/my-songs", "./tracks")
+}
+```
+
 ### Other Endpoints
 There are more less commonly used endpoints such as **me**, **apps**, and **oembed**. Refer to the [**SoundCloud API Documentation**](https://developers.soundcloud.com/docs/api/reference) for their usage.
 

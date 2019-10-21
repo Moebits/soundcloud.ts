@@ -4,7 +4,7 @@ const apiURL = "https://api.soundcloud.com/"
 const webURL = "https://www.soundcloud.com/"
 
 export default class API {
-    public constructor(private readonly clientID: string, private readonly oauthToken: string) {}
+    public constructor(public clientID: string, public oauthToken: string) {}
 
     /**
      * Gets an endpoint from the Soundcloud API.
