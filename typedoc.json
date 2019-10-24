@@ -4,6 +4,5 @@
     "exclude": "**/{test,node_modules,dist}/**/*.ts",
     "ignoreCompilerErrors": true,
     "externalPattern": "**/node_modules/**",
-    "excludeExternals": true,
-    "theme": "./node_modules/@tenpi/typedoc/bin/default/"
+    "excludeExternals": true
 }
