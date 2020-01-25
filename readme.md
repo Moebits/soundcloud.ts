@@ -23,7 +23,7 @@ npm install soundcloud.ts
 ### Getting Started
 Authenticating with your account is **optional**, but I still recommend it. If you don't authenticate, you won't be able to use private endpoints such as `/me`. Soundcloud has closed down their API applications, but you are still able to get your 
 client id and oauth token by inspecting the network traffic.
-- Go to any track that has downloads enabled on Soundcloud, such as: https://soundcloud.com/tenpimusic/starstruck
+- Go to any track that has downloads enabled on Soundcloud, such as: https://soundcloud.com/imtenpi/starstruck
 - Open up the dev tools (Right click -> inspect) and go to the Network tab
 - Download the track (hamburger menu -> download file), and observe the network tab.
 - You will see something like `&client_id="client id"&oauth_token="token"`, grab these credentials!
@@ -37,13 +37,13 @@ async function useAPI() {
   const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 
   /*You can get tracks by URL or ID (which can only be gotten from the API)*/
-  const track = await soundcloud.tracks.get("https://soundcloud.com/tenpimusic/snowflake")
+  const track = await soundcloud.tracks.get("https://soundcloud.com/imtenpi/snowflake")
   
   /*Worth to mention that you can omit the soundcloud.com part.*/
-  const trackShorthand = await soundcloud.tracks.get("tenpimusic/snowflake")
+  const trackShorthand = await soundcloud.tracks.get("imtenpi/snowflake")
 
   /*To get the ID with the url of a track/playlist/user, you can use the resolve endpoint.*/
-  const id = await soundcloud.resolve.get("https://soundcloud.com/tenpimusic/snowflake")
+  const id = await soundcloud.resolve.get("https://soundcloud.com/imtenpi/snowflake")
 
   /*You can search for tracks... with nothing?*/
   const randomSearch = await soundcloud.tracks.search()
@@ -53,10 +53,10 @@ async function useAPI() {
 
   /*You can also get the super secret token that is used on private tracks. Authentication required, 
   and only works with your own tracks.*/
-  const secretToken = await soundcloud.tracks.secretToken("tenpimusic/kudasai")
+  const secretToken = await soundcloud.tracks.secretToken("imtenpi/kudasai")
 
   /*Playlists are largely the same, you can use the get() and search() methods.*/
-  const playlist = await soundcloud.playlists.get("https://soundcloud.com/tenpimusic/sets/my-songs")
+  const playlist = await soundcloud.playlists.get("https://soundcloud.com/imtenpi/sets/my-songs")
 }
 ```
 
@@ -68,18 +68,18 @@ async function useAPI() {
   const userSearch = await soundcloud.users.search({q: "some user"})
 
   /*You can get the followers and following of a user.*/
-  const following = await soundcloud.users.following("tenpimusic")
-  const followers = await soundcloud.users.followers("tenpimusic")
+  const following = await soundcloud.users.following("imtenpi")
+  const followers = await soundcloud.users.followers("imtenpi")
   
   /*Favorite tracks too.*/
-  const favorites = await soundcloud.users.favorites("tenpimusic")
+  const favorites = await soundcloud.users.favorites("imtenpi")
 
   /*The web profiles are the social links that show on the side of a user's profile*/
-  const socialLinks = await soundcloud.users.webProfiles("tenpimusic")
+  const socialLinks = await soundcloud.users.webProfiles("imtenpi")
 
   /*It's very easy to get all of the comments on a track, or all of the comments by a user.*/
-  const userComments = await soundcloud.users.comments("tenpimusic")
-  const trackComments = await soundcloud.tracks.comments("tenpimusic/moonlight")
+  const userComments = await soundcloud.users.comments("imtenpi")
+  const trackComments = await soundcloud.tracks.comments("imtenpi/moonlight")
 
   /*And you can get a specific comment from its ID (must make an API call to get it).*/
   const comment = await soundcloud.comments.get(577904916)
@@ -89,7 +89,7 @@ async function useAPI() {
 ```ts
 async function useAPI() {
   /*If downloads aren't enabled, it will download the stream instead of the original file.*/
-  await soundcloud.util.downloadTrack("tenpimusic/snowflake", "./tracks")
+  await soundcloud.util.downloadTrack("imtenpi/snowflake", "./tracks")
 
   /*You can download multiple tracks by passing them as an array to downloadTracks(). The third
   parameter is the limit of tracks to download.*/
@@ -98,8 +98,8 @@ async function useAPI() {
 
   /*In addition, there are a bunch of utilities that do the above automatically for convenience.*/
   await soundcloud.util.downloadSearch("virtual riot", "./tracks")
-  await soundcloud.util.downloadFavorites("tenpimusic", "./tracks")
-  await soundcloud.util.downloadPlaylist("https://soundcloud.com/tenpimusic/sets/my-songs", "./tracks")
+  await soundcloud.util.downloadFavorites("imtenpi", "./tracks")
+  await soundcloud.util.downloadPlaylist("https://soundcloud.com/imtenpi/sets/my-songs", "./tracks")
 
   /*streamTrack() will download the track and will return a stream.Readable automatically.*/
   const readableStream = await soundcloud.util.streamTrack("https://soundcloud.com/virtual-riot/emotionalrmx")
