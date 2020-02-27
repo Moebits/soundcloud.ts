@@ -18,11 +18,11 @@ export class Users {
     /**
      * Gets a user by URL or ID.
      */
-    public get = async (userResolvable: string | number): Promise<SoundCloudUser> => {
+    public get = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable, true)
         if (userID.hasOwnProperty("id")) return userID
         const response = await this.api.get(`/users/${userID}`)
-        return response
+        return response as Promise<SoundCloudUser>
     }
 
     /**

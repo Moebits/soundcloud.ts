@@ -17,11 +17,11 @@ export class Playlists {
     /**
      * Fetches a playlist from URL or ID.
      */
-    public get = async (playlistResolvable: string | number): Promise<SoundCloudPlaylist> => {
+    public get = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.get(playlistResolvable, true)
         if (playlistID.hasOwnProperty("id")) return playlistID
         const response = await this.api.get(`/playlists/${playlistID}`)
-        return response
+        return response as Promise<SoundCloudPlaylist>
     }
 
     /**

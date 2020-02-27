@@ -10,17 +10,17 @@ export class Tracks {
      */
     public search = async (params?: SoundCloudTrackFilter) => {
         const response = await this.api.get(`/tracks`, params)
-        return response
+        return response as Promise<SoundCloudTrack[]>
     }
 
     /**
      * Fetches a track by URL or ID.
      */
-    public get = async (trackResolvable: string | number): Promise<SoundCloudTrack> => {
+    public get = async (trackResolvable: string | number) => {
         const id = await this.resolve.get(trackResolvable, true)
         if (id.hasOwnProperty("id")) return id
         const response = await this.api.get(`/tracks/${id}`)
-        return response
+        return response as Promise<SoundCloudTrack>
     }
 
     /**
