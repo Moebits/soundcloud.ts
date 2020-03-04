@@ -22,7 +22,7 @@ export class Users {
         const userID = await this.resolve.get(userResolvable, true)
         if (userID.hasOwnProperty("id")) return userID
         const response = await this.api.get(`/users/${userID}`)
-        return response as Promise<SoundCloudUser>
+        return response as Promise<SoundCloudUser>git config core.ignorecase false
     }
 
     /**
