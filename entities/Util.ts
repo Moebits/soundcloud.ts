@@ -82,9 +82,16 @@ export class Util {
         }
         if (!folder) folder = "./"
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        const result = await axios.get(track.stream_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
-        const dest = path.join(folder, `${track.title}.mp3`)
-        fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
-        return fs.createReadStream(dest)
+        if (track.downloadable === true) {
+            const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+            const dest = path.join(folder, `${track.title}.${result.headers["x-amz-meta-file-type"]}`)
+            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+            return fs.createReadStream(dest)
+        } else {
+            const result = await axios.get(track.stream_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+            const dest = path.join(folder, `${track.title}.mp3`)
+            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+            return fs.createReadStream(dest)
+        }
     }
 }
