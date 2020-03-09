@@ -127,9 +127,7 @@ export class Util {
             fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
             return fs.createReadStream(dest)
         } else {
-            const result = await axios.get(track.stream_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
-            const dest = path.join(folder, `${track.title}.mp3`)
-            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+            const dest = await this.downloadTrackStream(track.permalink_url, track.title, folder)
             return fs.createReadStream(dest)
         }
     }
