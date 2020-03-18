@@ -64,26 +64,39 @@ export class Util {
         return finalMP3
     }
 
-    public downloadTrack = async (trackResolvable: string | number | SoundCloudTrack, folder?: string) => {
+    /** Gets the title by scraping the html source */
+    public getTitle = async (songUrl: string) => {
+        const headers = {
+            "referer": "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+        }
+        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const title = html.match(/(?<="og:title" content=")(.*?)(?=")/)?.[0]?.replace(/\//g, "")
+        return title
+    }
+
+    public downloadTrack = async (trackResolvable: string | SoundCloudTrack, folder?: string) => {
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         let track: SoundCloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundCloudTrack
+            if (track.downloadable === true) {
+                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID}})
+                const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
+                fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+                return dest
+            } else {
+                return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
+            }
         } else {
-            track = await this.tracks.get(String(trackResolvable))
-        }
-        if (!folder) folder = "./"
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        if (track.downloadable === true) {
-            const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID}})
-            const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
-            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
-            return dest
-        } else {
-            return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
+            const url = trackResolvable as string
+            const title = await this.getTitle(url)
+            return this.downloadTrackStream(url, title, folder)
         }
     }
 
-    public downloadTracks = async (tracks: SoundCloudTrack[], dest?: string, limit?: number) => {
+    public downloadTracks = async (tracks: SoundCloudTrack[] | string[], dest?: string, limit?: number) => {
         if (!limit) limit = tracks.length
         const resultArray: string[] = []
         for (let i = 0; i < limit; i++) {
@@ -112,22 +125,25 @@ export class Util {
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
-    public streamTrack = async (trackResolvable: string | number | SoundCloudTrack, folder?: string) => {
+    public streamTrack = async (trackResolvable: string | SoundCloudTrack, folder?: string) => {
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         let track: SoundCloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundCloudTrack
+            if (track.downloadable === true) {
+                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+                const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
+                fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+                return fs.createReadStream(dest)
+            } else {
+                const dest = await this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
+                return fs.createReadStream(dest)
+            }
         } else {
-            track = await this.tracks.get(String(trackResolvable))
-        }
-        if (!folder) folder = "./"
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        if (track.downloadable === true) {
-            const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
-            const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
-            fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
-            return fs.createReadStream(dest)
-        } else {
-            const dest = await this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
+            const url = trackResolvable as string
+            const title = await this.getTitle(url)
+            const dest = await this.downloadTrackStream(url, title, folder)
             return fs.createReadStream(dest)
         }
     }
