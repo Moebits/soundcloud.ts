@@ -1,6 +1,6 @@
 {
   "name": "soundcloud.ts",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Wrapper for the Soundcloud API with typings",
   "main": "dist/soundcloud.js",
   "types": "dist/soundcloud.d.ts",

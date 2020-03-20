@@ -93,6 +93,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="playlists.html#get" class="tsd-kind-icon">get</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="playlists.html#scrape" class="tsd-kind-icon">scrape</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="playlists.html#search" class="tsd-kind-icon">search</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="playlists.html#secrettoken" class="tsd-kind-icon">secret<wbr>Token</a></li>
 							</ul>
@@ -112,7 +113,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L6">entities/Playlists.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L7">entities/Playlists.ts:7</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -134,7 +135,7 @@
 					<div class="tsd-signature tsd-kind-icon">api<span class="tsd-signature-symbol">:</span> <a href="playlists.html#api" class="tsd-signature-type">api</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L7">entities/Playlists.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L8">entities/Playlists.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -144,7 +145,7 @@
 					<div class="tsd-signature tsd-kind-icon">resolve<span class="tsd-signature-symbol">:</span> <a href="resolve.html" class="tsd-signature-type">Resolve</a><span class="tsd-signature-symbol"> =&nbsp;new Resolve(this.api)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L6">entities/Playlists.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L7">entities/Playlists.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -155,13 +156,13 @@
 					<a name="get" class="tsd-anchor"></a>
 					<h3>get</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>playlistResolvable<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/soundcloudplaylist.html" class="tsd-signature-type">SoundCloudPlaylist</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<span class="tsd-signature-symbol">(</span>playlistResolvable<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L20">entities/Playlists.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L21">entities/Playlists.ts:21</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -175,7 +176,35 @@
 									<h5>playlistResolvable: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/soundcloudplaylist.html" class="tsd-signature-type">SoundCloudPlaylist</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="scrape" class="tsd-anchor"></a>
+					<h3>scrape</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">scrape<span class="tsd-signature-symbol">(</span>query<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L41">entities/Playlists.ts:41</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Searches for playlists (web scraping)</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>query: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -189,7 +218,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L12">entities/Playlists.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L13">entities/Playlists.ts:13</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -217,7 +246,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/05c1eed/entities/Playlists.ts#L30">entities/Playlists.ts:30</a></li>
+									<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/3358ce9/entities/Playlists.ts#L31">entities/Playlists.ts:31</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -278,6 +307,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="playlists.html#get" class="tsd-kind-icon">get</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="playlists.html#scrape" class="tsd-kind-icon">scrape</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="playlists.html#search" class="tsd-kind-icon">search</a>

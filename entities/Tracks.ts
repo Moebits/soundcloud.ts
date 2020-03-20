@@ -1,3 +1,4 @@
+import axios from "axios"
 import api from "../API"
 import {SoundCloudComment, SoundCloudSecretToken, SoundCloudTrack, SoundCloudTrackFilter, SoundCloudUser} from "../types"
 import {Resolve} from "./index"
@@ -68,6 +69,24 @@ export class Tracks {
         const response = await this.api.get(`/tracks/${trackID}/secret-token`)
         .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
         return response as Promise<SoundCloudSecretToken>
+    }
+
+    /**
+     * Searches for tracks (web scraping)
+     */
+    public scrape = async (query: string) => {
+        const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+        const html = await axios.get(`https://soundcloud.com/search/sounds?q=${query}`, {headers}).then((r) => r.data)
+        const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
+        if (!urls) return []
+        const scrape: any = []
+        for (let i = 0; i < urls.length; i++) {
+            const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
+            const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
+            const track = data[5].data[0]
+            scrape.push(track)
+        }
+        return scrape as Promise<SoundCloudTrack[]>
     }
 
 }

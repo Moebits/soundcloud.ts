@@ -27,6 +27,19 @@ client id and oauth token by inspecting the network traffic.
 - Open up the dev tools (Right click -> inspect) and go to the Network tab
 - Download the track (hamburger menu -> download file), and observe the network tab.
 - You will see something like `&client_id="client id"&oauth_token="token"`, grab these credentials!
+- Edit - the oauth_token no longer appears on track downloads, but you might be able to find it by inspecting the network tab while you login to soundcloud. It should be in the format d-dddddd-ddddddddd-aaaaaaaaaaaaaa, where d is a digit and a is an alphanumeric character. 
+
+#### Update
+Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being 
+you can use the `scrape` methods which get data from the html source instead.
+```ts
+/*Alt get tracks*/
+const tracks = await soundcloud.tracks.scrape("cool track name")
+/*Alt get playlists*/
+const playlists = await soundcloud.playlists.scrape("cool playlist name")
+/*Alt get users*/
+const users = await soundcloud.users.scrape("cool username")
+```
 
 #### Searching for tracks and playlists
 ```ts

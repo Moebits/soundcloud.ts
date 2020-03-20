@@ -92,11 +92,23 @@
 				<p>Authenticating with your account is <strong>optional</strong>, but I still recommend it. If you don&#39;t authenticate, you won&#39;t be able to use private endpoints such as <code>/me</code>. Soundcloud has closed down their API applications, but you are still able to get your
 				client id and oauth token by inspecting the network traffic.</p>
 				<ul>
-					<li>Go to any track that has downloads enabled on Soundcloud, such as: <a href="https://soundcloud.com/tenpimusic/starstruck">https://soundcloud.com/tenpimusic/starstruck</a></li>
+					<li>Go to any track that has downloads enabled on Soundcloud, such as: <a href="https://soundcloud.com/imtenpi/starstruck">https://soundcloud.com/imtenpi/starstruck</a></li>
 					<li>Open up the dev tools (Right click -&gt; inspect) and go to the Network tab</li>
 					<li>Download the track (hamburger menu -&gt; download file), and observe the network tab.</li>
 					<li>You will see something like <code>&amp;client_id=&quot;client id&quot;&amp;oauth_token=&quot;token&quot;</code>, grab these credentials!</li>
+					<li>Edit - the oauth_token no longer appears on track downloads, but you might be able to find it by inspecting the network tab while you login to soundcloud. It should be in the format d-dddddd-ddddddddd-aaaaaaaaaaaaaa, where d is a digit and a is an alphanumeric character. </li>
 				</ul>
+				<a href="#update" id="update" style="color: inherit; text-decoration: none;">
+					<h4>Update</h4>
+				</a>
+				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being
+				you can use the <code>scrape</code> methods which get data from the html source instead.</p>
+				<pre><code class="language-ts"><span class="hljs-comment">/*Alt get tracks*/</span>
+<span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.scrape(<span class="hljs-string">"cool track name"</span>)
+<span class="hljs-comment">/*Alt get playlists*/</span>
+<span class="hljs-keyword">const</span> playlists = <span class="hljs-keyword">await</span> soundcloud.playlists.scrape(<span class="hljs-string">"cool playlist name"</span>)
+<span class="hljs-comment">/*Alt get users*/</span>
+<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> soundcloud.users.scrape(<span class="hljs-string">"cool username"</span>)</code></pre>
 				<a href="#searching-for-tracks-and-playlists" id="searching-for-tracks-and-playlists" style="color: inherit; text-decoration: none;">
 					<h4>Searching for tracks and playlists</h4>
 				</a>
@@ -107,13 +119,13 @@
   <span class="hljs-keyword">const</span> soundcloud = <span class="hljs-keyword">new</span> Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 
   <span class="hljs-comment">/*You can get tracks by URL or ID (which can only be gotten from the API)*/</span>
-  <span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.get(<span class="hljs-string">"https://soundcloud.com/tenpimusic/snowflake"</span>)
+  <span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.get(<span class="hljs-string">"https://soundcloud.com/imtenpi/snowflake"</span>)
 
   <span class="hljs-comment">/*Worth to mention that you can omit the soundcloud.com part.*/</span>
-  <span class="hljs-keyword">const</span> trackShorthand = <span class="hljs-keyword">await</span> soundcloud.tracks.get(<span class="hljs-string">"tenpimusic/snowflake"</span>)
+  <span class="hljs-keyword">const</span> trackShorthand = <span class="hljs-keyword">await</span> soundcloud.tracks.get(<span class="hljs-string">"imtenpi/snowflake"</span>)
 
   <span class="hljs-comment">/*To get the ID with the url of a track/playlist/user, you can use the resolve endpoint.*/</span>
-  <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">await</span> soundcloud.resolve.get(<span class="hljs-string">"https://soundcloud.com/tenpimusic/snowflake"</span>)
+  <span class="hljs-keyword">const</span> id = <span class="hljs-keyword">await</span> soundcloud.resolve.get(<span class="hljs-string">"https://soundcloud.com/imtenpi/snowflake"</span>)
 
   <span class="hljs-comment">/*You can search for tracks... with nothing?*/</span>
   <span class="hljs-keyword">const</span> randomSearch = <span class="hljs-keyword">await</span> soundcloud.tracks.search()
@@ -123,10 +135,10 @@
 
   <span class="hljs-comment">/*You can also get the super secret token that is used on private tracks. Authentication required, 
   and only works with your own tracks.*/</span>
-  <span class="hljs-keyword">const</span> secretToken = <span class="hljs-keyword">await</span> soundcloud.tracks.secretToken(<span class="hljs-string">"tenpimusic/kudasai"</span>)
+  <span class="hljs-keyword">const</span> secretToken = <span class="hljs-keyword">await</span> soundcloud.tracks.secretToken(<span class="hljs-string">"imtenpi/kudasai"</span>)
 
   <span class="hljs-comment">/*Playlists are largely the same, you can use the get() and search() methods.*/</span>
-  <span class="hljs-keyword">const</span> playlist = <span class="hljs-keyword">await</span> soundcloud.playlists.get(<span class="hljs-string">"https://soundcloud.com/tenpimusic/sets/my-songs"</span>)
+  <span class="hljs-keyword">const</span> playlist = <span class="hljs-keyword">await</span> soundcloud.playlists.get(<span class="hljs-string">"https://soundcloud.com/imtenpi/sets/my-songs"</span>)
 }</code></pre>
 				<a href="#searching-for-users-and-comments" id="searching-for-users-and-comments" style="color: inherit; text-decoration: none;">
 					<h4>Searching for users and comments</h4>
@@ -137,18 +149,18 @@
   <span class="hljs-keyword">const</span> userSearch = <span class="hljs-keyword">await</span> soundcloud.users.search({q: <span class="hljs-string">"some user"</span>})
 
   <span class="hljs-comment">/*You can get the followers and following of a user.*/</span>
-  <span class="hljs-keyword">const</span> following = <span class="hljs-keyword">await</span> soundcloud.users.following(<span class="hljs-string">"tenpimusic"</span>)
-  <span class="hljs-keyword">const</span> followers = <span class="hljs-keyword">await</span> soundcloud.users.followers(<span class="hljs-string">"tenpimusic"</span>)
+  <span class="hljs-keyword">const</span> following = <span class="hljs-keyword">await</span> soundcloud.users.following(<span class="hljs-string">"imtenpi"</span>)
+  <span class="hljs-keyword">const</span> followers = <span class="hljs-keyword">await</span> soundcloud.users.followers(<span class="hljs-string">"imtenpi"</span>)
 
   <span class="hljs-comment">/*Favorite tracks too.*/</span>
-  <span class="hljs-keyword">const</span> favorites = <span class="hljs-keyword">await</span> soundcloud.users.favorites(<span class="hljs-string">"tenpimusic"</span>)
+  <span class="hljs-keyword">const</span> favorites = <span class="hljs-keyword">await</span> soundcloud.users.favorites(<span class="hljs-string">"imtenpi"</span>)
 
   <span class="hljs-comment">/*The web profiles are the social links that show on the side of a user's profile*/</span>
-  <span class="hljs-keyword">const</span> socialLinks = <span class="hljs-keyword">await</span> soundcloud.users.webProfiles(<span class="hljs-string">"tenpimusic"</span>)
+  <span class="hljs-keyword">const</span> socialLinks = <span class="hljs-keyword">await</span> soundcloud.users.webProfiles(<span class="hljs-string">"imtenpi"</span>)
 
   <span class="hljs-comment">/*It's very easy to get all of the comments on a track, or all of the comments by a user.*/</span>
-  <span class="hljs-keyword">const</span> userComments = <span class="hljs-keyword">await</span> soundcloud.users.comments(<span class="hljs-string">"tenpimusic"</span>)
-  <span class="hljs-keyword">const</span> trackComments = <span class="hljs-keyword">await</span> soundcloud.tracks.comments(<span class="hljs-string">"tenpimusic/moonlight"</span>)
+  <span class="hljs-keyword">const</span> userComments = <span class="hljs-keyword">await</span> soundcloud.users.comments(<span class="hljs-string">"imtenpi"</span>)
+  <span class="hljs-keyword">const</span> trackComments = <span class="hljs-keyword">await</span> soundcloud.tracks.comments(<span class="hljs-string">"imtenpi/moonlight"</span>)
 
   <span class="hljs-comment">/*And you can get a specific comment from its ID (must make an API call to get it).*/</span>
   <span class="hljs-keyword">const</span> comment = <span class="hljs-keyword">await</span> soundcloud.comments.get(<span class="hljs-number">577904916</span>)
@@ -158,7 +170,7 @@
 				</a>
 				<pre><code class="language-ts"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">useAPI</span>(<span class="hljs-params"></span>) </span>{
   <span class="hljs-comment">/*If downloads aren't enabled, it will download the stream instead of the original file.*/</span>
-  <span class="hljs-keyword">await</span> soundcloud.util.downloadTrack(<span class="hljs-string">"tenpimusic/snowflake"</span>, <span class="hljs-string">"./tracks"</span>)
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadTrack(<span class="hljs-string">"imtenpi/snowflake"</span>, <span class="hljs-string">"./tracks"</span>)
 
   <span class="hljs-comment">/*You can download multiple tracks by passing them as an array to downloadTracks(). The third
   parameter is the limit of tracks to download.*/</span>
@@ -167,8 +179,8 @@
 
   <span class="hljs-comment">/*In addition, there are a bunch of utilities that do the above automatically for convenience.*/</span>
   <span class="hljs-keyword">await</span> soundcloud.util.downloadSearch(<span class="hljs-string">"virtual riot"</span>, <span class="hljs-string">"./tracks"</span>)
-  <span class="hljs-keyword">await</span> soundcloud.util.downloadFavorites(<span class="hljs-string">"tenpimusic"</span>, <span class="hljs-string">"./tracks"</span>)
-  <span class="hljs-keyword">await</span> soundcloud.util.downloadPlaylist(<span class="hljs-string">"https://soundcloud.com/tenpimusic/sets/my-songs"</span>, <span class="hljs-string">"./tracks"</span>)
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadFavorites(<span class="hljs-string">"imtenpi"</span>, <span class="hljs-string">"./tracks"</span>)
+  <span class="hljs-keyword">await</span> soundcloud.util.downloadPlaylist(<span class="hljs-string">"https://soundcloud.com/imtenpi/sets/my-songs"</span>, <span class="hljs-string">"./tracks"</span>)
 
   <span class="hljs-comment">/*streamTrack() will download the track and will return a stream.Readable automatically.*/</span>
   <span class="hljs-keyword">const</span> readableStream = <span class="hljs-keyword">await</span> soundcloud.util.streamTrack(<span class="hljs-string">"https://soundcloud.com/virtual-riot/emotionalrmx"</span>)
