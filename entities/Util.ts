@@ -34,8 +34,12 @@ export class Util {
         const html = await axios.get(songUrl, {headers})
         const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
         let url: string
+        const connect = this.api.oauthToken ? `?auth_token=${this.api.oauthToken}` : `?client_id=${this.api.clientID}`
         if (match) {
-            url = await axios.get(match + `?client_id=${this.api.clientID}`, {headers}).then((r) => r.data.url)
+            url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+            .catch(() => {
+                return Promise.reject("client id expired")
+            })
         } else {
             return null
         }
