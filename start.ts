@@ -8,7 +8,7 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // await soundcloud.util.downloadSearch("virtual riot")
     // await soundcloud.util.downloadSearch("virtual riot", "./tracks", 10)
     // const result = await soundcloud.tracks.search({q: "anime"})
-    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/mameyudoufu/vintage-computers", "./tracks")
+    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/virtual-riot/virtualriot-withyou", "./tracks")
     // const result = await soundcloud.users.getURL("imtenpi")
     console.log(result)
 })()

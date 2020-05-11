@@ -23,7 +23,7 @@ export class Util {
     }
 
     /**
-     * Downloads the stream of a track. Note: Requires ffmpeg because of the dependency on audioconcat.
+     * Downloads the stream of a track.
      */
     public downloadTrackStream = async (songUrl: string, title: string, folder: string) => {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
@@ -32,7 +32,8 @@ export class Util {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
         }
         const html = await axios.get(songUrl, {headers})
-        const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
+        // const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
+        const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
         let url: string
         const connect = this.api.oauthToken ? `?auth_token=${this.api.oauthToken}` : `?client_id=${this.api.clientID}`
         if (match) {
@@ -43,7 +44,7 @@ export class Util {
         } else {
             return null
         }
-        const result = await axios.get(url, {headers}).then((d) => d.data)
+        /*const result = await axios.get(url, {headers}).then((r) => r.data)
         const streamUrls = result.match(/(https:\/\/cf-hls-media.sndcdn.com)((.|\n)*?)(?=#)/gm)
         if (!fs.existsSync(folder)) fs.mkdirSync(folder)
         const src = path.join(folder, "concat")
@@ -64,7 +65,10 @@ export class Util {
                 resolve()
             })
         })
-        this.removeDirectory(src)
+        this.removeDirectory(src)*/
+        const finalMP3 = path.join(folder, `${title}.mp3`)
+        const binary = await axios.get(url, {headers, responseType: "arraybuffer"}).then((r) => r.data)
+        fs.writeFileSync(finalMP3, Buffer.from(binary, "binary"))
         return finalMP3
     }
 
