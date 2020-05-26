@@ -3,7 +3,7 @@ import * as fs from "fs"
 import * as path from "path"
 import * as stream from "stream"
 import api from "../API"
-import {SoundCloudTrack} from "../types"
+import {SoundcloudTrack, SoundcloudTrackV2} from "../types"
 import {Playlists, Tracks, Users} from "./index"
 
 export class Util {
@@ -13,17 +13,7 @@ export class Util {
     constructor(private readonly api: api) {}
 
     /**
-     * Utility for awaiting a stream.Writable
-     */
-    public awaitStream = async (writeStream: stream.Writable) => {
-        return new Promise((resolve, reject) => {
-            writeStream.on("finish", resolve)
-            writeStream.on("error", reject)
-        })
-    }
-
-    /**
-     * Downloads the stream of a track.
+     * Downloads the mp3 stream of a track.
      */
     public downloadTrackStream = async (songUrl: string, title: string, folder: string) => {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
@@ -72,7 +62,9 @@ export class Util {
         return finalMP3
     }
 
-    /** Gets the title by scraping the html source */
+    /**
+     * Gets a track title from the page
+     */
     public getTitle = async (songUrl: string) => {
         const headers = {
             "referer": "soundcloud.com",
@@ -83,12 +75,15 @@ export class Util {
         return title
     }
 
-    public downloadTrack = async (trackResolvable: string | SoundCloudTrack, folder?: string) => {
+    /**
+     * Downloads a track on Soundcloud.
+     */
+    public downloadTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
         if (!folder) folder = "./"
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        let track: SoundCloudTrack
+        let track: SoundcloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
-            track = trackResolvable as SoundCloudTrack
+            track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID}})
                 const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
@@ -104,7 +99,10 @@ export class Util {
         }
     }
 
-    public downloadTracks = async (tracks: SoundCloudTrack[] | string[], dest?: string, limit?: number) => {
+    /**
+     * Downloads an array of tracks.
+     */
+    public downloadTracks = async (tracks: SoundcloudTrack[] | SoundcloudTrackV2[] | string[], dest?: string, limit?: number) => {
         if (!limit) limit = tracks.length
         const resultArray: string[] = []
         for (let i = 0; i < limit; i++) {
@@ -118,27 +116,40 @@ export class Util {
         return resultArray
     }
 
+    /**
+     * Downloads all the tracks from the search query.
+     */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.tracks.search({q: query})
-        return this.downloadTracks(tracks, dest, limit)
+        const tracks = await this.tracks.searchV2({q: query})
+        return this.downloadTracks(tracks.collection, dest, limit)
     }
 
+    /**
+     * @deprecated
+     * Downloads all of a users favorites.
+     */
     public downloadFavorites = async (userResolvable: string | number, dest?: string, limit?: number) => {
         const tracks = await this.users.favorites(userResolvable)
         return this.downloadTracks(tracks, dest, limit)
     }
 
+    /**
+     * Downloads all the tracks in a playlist.
+     */
     public downloadPlaylist = async (playlistResolvable: string | number, dest?: string, limit?: number) => {
         const playlist = await this.playlists.get(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
-    public streamTrack = async (trackResolvable: string | SoundCloudTrack, folder?: string) => {
+    /**
+     * Same as downloadTrack, but it returns a readable stream.
+     */
+    public streamTrack = async (trackResolvable: string | SoundcloudTrack, folder?: string) => {
         if (!folder) folder = "./"
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        let track: SoundCloudTrack
+        let track: SoundcloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
-            track = trackResolvable as SoundCloudTrack
+            track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
                 const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
@@ -156,8 +167,20 @@ export class Util {
         }
     }
 
-    // Remove directory recursively
-    private removeDirectory(dir: string) {
+    /**
+     * Utility for awaiting a stream.Writable
+     */
+    private readonly awaitStream = async (writeStream: stream.Writable) => {
+        return new Promise((resolve, reject) => {
+            writeStream.on("finish", resolve)
+            writeStream.on("error", reject)
+        })
+    }
+
+    /**
+     * Removes a directory recursively
+     */
+    private readonly removeDirectory = (dir: string) => {
         if (dir === "/" || dir === "./") return
         if (fs.existsSync(dir)) {
             fs.readdirSync(dir).forEach(function(entry) {

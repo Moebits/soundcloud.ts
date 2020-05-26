@@ -1,19 +1,19 @@
-import {SoundCloudPlaylist} from "./index"
+import {SoundcloudPlaylist} from "./index"
 
-export interface SoundCloudActivityCollection {
-    collection: SoundCloudActivity[]
+export interface SoundcloudActivityCollection {
+    collection: SoundcloudActivity[]
     next_href: string
     future_href: string
 }
 
-export interface SoundCloudActivity {
-    origin: SoundCloudPlaylist
+export interface SoundcloudActivity {
+    origin: SoundcloudPlaylist
     tags: string | null,
     created_at: string
     type: string
 }
 
-export interface SoundCloudConnection {
+export interface SoundcloudConnection {
     created_at: string
     display_name: string
     id: number

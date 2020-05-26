@@ -1,7 +1,7 @@
 import axios from "axios"
 import api from "../API"
-import {SoundCloudComment, SoundCloudPlaylist, SoundCloudTrack, SoundCloudUser, SoundCloudUserCollection, SoundCloudUserFilter,
-SoundcloudUserSearchV2, SoundCloudWebProfile} from "../types"
+import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
+SoundcloudUserV2, SoundcloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
 export class Users {
@@ -12,120 +12,140 @@ export class Users {
      * @deprecated use searchV2
      * Searches for users.
      */
-    public search = async (params?: SoundCloudUserFilter) => {
+    public search = async (params?: SoundcloudUserFilter) => {
         const response = await this.api.get(`/users`, params)
-        return response as Promise<SoundCloudUser[]>
+        return response as Promise<SoundcloudUser[]>
     }
 
     /**
      * Searches for users using the v2 API.
      */
-    public searchV2 = async (params?: SoundCloudUserFilter) => {
+    public searchV2 = async (params?: SoundcloudUserFilter) => {
         const response = await this.api.getV2(`search/users`, params)
         return response as Promise<SoundcloudUserSearchV2>
     }
 
     /**
+     * @deprecated use getV2
      * Gets a user by URL or ID.
      */
     public get = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable, true)
         if (userID.hasOwnProperty("id")) return userID
         const response = await this.api.get(`/users/${userID}`)
-        return response as Promise<SoundCloudUser>
+        return response as Promise<SoundcloudUser>
     }
 
     /**
+     * Fetches a user from URL or ID using Soundcloud v2 API.
+     */
+    public getV2 = async (userResolvable: string | number) => {
+        const userID = await this.resolve.getAlt(userResolvable)
+        const response = await this.api.getV2(`/users/soundcloud:users:${userID}`)
+        return response as Promise<SoundcloudUserV2>
+    }
+
+    /**
+     * @deprecated
      * Gets all the tracks by the user.
      */
     public tracks = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/tracks`)
-        return response as Promise<SoundCloudTrack[]>
+        return response as Promise<SoundcloudTrack[]>
     }
 
     /**
+     * @deprecated
      * Gets all the playlists by the user.
      */
     public playlists = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/playlists`)
-        return response as Promise<SoundCloudPlaylist[]>
+        return response as Promise<SoundcloudPlaylist[]>
     }
 
     /**
+     * @deprecated
      * Gets all the users the user is following.
      */
     public followings = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/followings`)
-        return response as Promise<SoundCloudUserCollection>
+        return response as Promise<SoundcloudUserCollection>
     }
 
     /**
+     * @deprecated
      * Gets a specific following.
      */
     public following = async (userResolvable: string | number, anotherUserResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const followingID = await this.resolve.get(anotherUserResolvable)
         const response = await this.api.get(`/users/${userID}/followings/${followingID}`)
-        return response as Promise<SoundCloudUser>
+        return response as Promise<SoundcloudUser>
     }
 
     /**
+     * @deprecated
      * Gets all of a users followers.
      */
     public followers = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/followers`)
-        return response as Promise<SoundCloudUserCollection>
+        return response as Promise<SoundcloudUserCollection>
     }
 
     /**
+     * @deprecated
      * Gets a specific follower.
      */
     public follower = async (userResolvable: string | number, anotherUserResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const followerID = await this.resolve.get(anotherUserResolvable)
         const response = await this.api.get(`/users/${userID}/followers/${followerID}`)
-        return response as Promise<SoundCloudUser>
+        return response as Promise<SoundcloudUser>
     }
 
     /**
+     * @deprecated
      * Gets all comments by the user.
      */
     public comments = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/comments`)
-        return response as Promise<SoundCloudComment[]>
+        return response as Promise<SoundcloudComment[]>
     }
 
     /**
+     * @deprecated
      * Gets all of a users favorite tracks.
      */
     public favorites = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/favorites`)
-        return response as Promise<SoundCloudTrack[]>
+        return response as Promise<SoundcloudTrack[]>
     }
 
     /**
+     * @deprecated
      * Gets a specific favorite track.
      */
     public favorite = async (userResolvable: string | number, trackResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const trackID = await this.resolve.get(trackResolvable)
         const response = await this.api.get(`/users/${userID}/favorites/${trackID}`)
-        return response as Promise<SoundCloudTrack>
+        return response as Promise<SoundcloudTrack>
     }
 
     /**
+     * @deprecated
      * Gets all the web profiles on a users sidebar.
      */
     public webProfiles = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/web-profiles`)
-        return response as Promise<SoundCloudWebProfile[]>
+        return response as Promise<SoundcloudWebProfile[]>
     }
 
     /**
@@ -143,7 +163,7 @@ export class Users {
             const user = data[4].data[0]
             scrape.push(user)
         }
-        return scrape as Promise<SoundCloudUser[]>
+        return scrape as Promise<SoundcloudUserV2[]>
     }
 
     /**
@@ -155,7 +175,7 @@ export class Users {
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
         const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
         const user = data[4].data[0]
-        return user as Promise<SoundCloudUser>
+        return user as Promise<SoundcloudUserV2>
     }
 
 }

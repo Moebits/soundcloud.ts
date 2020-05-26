@@ -1,5 +1,5 @@
-import {SoundCloudUserMini} from "./index"
-export interface SoundCloudComment {
+import {SoundcloudUserMini} from "./index"
+export interface SoundcloudComment {
     kind: "comment"
     id: number
     created_at: string
@@ -8,5 +8,8 @@ export interface SoundCloudComment {
     timestamp: number
     body: string
     uri: string
-    user: SoundCloudUserMini
+    user: SoundcloudUserMini
+    self: {
+        urn: string
+    }
 }

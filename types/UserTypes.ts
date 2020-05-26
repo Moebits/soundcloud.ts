@@ -1,9 +1,9 @@
 import {SoundcloudSearchV2} from "./index"
-export interface SoundCloudUserFilter {
+export interface SoundcloudUserFilter {
     q?: string
 }
 
-export interface SoundCloudUserMini {
+export interface SoundcloudUserMini {
     avatar_url: string
     id: number
     kind: string
@@ -14,7 +14,7 @@ export interface SoundCloudUserMini {
     last_modified: string
 }
 
-export interface SoundCloudUser {
+export interface SoundcloudUser {
     kind: "user"
     id: number
     permalink: string
@@ -63,8 +63,8 @@ export interface SoundcloudUserV2 {
     comments_count: number
     country_code: number | null
     created_at: string
-    creator_subscriptions: any[]
-    creator_subscription: any
+    creator_subscriptions: SoundcloudCreatorSubscription[]
+    creator_subscription: SoundcloudCreatorSubscription
     description: string
     followers_count: number
     followings_count: number
@@ -86,14 +86,19 @@ export interface SoundcloudUserV2 {
     urn: string
     username: string
     verified: boolean
-    visuals: any
+    visuals: {
+        urn: string
+        enabled: boolean
+        visuals: SoundcloudVisual[]
+        tracking: null
+    }
 }
 
 export interface SoundcloudUserSearchV2 extends SoundcloudSearchV2 {
     collection: SoundcloudUserV2[]
 }
 
-export interface SoundCloudWebProfile {
+export interface SoundcloudWebProfile {
     kind: "web-profile"
     id: number
     service: string
@@ -103,7 +108,19 @@ export interface SoundCloudWebProfile {
     created_at: string
 }
 
-export interface SoundCloudUserCollection {
-    collection: SoundCloudUser
+export interface SoundcloudUserCollection {
+    collection: SoundcloudUser
     next_href: string | null
+}
+
+export interface SoundcloudVisual {
+    urn: string
+    entry_time: number
+    visual_url: string
+}
+
+export interface SoundcloudCreatorSubscription {
+    product: {
+        id: string
+    }
 }

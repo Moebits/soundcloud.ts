@@ -1,4 +1,4 @@
-export type SoundCloudImageFormats =
+export type SoundcloudImageFormats =
     | "t500x500"
     | "crop"
     | "t300x300"
@@ -9,7 +9,7 @@ export type SoundCloudImageFormats =
     | "tiny"
     | "mini"
 
-export interface SoundCloudApp {
+export interface SoundcloudApp {
     id: number
     kind: "app"
     name: string
@@ -19,7 +19,7 @@ export interface SoundCloudApp {
     creator: string
 }
 
-export interface SoundCloudOembedFilter {
+export interface SoundcloudOembedFilter {
     url: string
     format?: string
     callback?: string
@@ -31,7 +31,7 @@ export interface SoundCloudOembedFilter {
     iframe?: boolean
 }
 
-export interface SoundCloudOembed {
+export interface SoundcloudOembed {
     version: string
     type: string
     provider_name: string

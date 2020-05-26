@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundCloudPlaylist, SoundCloudPlaylistFilter, SoundcloudPlaylistSearchV2, SoundCloudSecretToken} from "../types"
+import {SoundcloudPlaylist, SoundcloudPlaylistFilter, SoundcloudPlaylistSearchV2, SoundcloudPlaylistV2, SoundcloudSecretToken} from "../types"
 import {Resolve} from "./index"
 
 export class Playlists {
@@ -11,37 +11,48 @@ export class Playlists {
      * @deprecated use searchV2
      * Searches for playlists.
      */
-    public search = async (params?: SoundCloudPlaylistFilter) => {
+    public search = async (params?: SoundcloudPlaylistFilter) => {
         const response = await this.api.get(`/playlists`, params)
-        return response as Promise<SoundCloudPlaylist[]>
+        return response as Promise<SoundcloudPlaylist[]>
     }
 
     /**
      * Searches for playlists using the v2 API.
      */
-    public searchV2 = async (params?: SoundCloudPlaylistFilter) => {
+    public searchV2 = async (params?: SoundcloudPlaylistFilter) => {
         const response = await this.api.getV2(`search/playlists`, params)
         return response as Promise<SoundcloudPlaylistSearchV2>
     }
 
     /**
+     * @deprecated use getV2
      * Fetches a playlist from URL or ID.
      */
     public get = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.get(playlistResolvable, true)
         if (playlistID.hasOwnProperty("id")) return playlistID
         const response = await this.api.get(`/playlists/${playlistID}`)
-        return response as Promise<SoundCloudPlaylist>
+        return response as Promise<SoundcloudPlaylist>
     }
 
     /**
+     * Fetches a playlist from URL or ID using Soundcloud v2 API.
+     */
+    public getV2 = async (playlistResolvable: string | number) => {
+        const playlistID = await this.resolve.getAlt(playlistResolvable)
+        const response = await this.api.getV2(`/playlists/soundcloud:playlists:${playlistID}`)
+        return response as Promise<SoundcloudPlaylistV2>
+    }
+
+    /**
+     * @deprecated
      * Requires Authentication - Gets the secret token from one of your playlists.
      */
     public secretToken = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.get(playlistResolvable)
         const response = await this.api.get(`/playlists/${playlistID}/secret-token`)
         .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
-        return response as Promise<SoundCloudSecretToken>
+        return response as Promise<SoundcloudSecretToken>
     }
 
     /**
@@ -59,7 +70,7 @@ export class Playlists {
             const user = data[5].data[0]
             scrape.push(user)
         }
-        return scrape as Promise<SoundCloudPlaylist[]>
+        return scrape as Promise<SoundcloudPlaylistV2[]>
     }
 
     /**
@@ -71,6 +82,6 @@ export class Playlists {
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
         const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
         const playlist = data[5].data[0]
-        return playlist as Promise<SoundCloudPlaylist>
+        return playlist as Promise<SoundcloudPlaylistV2>
     }
 }

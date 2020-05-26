@@ -1,10 +1,10 @@
-import {SoundCloudLicense, SoundcloudSearchV2, SoundCloudTrack, SoundcloudTrackV2, SoundCloudUserMini} from "./index"
+import {SoundcloudLicense, SoundcloudSearchV2, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUserMini, SoundcloudUserV2} from "./index"
 
-export interface SoundCloudPlaylistFilter {
+export interface SoundcloudPlaylistFilter {
     representation?: "compact" | "id"
     q?: string
 }
-export interface SoundCloudPlaylist {
+export interface SoundcloudPlaylist {
     duration: number
     release_day: number | null
     permalink_url: string
@@ -22,8 +22,8 @@ export interface SoundCloudPlaylist {
     track_count: number
     user_id: number
     last_modified: string
-    license: SoundCloudLicense
-    tracks: SoundCloudTrack[]
+    license: SoundcloudLicense
+    tracks: SoundcloudTrack[]
     playlist_type: string | null
     id: number
     downloadable: boolean | null
@@ -39,7 +39,7 @@ export interface SoundCloudPlaylist {
     artwork_url: string | null
     ean: string | null
     streamable: boolean
-    user: SoundCloudUserMini
+    user: SoundcloudUserMini
     embeddable_by: string
     label_id: string | null
 }
@@ -60,12 +60,12 @@ export interface SoundcloudPlaylistV2 {
     track_count: number
     user_id: number
     last_modified: string
-    license: string
+    license: SoundcloudLicense
     tracks: SoundcloudTrackV2[]
     id: number
     release_date: string | null
     display_date: string
-    sharing: string
+    sharing: "public" | "private"
     secret_token: string | null
     created_at: string
     likes_count: number
@@ -75,9 +75,9 @@ export interface SoundcloudPlaylistV2 {
     managed_by_feeds: boolean
     artwork_url: string | null
     is_album: boolean
-    user: any
+    user: SoundcloudUserV2
     published_at: string | null
-    embeddable_by: string
+    embeddable_by: "all" | "me" | "none"
 }
 
 export interface SoundcloudPlaylistSearchV2 extends SoundcloudSearchV2 {

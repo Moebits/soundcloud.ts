@@ -130,160 +130,144 @@ There are more less commonly used endpoints such as **me**, **apps**, and **oemb
 
 ### Common Types
 <details>
-<summary>SoundCloudTrack</summary>
+<summary>SoundCloudTrackV2</summary>
 
 ```ts
-export interface SoundCloudTrack {
+export interface SoundcloudTrackV2 {
     comment_count: number
-    release: number | ""
-    original_content_size: number
-    track_type: SoundCloudTrackType | null
-    original_format: string
+    full_duration: number
+    downloadable: boolean
+    created_at: string
+    description: string | null
+    media: {
+        transcodings: SoundcloudTranscoding[]
+    }
+    title: string
+    publisher_metadata: {
+        urn: string
+        contains_music: boolean
+        id: number
+    }
+    duration: number
+    has_downloads_left: boolean
+    artwork_url: string
+    public: boolean
     streamable: boolean
-    download_url: string | null
+    tag_list: string
+    genre: string
     id: number
+    reposts_count: number
     state: "processing" | "failed" | "finished"
+    label_name: string | null
     last_modified: string
-    favoritings_count: number
+    commentable: boolean
+    policy: string
+    visuals: string | null
     kind: string
-    purchase_url: string
-    release_year: number | null
-    sharing: string
-    attachments_uri: string
-    license: SoundCloudLicense
+    purchase_url: string | null
+    sharing: "private" | "public"
+    uri: string
+    secret_token: string | null
+    download_count: number
+    likes_count: number
+    urn: string
+    license: SoundcloudLicense
+    purchase_title: string | null
+    display_date: string
+    embeddable_by: "all" | "me" | "none"
+    release_date: string
     user_id: number
-    user_favorite: boolean
+    monetization_model: string
     waveform_url: string
     permalink: string
     permalink_url: string
+    user: SoundcloudUserV2
     playback_count: number
-    downloadable: boolean
-    created_at: string
-    description: string
-    title: string
-    duration: number
-    artwork_url: string
-    video_url: string | null
-    tag_list: string
-    release_month: number | null
-    genre: string
-    release_day: number | null
-    reposts_count: number
-    label_name: string | null
-    commentable: boolean
-    bpm: number | null
-    policy: string
-    key_signature: string
-    isrc: string | null
-    uri: string
-    download_count: number
-    likes_count: number
-    purchase_title: string
-    embeddable_by: string
-    monetization_model: string
-    user: SoundCloudUserMini
-    user_playback_count: number | null
-    stream_url: string
-    label?: SoundCloudUserMini
-    label_id: number | null
-    asset_data?: string
-    artwork_data?: string
 }
 ```
 </details>
 
 <details>
-<summary>SoundCloudPlaylist</summary>
+<summary>SoundCloudPlaylistV2</summary>
 
 ```ts
-export interface SoundCloudPlaylist {
+export interface SoundcloudPlaylistV2 {
     duration: number
-    release_day: number | null
     permalink_url: string
     reposts_count: number
     genre: string | null
     permalink: string
     purchase_url: string | null
-    release_month: number | null
     description: string | null
     uri: string
     label_name: string | null
     tag_list: string
-    release_year: number | null
-    secret_uri: string
+    set_type: string
+    public: boolean
     track_count: number
     user_id: number
     last_modified: string
-    license: SoundCloudLicense
-    tracks: SoundCloudTrack[]
-    playlist_type: string | null
+    license: SoundcloudLicense
+    tracks: SoundcloudTrackV2[]
     id: number
-    downloadable: boolean | null
-    sharing: "private" | "public"
-    secret_token?: string
+    release_date: string | null
+    display_date: string
+    sharing: "public" | "private"
+    secret_token: string | null
     created_at: string
-    release: number | null
     likes_count: number
-    kind: "playlist"
+    kind: string
     title: string
-    type: string | null
     purchase_title: string | null
+    managed_by_feeds: boolean
     artwork_url: string | null
-    ean: string | null
-    streamable: boolean
-    user: SoundCloudUserMini
-    embeddable_by: string
-    label_id: string | null
+    is_album: boolean
+    user: SoundcloudUserV2
+    published_at: string | null
+    embeddable_by: "all" | "me" | "none"
 }
 ```
 </details>
 
 <details>
-<summary>SoundCloudUser</summary>
+<summary>SoundCloudUserV2</summary>
 
 ```ts
-export interface SoundCloudUser {
-    kind: "user"
-    id: number
-    permalink: string
-    subscriptions: []
-    username: string
-    uri: string
-    permalink_url: string
+export interface SoundcloudUserV2 {
     avatar_url: string
-    country: string
-    full_name: string
     city: string
+    comments_count: number
+    country_code: number | null
+    created_at: string
+    creator_subscriptions: SoundcloudCreatorSubscription[]
+    creator_subscription: SoundcloudCreatorSubscription
     description: string
-    discogs_name: string | null
-    myspace_name: string | null
-    website: string | null
-    website_title: string
-    online: boolean
-    track_count: number
-    playlist_count: number
     followers_count: number
     followings_count: number
-    likes_count: number
-    comments_count: number
-    public_favorites_count: number
-    avatar_data?: string
-    quota?: {
-        unlimited_upload_quota: boolean
-        upload_seconds_used: number
-        upload_seconds_left: number
-    }
-    private_playlists_count?: number
-    primary_email_confirmed?: boolean
-    private_tracks_count?: number
-    locale?: string
-    last_modified: string
     first_name: string
+    full_name: string
+    groups_count: number
+    id: number
+    kind: string
+    last_modified: string
     last_name: string
-    reposts_count: number
-    upload_seconds_left?: number
-    plan: string
-
+    likes_count: number
+    playlist_likes_count: number
+    permalink: string
+    permalink_url: string
+    playlist_count: number
+    reposts_count: number | null
+    track_count: number
+    uri: string
+    urn: string
+    username: string
+    verified: boolean
+    visuals: {
+        urn: string
+        enabled: boolean
+        visuals: SoundcloudVisual[]
+        tracking: null
+    }
 }
 ```
 </details>
@@ -302,6 +286,9 @@ export interface SoundCloudComment {
     body: string
     uri: string
     user: SoundCloudUserMini
+    self: {
+      urn: string
+    }
 }
 ```
 </details>
