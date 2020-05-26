@@ -102,13 +102,19 @@
 					<h4>Update</h4>
 				</a>
 				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being
-				you can use the <code>scrape</code> methods which get data from the html source instead.</p>
-				<pre><code class="language-ts"><span class="hljs-comment">/*Alt get tracks*/</span>
-<span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.scrape(<span class="hljs-string">"cool track name"</span>)
-<span class="hljs-comment">/*Alt get playlists*/</span>
-<span class="hljs-keyword">const</span> playlists = <span class="hljs-keyword">await</span> soundcloud.playlists.scrape(<span class="hljs-string">"cool playlist name"</span>)
-<span class="hljs-comment">/*Alt get users*/</span>
-<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> soundcloud.users.scrape(<span class="hljs-string">"cool username"</span>)</code></pre>
+				you can use the <code>searchAlt</code> and <code>getAlt</code> methods which get data from the html source instead.</p>
+				<pre><code class="language-ts"><span class="hljs-comment">/*Alt search tracks*/</span>
+<span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.searchAlt(<span class="hljs-string">"cool track name"</span>)
+<span class="hljs-comment">/*Alt get track*/</span>
+<span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.getAlt(<span class="hljs-string">"succducc/azure"</span>)
+<span class="hljs-comment">/*Alt search playlists*/</span>
+<span class="hljs-keyword">const</span> playlists = <span class="hljs-keyword">await</span> soundcloud.playlists.searchAlt(<span class="hljs-string">"cool playlist name"</span>)
+<span class="hljs-comment">/*Alt get playlist*/</span>
+<span class="hljs-keyword">const</span> playlist = <span class="hljs-keyword">await</span> soundcloud.playlists.getAlt(<span class="hljs-string">"virtual-riot/sets/throwback-ep"</span>)
+<span class="hljs-comment">/*Alt search users*/</span>
+<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> soundcloud.users.searchAlt(<span class="hljs-string">"cool username"</span>)
+<span class="hljs-comment">/*Alt get user*/</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> soundcloud.playlists.getAlt(<span class="hljs-string">"someone"</span>)</code></pre>
 				<a href="#searching-for-tracks-and-playlists" id="searching-for-tracks-and-playlists" style="color: inherit; text-decoration: none;">
 					<h4>Searching for tracks and playlists</h4>
 				</a>
@@ -193,150 +199,134 @@
 					<h3>Common Types</h3>
 				</a>
 				<details>
-					<summary>SoundCloudTrack</summary>
-					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundCloudTrack {
+					<summary>SoundCloudTrackV2</summary>
+					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundcloudTrackV2 {
     comment_count: <span class="hljs-built_in">number</span>
-    release: <span class="hljs-built_in">number</span> | <span class="hljs-string">""</span>
-    original_content_size: <span class="hljs-built_in">number</span>
-    track_type: SoundCloudTrackType | <span class="hljs-literal">null</span>
-    original_format: <span class="hljs-built_in">string</span>
+    full_duration: <span class="hljs-built_in">number</span>
+    downloadable: <span class="hljs-built_in">boolean</span>
+    created_at: <span class="hljs-built_in">string</span>
+    description: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    media: {
+        transcodings: SoundcloudTranscoding[]
+    }
+    title: <span class="hljs-built_in">string</span>
+    publisher_metadata: {
+        urn: <span class="hljs-built_in">string</span>
+        contains_music: <span class="hljs-built_in">boolean</span>
+        id: <span class="hljs-built_in">number</span>
+    }
+    duration: <span class="hljs-built_in">number</span>
+    has_downloads_left: <span class="hljs-built_in">boolean</span>
+    artwork_url: <span class="hljs-built_in">string</span>
+    <span class="hljs-keyword">public</span>: <span class="hljs-built_in">boolean</span>
     streamable: <span class="hljs-built_in">boolean</span>
-    download_url: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    tag_list: <span class="hljs-built_in">string</span>
+    genre: <span class="hljs-built_in">string</span>
     id: <span class="hljs-built_in">number</span>
+    reposts_count: <span class="hljs-built_in">number</span>
     state: <span class="hljs-string">"processing"</span> | <span class="hljs-string">"failed"</span> | <span class="hljs-string">"finished"</span>
+    label_name: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     last_modified: <span class="hljs-built_in">string</span>
-    favoritings_count: <span class="hljs-built_in">number</span>
+    commentable: <span class="hljs-built_in">boolean</span>
+    policy: <span class="hljs-built_in">string</span>
+    visuals: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     kind: <span class="hljs-built_in">string</span>
-    purchase_url: <span class="hljs-built_in">string</span>
-    release_year: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    sharing: <span class="hljs-built_in">string</span>
-    attachments_uri: <span class="hljs-built_in">string</span>
-    license: SoundCloudLicense
+    purchase_url: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    sharing: <span class="hljs-string">"private"</span> | <span class="hljs-string">"public"</span>
+    uri: <span class="hljs-built_in">string</span>
+    secret_token: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    download_count: <span class="hljs-built_in">number</span>
+    likes_count: <span class="hljs-built_in">number</span>
+    urn: <span class="hljs-built_in">string</span>
+    license: SoundcloudLicense
+    purchase_title: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    display_date: <span class="hljs-built_in">string</span>
+    embeddable_by: <span class="hljs-string">"all"</span> | <span class="hljs-string">"me"</span> | <span class="hljs-string">"none"</span>
+    release_date: <span class="hljs-built_in">string</span>
     user_id: <span class="hljs-built_in">number</span>
-    user_favorite: <span class="hljs-built_in">boolean</span>
+    monetization_model: <span class="hljs-built_in">string</span>
     waveform_url: <span class="hljs-built_in">string</span>
     permalink: <span class="hljs-built_in">string</span>
     permalink_url: <span class="hljs-built_in">string</span>
+    user: SoundcloudUserV2
     playback_count: <span class="hljs-built_in">number</span>
-    downloadable: <span class="hljs-built_in">boolean</span>
-    created_at: <span class="hljs-built_in">string</span>
-    description: <span class="hljs-built_in">string</span>
-    title: <span class="hljs-built_in">string</span>
-    duration: <span class="hljs-built_in">number</span>
-    artwork_url: <span class="hljs-built_in">string</span>
-    video_url: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    tag_list: <span class="hljs-built_in">string</span>
-    release_month: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    genre: <span class="hljs-built_in">string</span>
-    release_day: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    reposts_count: <span class="hljs-built_in">number</span>
-    label_name: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    commentable: <span class="hljs-built_in">boolean</span>
-    bpm: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    policy: <span class="hljs-built_in">string</span>
-    key_signature: <span class="hljs-built_in">string</span>
-    isrc: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    uri: <span class="hljs-built_in">string</span>
-    download_count: <span class="hljs-built_in">number</span>
-    likes_count: <span class="hljs-built_in">number</span>
-    purchase_title: <span class="hljs-built_in">string</span>
-    embeddable_by: <span class="hljs-built_in">string</span>
-    monetization_model: <span class="hljs-built_in">string</span>
-    user: SoundCloudUserMini
-    user_playback_count: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    stream_url: <span class="hljs-built_in">string</span>
-    label?: SoundCloudUserMini
-    label_id: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    asset_data?: <span class="hljs-built_in">string</span>
-    artwork_data?: <span class="hljs-built_in">string</span>
 }</code></pre>
 				</details>
 				<details>
-					<summary>SoundCloudPlaylist</summary>
-					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundCloudPlaylist {
+					<summary>SoundCloudPlaylistV2</summary>
+					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundcloudPlaylistV2 {
     duration: <span class="hljs-built_in">number</span>
-    release_day: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
     permalink_url: <span class="hljs-built_in">string</span>
     reposts_count: <span class="hljs-built_in">number</span>
     genre: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     permalink: <span class="hljs-built_in">string</span>
     purchase_url: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    release_month: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
     description: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     uri: <span class="hljs-built_in">string</span>
     label_name: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     tag_list: <span class="hljs-built_in">string</span>
-    release_year: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
-    secret_uri: <span class="hljs-built_in">string</span>
+    set_type: <span class="hljs-built_in">string</span>
+    <span class="hljs-keyword">public</span>: <span class="hljs-built_in">boolean</span>
     track_count: <span class="hljs-built_in">number</span>
     user_id: <span class="hljs-built_in">number</span>
     last_modified: <span class="hljs-built_in">string</span>
-    license: SoundCloudLicense
-    tracks: SoundCloudTrack[]
-    playlist_type: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    license: SoundcloudLicense
+    tracks: SoundcloudTrackV2[]
     id: <span class="hljs-built_in">number</span>
-    downloadable: <span class="hljs-built_in">boolean</span> | <span class="hljs-literal">null</span>
-    sharing: <span class="hljs-string">"private"</span> | <span class="hljs-string">"public"</span>
-    secret_token?: <span class="hljs-built_in">string</span>
+    release_date: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    display_date: <span class="hljs-built_in">string</span>
+    sharing: <span class="hljs-string">"public"</span> | <span class="hljs-string">"private"</span>
+    secret_token: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     created_at: <span class="hljs-built_in">string</span>
-    release: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
     likes_count: <span class="hljs-built_in">number</span>
-    kind: <span class="hljs-string">"playlist"</span>
+    kind: <span class="hljs-built_in">string</span>
     title: <span class="hljs-built_in">string</span>
-    <span class="hljs-keyword">type</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
     purchase_title: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    managed_by_feeds: <span class="hljs-built_in">boolean</span>
     artwork_url: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    ean: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    streamable: <span class="hljs-built_in">boolean</span>
-    user: SoundCloudUserMini
-    embeddable_by: <span class="hljs-built_in">string</span>
-    label_id: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    is_album: <span class="hljs-built_in">boolean</span>
+    user: SoundcloudUserV2
+    published_at: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
+    embeddable_by: <span class="hljs-string">"all"</span> | <span class="hljs-string">"me"</span> | <span class="hljs-string">"none"</span>
 }</code></pre>
 				</details>
 				<details>
-					<summary>SoundCloudUser</summary>
-					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundCloudUser {
-    kind: <span class="hljs-string">"user"</span>
-    id: <span class="hljs-built_in">number</span>
-    permalink: <span class="hljs-built_in">string</span>
-    subscriptions: []
-    username: <span class="hljs-built_in">string</span>
-    uri: <span class="hljs-built_in">string</span>
-    permalink_url: <span class="hljs-built_in">string</span>
+					<summary>SoundCloudUserV2</summary>
+					<pre><code class="language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> SoundcloudUserV2 {
     avatar_url: <span class="hljs-built_in">string</span>
-    country: <span class="hljs-built_in">string</span>
-    full_name: <span class="hljs-built_in">string</span>
     city: <span class="hljs-built_in">string</span>
+    comments_count: <span class="hljs-built_in">number</span>
+    country_code: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
+    created_at: <span class="hljs-built_in">string</span>
+    creator_subscriptions: SoundcloudCreatorSubscription[]
+    creator_subscription: SoundcloudCreatorSubscription
     description: <span class="hljs-built_in">string</span>
-    discogs_name: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    myspace_name: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    website: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>
-    website_title: <span class="hljs-built_in">string</span>
-    online: <span class="hljs-built_in">boolean</span>
-    track_count: <span class="hljs-built_in">number</span>
-    playlist_count: <span class="hljs-built_in">number</span>
     followers_count: <span class="hljs-built_in">number</span>
     followings_count: <span class="hljs-built_in">number</span>
-    likes_count: <span class="hljs-built_in">number</span>
-    comments_count: <span class="hljs-built_in">number</span>
-    public_favorites_count: <span class="hljs-built_in">number</span>
-    avatar_data?: <span class="hljs-built_in">string</span>
-    quota?: {
-        unlimited_upload_quota: <span class="hljs-built_in">boolean</span>
-        upload_seconds_used: <span class="hljs-built_in">number</span>
-        upload_seconds_left: <span class="hljs-built_in">number</span>
-    }
-    private_playlists_count?: <span class="hljs-built_in">number</span>
-    primary_email_confirmed?: <span class="hljs-built_in">boolean</span>
-    private_tracks_count?: <span class="hljs-built_in">number</span>
-    locale?: <span class="hljs-built_in">string</span>
-    last_modified: <span class="hljs-built_in">string</span>
     first_name: <span class="hljs-built_in">string</span>
+    full_name: <span class="hljs-built_in">string</span>
+    groups_count: <span class="hljs-built_in">number</span>
+    id: <span class="hljs-built_in">number</span>
+    kind: <span class="hljs-built_in">string</span>
+    last_modified: <span class="hljs-built_in">string</span>
     last_name: <span class="hljs-built_in">string</span>
-    reposts_count: <span class="hljs-built_in">number</span>
-    upload_seconds_left?: <span class="hljs-built_in">number</span>
-    plan: <span class="hljs-built_in">string</span>
-
+    likes_count: <span class="hljs-built_in">number</span>
+    playlist_likes_count: <span class="hljs-built_in">number</span>
+    permalink: <span class="hljs-built_in">string</span>
+    permalink_url: <span class="hljs-built_in">string</span>
+    playlist_count: <span class="hljs-built_in">number</span>
+    reposts_count: <span class="hljs-built_in">number</span> | <span class="hljs-literal">null</span>
+    track_count: <span class="hljs-built_in">number</span>
+    uri: <span class="hljs-built_in">string</span>
+    urn: <span class="hljs-built_in">string</span>
+    username: <span class="hljs-built_in">string</span>
+    verified: <span class="hljs-built_in">boolean</span>
+    visuals: {
+        urn: <span class="hljs-built_in">string</span>
+        enabled: <span class="hljs-built_in">boolean</span>
+        visuals: SoundcloudVisual[]
+        tracking: <span class="hljs-literal">null</span>
+    }
 }</code></pre>
 				</details>
 				<details>
@@ -351,6 +341,9 @@
     body: <span class="hljs-built_in">string</span>
     uri: <span class="hljs-built_in">string</span>
     user: SoundCloudUserMini
+    self: {
+      urn: <span class="hljs-built_in">string</span>
+    }
 }</code></pre>
 				</details>
 			</div>
@@ -399,67 +392,100 @@
 						<a href="classes/util.html" class="tsd-kind-icon">Util</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudactivity.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity</a>
+						<a href="interfaces/soundcloudactivity.html" class="tsd-kind-icon">Soundcloud<wbr>Activity</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudactivitycollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Activity<wbr>Collection</a>
+						<a href="interfaces/soundcloudactivitycollection.html" class="tsd-kind-icon">Soundcloud<wbr>Activity<wbr>Collection</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudapp.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>App</a>
+						<a href="interfaces/soundcloudapp.html" class="tsd-kind-icon">Soundcloud<wbr>App</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudcomment.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Comment</a>
+						<a href="interfaces/soundcloudcomment.html" class="tsd-kind-icon">Soundcloud<wbr>Comment</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudconnection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Connection</a>
+						<a href="interfaces/soundcloudconnection.html" class="tsd-kind-icon">Soundcloud<wbr>Connection</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudoembed.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed</a>
+						<a href="interfaces/soundcloudcreatorsubscription.html" class="tsd-kind-icon">Soundcloud<wbr>Creator<wbr>Subscription</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudoembedfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Oembed<wbr>Filter</a>
+						<a href="interfaces/soundcloudoembed.html" class="tsd-kind-icon">Soundcloud<wbr>Oembed</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudplaylist.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist</a>
+						<a href="interfaces/soundcloudoembedfilter.html" class="tsd-kind-icon">Soundcloud<wbr>Oembed<wbr>Filter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudplaylistfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Playlist<wbr>Filter</a>
+						<a href="interfaces/soundcloudplaylist.html" class="tsd-kind-icon">Soundcloud<wbr>Playlist</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudsecrettoken.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Secret<wbr>Token</a>
+						<a href="interfaces/soundcloudplaylistfilter.html" class="tsd-kind-icon">Soundcloud<wbr>Playlist<wbr>Filter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudtrack.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track</a>
+						<a href="interfaces/soundcloudplaylistsearchv2.html" class="tsd-kind-icon">Soundcloud<wbr>Playlist<wbr>Search<wbr>V2</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudtrackfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track<wbr>Filter</a>
+						<a href="interfaces/soundcloudplaylistv2.html" class="tsd-kind-icon">Soundcloud<wbr>Playlist<wbr>V2</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundclouduser.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User</a>
+						<a href="interfaces/soundcloudsearchv2.html" class="tsd-kind-icon">Soundcloud<wbr>Search<wbr>V2</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudusercollection.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Collection</a>
+						<a href="interfaces/soundcloudsecrettoken.html" class="tsd-kind-icon">Soundcloud<wbr>Secret<wbr>Token</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundclouduserfilter.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Filter</a>
+						<a href="interfaces/soundcloudtrack.html" class="tsd-kind-icon">Soundcloud<wbr>Track</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudusermini.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>User<wbr>Mini</a>
+						<a href="interfaces/soundcloudtrackfilter.html" class="tsd-kind-icon">Soundcloud<wbr>Track<wbr>Filter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/soundcloudwebprofile.html" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Web<wbr>Profile</a>
+						<a href="interfaces/soundcloudtracksearchv2.html" class="tsd-kind-icon">Soundcloud<wbr>Track<wbr>Search<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudtrackv2.html" class="tsd-kind-icon">Soundcloud<wbr>Track<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudtranscoding.html" class="tsd-kind-icon">Soundcloud<wbr>Transcoding</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundclouduser.html" class="tsd-kind-icon">Soundcloud<wbr>User</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudusercollection.html" class="tsd-kind-icon">Soundcloud<wbr>User<wbr>Collection</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundclouduserfilter.html" class="tsd-kind-icon">Soundcloud<wbr>User<wbr>Filter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudusermini.html" class="tsd-kind-icon">Soundcloud<wbr>User<wbr>Mini</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudusersearchv2.html" class="tsd-kind-icon">Soundcloud<wbr>User<wbr>Search<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundclouduserv2.html" class="tsd-kind-icon">Soundcloud<wbr>User<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudvisual.html" class="tsd-kind-icon">Soundcloud<wbr>Visual</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/soundcloudwebprofile.html" class="tsd-kind-icon">Soundcloud<wbr>Web<wbr>Profile</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#soundcloudimageformats" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Image<wbr>Formats</a>
+						<a href="globals.html#soundcloudimageformats" class="tsd-kind-icon">Soundcloud<wbr>Image<wbr>Formats</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#soundcloudlicense" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>License</a>
+						<a href="globals.html#soundcloudlicense" class="tsd-kind-icon">Soundcloud<wbr>License</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#soundcloudtracktype" class="tsd-kind-icon">Sound<wbr>Cloud<wbr>Track<wbr>Type</a>
+						<a href="globals.html#soundcloudtracktype" class="tsd-kind-icon">Soundcloud<wbr>Track<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#apiurl" class="tsd-kind-icon">apiURL</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#apiv2url" class="tsd-kind-icon">api<wbr>V2URL</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#publicid" class="tsd-kind-icon">publicID</a>

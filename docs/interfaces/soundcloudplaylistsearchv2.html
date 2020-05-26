@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SoundcloudApp | soundcloud.ts</title>
+	<title>SoundcloudPlaylistSearchV2 | soundcloud.ts</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="soundcloudapp.html">SoundcloudApp</a>
+					<a href="soundcloudplaylistsearchv2.html">SoundcloudPlaylistSearchV2</a>
 				</li>
 			</ul>
-			<h1>Interface SoundcloudApp</h1>
+			<h1>Interface SoundcloudPlaylistSearchV2</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,12 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">SoundcloudApp</span>
+						<a href="soundcloudsearchv2.html" class="tsd-signature-type">SoundcloudSearchV2</a>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">SoundcloudPlaylistSearchV2</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
@@ -79,13 +84,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#creator" class="tsd-kind-icon">creator</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#external_url" class="tsd-kind-icon">external_<wbr>url</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#kind" class="tsd-kind-icon">kind</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#name" class="tsd-kind-icon">name</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#permalink_url" class="tsd-kind-icon">permalink_<wbr>url</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudapp.html#uri" class="tsd-kind-icon">uri</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="soundcloudplaylistsearchv2.html#collection" class="tsd-kind-icon">collection</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="soundcloudplaylistsearchv2.html#next_href" class="tsd-kind-icon">next_<wbr>href</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="soundcloudplaylistsearchv2.html#query_urn" class="tsd-kind-icon">query_<wbr>urn</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="soundcloudplaylistsearchv2.html#total_results" class="tsd-kind-icon">total_<wbr>results</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,72 +96,45 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="creator" class="tsd-anchor"></a>
-					<h3>creator</h3>
-					<div class="tsd-signature tsd-kind-icon">creator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="collection" class="tsd-anchor"></a>
+					<h3>collection</h3>
+					<div class="tsd-signature tsd-kind-icon">collection<span class="tsd-signature-symbol">:</span> <a href="soundcloudplaylistv2.html" class="tsd-signature-type">SoundcloudPlaylistV2</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L19">types/APITypes.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/PlaylistTypes.ts#L84">types/PlaylistTypes.ts:84</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="external_url" class="tsd-anchor"></a>
-					<h3>external_<wbr>url</h3>
-					<div class="tsd-signature tsd-kind-icon">external_<wbr>url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="next_href" class="tsd-anchor"></a>
+					<h3>next_<wbr>href</h3>
+					<div class="tsd-signature tsd-kind-icon">next_<wbr>href<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="soundcloudsearchv2.html">SoundcloudSearchV2</a>.<a href="soundcloudsearchv2.html#next_href">next_href</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L18">types/APITypes.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L51">types/APITypes.ts:51</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="query_urn" class="tsd-anchor"></a>
+					<h3>query_<wbr>urn</h3>
+					<div class="tsd-signature tsd-kind-icon">query_<wbr>urn<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="soundcloudsearchv2.html">SoundcloudSearchV2</a>.<a href="soundcloudsearchv2.html#query_urn">query_urn</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L13">types/APITypes.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L52">types/APITypes.ts:52</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="kind" class="tsd-anchor"></a>
-					<h3>kind</h3>
-					<div class="tsd-signature tsd-kind-icon">kind<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"app"</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="total_results" class="tsd-anchor"></a>
+					<h3>total_<wbr>results</h3>
+					<div class="tsd-signature tsd-kind-icon">total_<wbr>results<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
+						<p>Inherited from <a href="soundcloudsearchv2.html">SoundcloudSearchV2</a>.<a href="soundcloudsearchv2.html#total_results">total_results</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L14">types/APITypes.ts:14</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L15">types/APITypes.ts:15</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="permalink_url" class="tsd-anchor"></a>
-					<h3>permalink_<wbr>url</h3>
-					<div class="tsd-signature tsd-kind-icon">permalink_<wbr>url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L17">types/APITypes.ts:17</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="uri" class="tsd-anchor"></a>
-					<h3>uri</h3>
-					<div class="tsd-signature tsd-kind-icon">uri<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L16">types/APITypes.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/Tenpi/soundcloud.ts/blob/6ecb8cf/types/APITypes.ts#L50">types/APITypes.ts:50</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -178,28 +153,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="soundcloudapp.html" class="tsd-kind-icon">Soundcloud<wbr>App</a>
+						<a href="soundcloudplaylistsearchv2.html" class="tsd-kind-icon">Soundcloud<wbr>Playlist<wbr>Search<wbr>V2</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#creator" class="tsd-kind-icon">creator</a>
+								<a href="soundcloudplaylistsearchv2.html#collection" class="tsd-kind-icon">collection</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#external_url" class="tsd-kind-icon">external_<wbr>url</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="soundcloudplaylistsearchv2.html#next_href" class="tsd-kind-icon">next_<wbr>href</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#id" class="tsd-kind-icon">id</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="soundcloudplaylistsearchv2.html#query_urn" class="tsd-kind-icon">query_<wbr>urn</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#kind" class="tsd-kind-icon">kind</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#name" class="tsd-kind-icon">name</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#permalink_url" class="tsd-kind-icon">permalink_<wbr>url</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="soundcloudapp.html#uri" class="tsd-kind-icon">uri</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+								<a href="soundcloudplaylistsearchv2.html#total_results" class="tsd-kind-icon">total_<wbr>results</a>
 							</li>
 						</ul>
 					</li>
