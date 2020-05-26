@@ -1,7 +1,7 @@
 import axios from "axios"
 import api from "../API"
-import {SoundCloudComment, SoundCloudPlaylist, SoundCloudTrack, SoundCloudUser, SoundCloudUserCollection,
-SoundCloudUserFilter, SoundCloudWebProfile} from "../types"
+import {SoundCloudComment, SoundCloudPlaylist, SoundCloudTrack, SoundCloudUser, SoundCloudUserCollection, SoundCloudUserFilter,
+SoundcloudUserSearchV2, SoundCloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
 export class Users {
@@ -9,11 +9,20 @@ export class Users {
     constructor(private readonly api: api) {}
 
     /**
+     * @deprecated use searchV2
      * Searches for users.
      */
     public search = async (params?: SoundCloudUserFilter) => {
         const response = await this.api.get(`/users`, params)
         return response as Promise<SoundCloudUser[]>
+    }
+
+    /**
+     * Searches for users using the v2 API.
+     */
+    public searchV2 = async (params?: SoundCloudUserFilter) => {
+        const response = await this.api.getV2(`search/users`, params)
+        return response as Promise<SoundcloudUserSearchV2>
     }
 
     /**
@@ -122,7 +131,7 @@ export class Users {
     /**
      * Searches for users (web scraping)
      */
-    public scrape = async (query: string) => {
+    public searchAlt = async (query: string) => {
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const html = await axios.get(`https://soundcloud.com/search/people?q=${query}`, {headers}).then((r) => r.data)
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
@@ -140,7 +149,7 @@ export class Users {
     /**
      * Gets a user by URL (web scraping)
      */
-    public getURL = async (url: string) => {
+    public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)

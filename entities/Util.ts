@@ -35,7 +35,7 @@ export class Util {
         // const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
         const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
         let url: string
-        const connect = this.api.oauthToken ? `?auth_token=${this.api.oauthToken}` : `?client_id=${this.api.clientID}`
+        const connect = match.includes("secret_token") ? `&client_id=${this.api.clientID}` : `?client_id=${this.api.clientID}`
         if (match) {
             url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
             .catch(() => {

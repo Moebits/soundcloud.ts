@@ -45,3 +45,9 @@ export interface SoundCloudOembed {
     author_name?: string
     author_url?: string
 }
+
+export interface SoundcloudSearchV2 {
+    total_results: number
+    next_href: string
+    query_urn: string
+}

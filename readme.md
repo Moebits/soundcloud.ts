@@ -31,20 +31,20 @@ client id and oauth token by inspecting the network traffic.
 
 #### Update
 Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being 
-you can use the `scrape` and `getURL` methods which get data from the html source instead.
+you can use the `searchAlt` and `getAlt` methods which get data from the html source instead.
 ```ts
 /*Alt search tracks*/
-const tracks = await soundcloud.tracks.scrape("cool track name")
+const tracks = await soundcloud.tracks.searchAlt("cool track name")
 /*Alt get track*/
-const track = await soundcloud.tracks.getURL("succducc/azure")
+const track = await soundcloud.tracks.getAlt("succducc/azure")
 /*Alt search playlists*/
-const playlists = await soundcloud.playlists.scrape("cool playlist name")
+const playlists = await soundcloud.playlists.searchAlt("cool playlist name")
 /*Alt get playlist*/
-const playlist = await soundcloud.playlists.getURL("virtual-riot/sets/throwback-ep")
+const playlist = await soundcloud.playlists.getAlt("virtual-riot/sets/throwback-ep")
 /*Alt search users*/
-const users = await soundcloud.users.scrape("cool username")
+const users = await soundcloud.users.searchAlt("cool username")
 /*Alt get user*/
-const user = await soundcloud.playlists.getURL("someone")
+const user = await soundcloud.playlists.getAlt("someone")
 ```
 
 #### Searching for tracks and playlists

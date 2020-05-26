@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundCloudPlaylist, SoundCloudPlaylistFilter, SoundCloudSecretToken} from "../types"
+import {SoundCloudPlaylist, SoundCloudPlaylistFilter, SoundcloudPlaylistSearchV2, SoundCloudSecretToken} from "../types"
 import {Resolve} from "./index"
 
 export class Playlists {
@@ -8,11 +8,20 @@ export class Playlists {
     public constructor(private readonly api: api) {}
 
     /**
+     * @deprecated use searchV2
      * Searches for playlists.
      */
     public search = async (params?: SoundCloudPlaylistFilter) => {
         const response = await this.api.get(`/playlists`, params)
         return response as Promise<SoundCloudPlaylist[]>
+    }
+
+    /**
+     * Searches for playlists using the v2 API.
+     */
+    public searchV2 = async (params?: SoundCloudPlaylistFilter) => {
+        const response = await this.api.getV2(`search/playlists`, params)
+        return response as Promise<SoundcloudPlaylistSearchV2>
     }
 
     /**
@@ -38,7 +47,7 @@ export class Playlists {
     /**
      * Searches for playlists (web scraping)
      */
-    public scrape = async (query: string) => {
+    public searchAlt = async (query: string) => {
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const html = await axios.get(`https://soundcloud.com/search/sets?q=${query}`, {headers}).then((r) => r.data)
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
@@ -56,7 +65,7 @@ export class Playlists {
     /**
      * Gets a playlist by URL (web scraping)
      */
-    public getURL = async (url: string) => {
+    public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)

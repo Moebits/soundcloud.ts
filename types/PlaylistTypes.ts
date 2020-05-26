@@ -1,4 +1,4 @@
-import {SoundCloudLicense, SoundCloudTrack, SoundCloudUserMini} from "./index"
+import {SoundCloudLicense, SoundcloudSearchV2, SoundCloudTrack, SoundcloudTrackV2, SoundCloudUserMini} from "./index"
 
 export interface SoundCloudPlaylistFilter {
     representation?: "compact" | "id"
@@ -42,4 +42,44 @@ export interface SoundCloudPlaylist {
     user: SoundCloudUserMini
     embeddable_by: string
     label_id: string | null
+}
+
+export interface SoundcloudPlaylistV2 {
+    duration: number
+    permalink_url: string
+    reposts_count: number
+    genre: string | null
+    permalink: string
+    purchase_url: string | null
+    description: string | null
+    uri: string
+    label_name: string | null
+    tag_list: string
+    set_type: string
+    public: boolean
+    track_count: number
+    user_id: number
+    last_modified: string
+    license: string
+    tracks: SoundcloudTrackV2[]
+    id: number
+    release_date: string | null
+    display_date: string
+    sharing: string
+    secret_token: string | null
+    created_at: string
+    likes_count: number
+    kind: string
+    title: string
+    purchase_title: string | null
+    managed_by_feeds: boolean
+    artwork_url: string | null
+    is_album: boolean
+    user: any
+    published_at: string | null
+    embeddable_by: string
+}
+
+export interface SoundcloudPlaylistSearchV2 extends SoundcloudSearchV2 {
+    collection: SoundcloudPlaylistV2[]
 }

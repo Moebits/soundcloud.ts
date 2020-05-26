@@ -1,17 +1,26 @@
 import axios from "axios"
 import api from "../API"
-import {SoundCloudComment, SoundCloudSecretToken, SoundCloudTrack, SoundCloudTrackFilter, SoundCloudUser} from "../types"
+import {SoundCloudComment, SoundCloudSecretToken, SoundCloudTrack, SoundCloudTrackFilter, SoundcloudTrackSearchV2, SoundCloudUser} from "../types"
 import {Resolve} from "./index"
 export class Tracks {
     private readonly resolve = new Resolve(this.api)
     public constructor(private readonly api: api) {}
 
     /**
+     * @deprecated Use searchV2
      * Searches for tracks.
      */
     public search = async (params?: SoundCloudTrackFilter) => {
         const response = await this.api.get(`/tracks`, params)
         return response as Promise<SoundCloudTrack[]>
+    }
+
+    /**
+     * Searches for tracks using the v2 API.
+     */
+    public searchV2 = async (params?: SoundCloudTrackFilter) => {
+        const response = await this.api.getV2(`search/tracks`, params)
+        return response as Promise<SoundcloudTrackSearchV2>
     }
 
     /**
@@ -74,7 +83,7 @@ export class Tracks {
     /**
      * Searches for tracks (web scraping)
      */
-    public scrape = async (query: string) => {
+    public searchAlt = async (query: string) => {
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const html = await axios.get(`https://soundcloud.com/search/sounds?q=${query}`, {headers}).then((r) => r.data)
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
@@ -92,7 +101,7 @@ export class Tracks {
     /**
      * Gets a track by URL (web scraping)
      */
-    public getURL = async (url: string) => {
+    public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)

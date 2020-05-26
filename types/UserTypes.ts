@@ -1,3 +1,4 @@
+import {SoundcloudSearchV2} from "./index"
 export interface SoundCloudUserFilter {
     q?: string
 }
@@ -54,7 +55,42 @@ export interface SoundCloudUser {
     reposts_count: number
     upload_seconds_left?: number
     plan: string
+}
 
+export interface SoundcloudUserV2 {
+    avatar_url: string
+    city: string
+    comments_count: number
+    country_code: number | null
+    created_at: string
+    creator_subscriptions: any[]
+    creator_subscription: any
+    description: string
+    followers_count: number
+    followings_count: number
+    first_name: string
+    full_name: string
+    groups_count: number
+    id: number
+    kind: string
+    last_modified: string
+    last_name: string
+    likes_count: number
+    playlist_likes_count: number
+    permalink: string
+    permalink_url: string
+    playlist_count: number
+    reposts_count: number | null
+    track_count: number
+    uri: string
+    urn: string
+    username: string
+    verified: boolean
+    visuals: any
+}
+
+export interface SoundcloudUserSearchV2 extends SoundcloudSearchV2 {
+    collection: SoundcloudUserV2[]
 }
 
 export interface SoundCloudWebProfile {

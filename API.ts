@@ -1,6 +1,7 @@
 import axios from "axios"
 
 const apiURL = "https://api.soundcloud.com/"
+const apiV2URL = "https://api-v2.soundcloud.com/"
 const webURL = "https://www.soundcloud.com/"
 
 export default class API {
@@ -16,6 +17,19 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
+        const response = await axios.get(endpoint, {params, headers: this.headers}).then((r) => r.data)
+        return response
+    }
+
+    /**
+     * Gets an endpoint from the Soundcloud V2 API.
+     */
+    public getV2 = async (endpoint: string, params?: any) => {
+        if (!params) params = {}
+        params.client_id = this.clientID
+        if (this.oauthToken) params.oauth_token = this.oauthToken
+        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
+        endpoint = apiV2URL + endpoint
         const response = await axios.get(endpoint, {params, headers: this.headers}).then((r) => r.data)
         return response
     }

@@ -1,4 +1,4 @@
-import {SoundCloudUserMini} from "./index"
+import {SoundcloudSearchV2, SoundCloudUserMini} from "./index"
 
 export type SoundCloudLicense =
     | "no-rights-reserved"
@@ -96,6 +96,55 @@ export interface SoundCloudTrack {
     label_id: number | null
     asset_data?: string
     artwork_data?: string
+}
+
+export interface SoundcloudTrackV2 {
+    comment_count: number
+    full_duration: number
+    downloadable: boolean
+    created_at: string
+    description: string | null
+    media: any
+    title: string
+    publisher_metadata: any
+    duration: number
+    has_downloads_left: boolean
+    artwork_url: string
+    public: boolean
+    streamable: boolean
+    tag_list: string
+    genre: string
+    id: number
+    reposts_count: number
+    state: string
+    label_name: string | null
+    last_modified: string
+    commentable: boolean
+    policy: string
+    visuals: string | null
+    kind: string
+    purchase_url: string | null
+    sharing: string
+    uri: string
+    secret_token: string | null
+    download_count: number
+    likes_count: number
+    urn: string
+    license: string
+    purchase_title: string | null
+    display_date: string
+    embeddable_by: string
+    release_date: string
+    user_id: number
+    monetization_model: string
+    waveform_url: string
+    permalink: string
+    permalink_url: string
+    user: any
+    playback_count: number
+}
+export interface SoundcloudTrackSearchV2 extends SoundcloudSearchV2 {
+    collection: SoundcloudTrackV2[]
 }
 
 export interface SoundCloudSecretToken {
