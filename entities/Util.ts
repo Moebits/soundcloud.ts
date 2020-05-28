@@ -21,6 +21,7 @@ export class Util {
             "referer": "soundcloud.com",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
         }
+        if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         const html = await axios.get(songUrl, {headers})
         // const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
         const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
