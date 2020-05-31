@@ -11,6 +11,7 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // const result = await soundcloud.util.downloadTrack("https://soundcloud.com/virtual-riot/virtualriot-withyou", "./tracks")
     // const result = await soundcloud.users.getURL("imtenpi")
     // const result = await soundcloud.playlists.searchV2({q: "anime"})
-    const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
+    // const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
+    const result = await soundcloud.util.streamLink("imtenpi/snowflake")
     console.log(result)
 })()
