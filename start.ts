@@ -12,6 +12,7 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // const result = await soundcloud.users.getURL("imtenpi")
     // const result = await soundcloud.playlists.searchV2({q: "anime"})
     // const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
-    const result = await soundcloud.util.streamLink("imtenpi/snowflake")
+    // const result = await soundcloud.util.streamLink("imtenpi/snowflake")
+    const result = await soundcloud.tracks.searchV2({q: "kawaii"})
     console.log(result)
 })()

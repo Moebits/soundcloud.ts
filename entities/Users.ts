@@ -174,7 +174,7 @@ export class Users {
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
         const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-        const user = data[4].data[0]
+        const user = data[5].data[0]
         return user as Promise<SoundcloudUserV2>
     }
 
