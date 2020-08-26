@@ -171,7 +171,7 @@ export class Util {
     /**
      * Same as downloadTrack, but it returns a readable stream.
      */
-    public streamTrack = async (trackResolvable: string | SoundcloudTrack, folder?: string) => {
+    public streamTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
         if (!folder) folder = "./"
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         let track: SoundcloudTrack
@@ -192,6 +192,27 @@ export class Util {
             const dest = await this.downloadTrackStream(url, title, folder)
             return fs.createReadStream(dest)
         }
+    }
+
+    /**
+     * Downloads a track's song cover.
+     */
+    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        let track: SoundcloudTrackV2
+        if (trackResolvable.hasOwnProperty("artwork_url")) {
+            track = trackResolvable as SoundcloudTrackV2
+        } else {
+            track = await this.tracks.getV2(trackResolvable as string)
+        }
+        let artwork = track.artwork_url ? track.artwork_url : track.user.avatar_url
+        artwork = artwork.replace(".jpg", ".png").replace("-large", "-t500x500")
+        const title = track.title.replace(/\//g, "")
+        const dest = path.join(folder, `${title}.png`)
+        const arrayBuffer = await axios.get(artwork, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}}).then((r) => r.data)
+        fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
+        return dest
     }
 
     /**

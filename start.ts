@@ -13,6 +13,6 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // const result = await soundcloud.playlists.searchV2({q: "anime"})
     // const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
     // const result = await soundcloud.util.streamLink("imtenpi/snowflake")
-    const result = await soundcloud.tracks.getV2("https://soundcloud.com/virtual-riot/liquid-dnb-fun-test")
+    const result = await soundcloud.util.downloadSongCover("https://soundcloud.com/imtenpi/rainfall", "./tracks")
     console.log(result)
 })()
