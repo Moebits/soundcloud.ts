@@ -61,28 +61,6 @@ export class Util {
         } else {
             return null
         }
-        /*const result = await axios.get(url, {headers}).then((r) => r.data)
-        const streamUrls = result.match(/(https:\/\/cf-hls-media.sndcdn.com)((.|\n)*?)(?=#)/gm)
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder)
-        const src = path.join(folder, "concat")
-        if (!fs.existsSync(src)) fs.mkdirSync(src)
-        const chunkList: string[] = []
-        for (let i = 0; i < streamUrls.length; i++) {
-            const chunkPath = `${title}${i}.mp3`
-            const dest = path.join(src, chunkPath)
-            const res = await axios.get(streamUrls[i], {responseType: "arraybuffer"})
-            fs.writeFileSync(dest, Buffer.from(res.data, "binary"))
-            chunkList.push(dest)
-        }
-        const audioconcat = require("audioconcat")
-        const finalMP3 = path.join(folder, `${title}.mp3`)
-        await new Promise((resolve) => {
-            audioconcat(chunkList).concat(finalMP3)
-            .on("end", () => {
-                resolve()
-            })
-        })
-        this.removeDirectory(src)*/
         const finalMP3 = path.join(folder, `${title}.mp3`)
         const binary = await axios.get(url, {headers, responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(finalMP3, Buffer.from(binary, "binary"))
@@ -163,8 +141,8 @@ export class Util {
     /**
      * Downloads all the tracks in a playlist.
      */
-    public downloadPlaylist = async (playlistResolvable: string | number, dest?: string, limit?: number) => {
-        const playlist = await this.playlists.get(playlistResolvable)
+    public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
+        const playlist = await this.playlists.getAlt(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
