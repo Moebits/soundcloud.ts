@@ -101,20 +101,21 @@
 				<a href="#update" id="update" style="color: inherit; text-decoration: none;">
 					<h4>Update</h4>
 				</a>
-				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being
-				you can use the <code>searchAlt</code> and <code>getAlt</code> methods which get data from the html source instead.</p>
-				<pre><code class="language-ts"><span class="hljs-comment">/*Alt search tracks*/</span>
-<span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.searchAlt(<span class="hljs-string">"cool track name"</span>)
-<span class="hljs-comment">/*Alt get track*/</span>
-<span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.getAlt(<span class="hljs-string">"succducc/azure"</span>)
-<span class="hljs-comment">/*Alt search playlists*/</span>
-<span class="hljs-keyword">const</span> playlists = <span class="hljs-keyword">await</span> soundcloud.playlists.searchAlt(<span class="hljs-string">"cool playlist name"</span>)
-<span class="hljs-comment">/*Alt get playlist*/</span>
+				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use <code>getV2</code> and <code>searchV2</code> which use the v2 endpoints or <code>getAlt</code> and <code>searchAlt</code> which get data by web scraping. Note that for playlists, <code>getV2</code> returns a 500 error so stick with <code>getAlt</code> for now.</p>
+				<pre><code class="language-ts"><span class="hljs-comment">/*Get track v2*/</span>
+<span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.getV2(<span class="hljs-string">"succducc/azure"</span>)
+<span class="hljs-comment">/*Search tracks v2*/</span>
+<span class="hljs-keyword">const</span> tracks = <span class="hljs-keyword">await</span> soundcloud.tracks.searchV2({q: <span class="hljs-string">"cool track name"</span>})
+
+<span class="hljs-comment">/*Get user v2*/</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> soundcloud.playlists.getV2(<span class="hljs-string">"someone"</span>)
+<span class="hljs-comment">/*Search users v2*/</span>
+<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> soundcloud.users.searchV2({q: <span class="hljs-string">"cool username"</span>})
+
+<span class="hljs-comment">/*Get playlist (web scraping)*/</span>
 <span class="hljs-keyword">const</span> playlist = <span class="hljs-keyword">await</span> soundcloud.playlists.getAlt(<span class="hljs-string">"virtual-riot/sets/throwback-ep"</span>)
-<span class="hljs-comment">/*Alt search users*/</span>
-<span class="hljs-keyword">const</span> users = <span class="hljs-keyword">await</span> soundcloud.users.searchAlt(<span class="hljs-string">"cool username"</span>)
-<span class="hljs-comment">/*Alt get user*/</span>
-<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> soundcloud.playlists.getAlt(<span class="hljs-string">"someone"</span>)</code></pre>
+<span class="hljs-comment">/*Search playlists v2*/</span>
+<span class="hljs-keyword">const</span> playlists = <span class="hljs-keyword">await</span> soundcloud.playlists.searchV2({q: <span class="hljs-string">"cool playlist name"</span>})</code></pre>
 				<a href="#searching-for-tracks-and-playlists" id="searching-for-tracks-and-playlists" style="color: inherit; text-decoration: none;">
 					<h4>Searching for tracks and playlists</h4>
 				</a>
