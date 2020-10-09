@@ -30,21 +30,22 @@ client id and oauth token by inspecting the network traffic.
 - Edit - the oauth_token no longer appears on track downloads, but you might be able to find it by inspecting the network tab while you login to soundcloud. It should be in the format d-dddddd-ddddddddd-aaaaaaaaaaaaaa, where d is a digit and a is an alphanumeric character. 
 
 #### Update
-Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. For the time being 
-you can use the `searchAlt` and `getAlt` methods which get data from the html source instead.
+Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping. Note that for playlists, `getV2` returns a 500 error so stick with `getAlt` for now.
 ```ts
-/*Alt search tracks*/
-const tracks = await soundcloud.tracks.searchAlt("cool track name")
-/*Alt get track*/
-const track = await soundcloud.tracks.getAlt("succducc/azure")
-/*Alt search playlists*/
-const playlists = await soundcloud.playlists.searchAlt("cool playlist name")
-/*Alt get playlist*/
+/*Get track v2*/
+const track = await soundcloud.tracks.getV2("succducc/azure")
+/*Search tracks v2*/
+const tracks = await soundcloud.tracks.searchV2({q: "cool track name"})
+
+/*Get user v2*/
+const user = await soundcloud.playlists.getV2("someone")
+/*Search users v2*/
+const users = await soundcloud.users.searchV2({q: "cool username"})
+
+/*Get playlist (web scraping)*/
 const playlist = await soundcloud.playlists.getAlt("virtual-riot/sets/throwback-ep")
-/*Alt search users*/
-const users = await soundcloud.users.searchAlt("cool username")
-/*Alt get user*/
-const user = await soundcloud.playlists.getAlt("someone")
+/*Search playlists v2*/
+const playlists = await soundcloud.playlists.searchV2({q: "cool playlist name"})
 ```
 
 #### Searching for tracks and playlists

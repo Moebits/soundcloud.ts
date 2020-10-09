@@ -67,7 +67,7 @@ export class Playlists {
         for (let i = 0; i < urls.length; i++) {
             const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
             const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-            const user = data[5].data[0]
+            const user = data[7].data[0]
             scrape.push(user)
         }
         return scrape as Promise<SoundcloudPlaylistV2[]>

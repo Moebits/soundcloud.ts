@@ -32,7 +32,7 @@ export class Resolve {
         if (String(resolvable).includes("soundcloud")) {
             const html = await axios.get(String(resolvable), {headers: API.headers}).then((r) => r.data)
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-            id = data[6]?.data?.[0]?.id ? data[6].data[0].id : data[5].data[0].id
+            id = data[7]?.data?.[0]?.id ? data[7].data[0].id : data[6].data[0].id
         }
         return id
     }
