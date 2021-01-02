@@ -107,7 +107,7 @@ export class Tracks {
         for (let i = 0; i < urls.length; i++) {
             const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
             const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-            const track = data[7].data[0]
+            const track = data[data.length - 1].data[0]
             scrape.push(track)
         }
         return scrape as Promise<SoundcloudTrackV2[]>
@@ -121,7 +121,7 @@ export class Tracks {
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
         const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-        const track = data[7].data[0]
+        const track = data[data.length - 1].data[0]
         return track as Promise<SoundcloudTrackV2>
     }
 
