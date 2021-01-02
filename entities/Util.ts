@@ -75,9 +75,8 @@ export class Util {
         const writeStream = fs.createWriteStream(finalMP3)
         stream.pipe(writeStream)
 
-        // Wait for 'end' event (file save completion)
-        await new Promise(r => stream.on('end', () => r))
-
+        await new Promise<void>(resolve => stream.on("end", () => resolve()))
+        
         return finalMP3
     }
 

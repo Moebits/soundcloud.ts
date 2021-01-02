@@ -101,7 +101,7 @@
 				<a href="#update" id="update" style="color: inherit; text-decoration: none;">
 					<h4>Update</h4>
 				</a>
-				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use <code>getV2</code> and <code>searchV2</code> which use the v2 endpoints or <code>getAlt</code> and <code>searchAlt</code> which get data by web scraping. Note that for playlists, <code>getV2</code> returns a 500 error so stick with <code>getAlt</code> for now.</p>
+				<p>Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use <code>getV2</code> and <code>searchV2</code> which use the v2 endpoints or <code>getAlt</code> and <code>searchAlt</code> which get data by web scraping.</p>
 				<pre><code class="language-ts"><span class="hljs-comment">/*Get track v2*/</span>
 <span class="hljs-keyword">const</span> track = <span class="hljs-keyword">await</span> soundcloud.tracks.getV2(<span class="hljs-string">"succducc/azure"</span>)
 <span class="hljs-comment">/*Search tracks v2*/</span>
