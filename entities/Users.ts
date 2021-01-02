@@ -41,7 +41,7 @@ export class Users {
      */
     public getV2 = async (userResolvable: string | number) => {
         const userID = await this.resolve.getAlt(userResolvable)
-        const response = await this.api.getV2(`/users/soundcloud:users:${userID}`)
+        const response = await this.api.getV2(`/users/${userID}`)
         return response as Promise<SoundcloudUserV2>
     }
 

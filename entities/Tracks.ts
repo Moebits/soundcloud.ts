@@ -39,7 +39,7 @@ export class Tracks {
      */
     public getV2 = async (trackResolvable: string | number) => {
         const trackID = await this.resolve.getAlt(trackResolvable)
-        const response = await this.api.getV2(`/tracks/soundcloud:tracks:${trackID}`)
+        const response = await this.api.getV2(`/tracks/${trackID}`)
         return response as Promise<SoundcloudTrackV2>
     }
 

@@ -40,7 +40,7 @@ export class Playlists {
      */
     public getV2 = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.getAlt(playlistResolvable)
-        const response = await this.api.getV2(`/playlists/soundcloud:playlists:${playlistID}`)
+        const response = await this.api.getV2(`/playlists/${playlistID}`)
         return response as Promise<SoundcloudPlaylistV2>
     }
 
