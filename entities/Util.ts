@@ -38,10 +38,9 @@ export class Util {
     }
 
     /**
-     * Downloads the mp3 stream of a track.
+     * Downloads the mp3 stream of a track as readable stream.
      */
-    public downloadTrackStream = async (songUrl: string, title: string, folder: string) => {
-        if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
+    private downloadTrackReadableStream = async (songUrl: string): Promise<stream.Readable> => {
         const headers = {
             "referer": "soundcloud.com",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
@@ -61,9 +60,24 @@ export class Util {
         } else {
             return null
         }
+        const readable = await axios.get(url, {headers, responseType: "stream"}).then((r) => r.data)
+        return readable
+    }
+
+    /**
+     * Downloads the mp3 stream of a track.
+     */
+    public downloadTrackStream = async (songUrl: string, title: string, folder: string) => {
+        if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
         const finalMP3 = path.join(folder, `${title}.mp3`)
-        const binary = await axios.get(url, {headers, responseType: "arraybuffer"}).then((r) => r.data)
-        fs.writeFileSync(finalMP3, Buffer.from(binary, "binary"))
+
+        const stream = await this.downloadTrackReadableStream(songUrl);
+        const writeStream = fs.createWriteStream(finalMP3)
+        stream.pipe(writeStream)
+
+        // Wait for 'end' event (file save completion)
+        await new Promise(r => stream.on('end', () => r))
+
         return finalMP3
     }
 
@@ -169,6 +183,24 @@ export class Util {
             const title = await this.getTitle(url)
             const dest = await this.downloadTrackStream(url, title, folder)
             return fs.createReadStream(dest)
+        }
+    }
+
+    /**
+     * Similar to streamTrack, but it does not download the track, only returns readable stream.
+     */
+    public streamTrackDirectly = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2): Promise<stream.Readable> => {
+        let track: SoundcloudTrack
+        if (trackResolvable.hasOwnProperty("downloadable")) {
+            track = trackResolvable as SoundcloudTrack
+            if (track.downloadable === true) {
+                return await axios.get(track.download_url, {responseType: "stream", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+            } else {
+                return await this.downloadTrackReadableStream(track.permalink_url)
+            }
+        } else {
+            const url = trackResolvable as string
+            return await this.downloadTrackReadableStream(url)
         }
     }
 

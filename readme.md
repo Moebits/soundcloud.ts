@@ -30,7 +30,7 @@ client id and oauth token by inspecting the network traffic.
 - Edit - the oauth_token no longer appears on track downloads, but you might be able to find it by inspecting the network tab while you login to soundcloud. It should be in the format d-dddddd-ddddddddd-aaaaaaaaaaaaaa, where d is a digit and a is an alphanumeric character. 
 
 #### Update
-Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping. Note that for playlists, `getV2` returns a 500 error so stick with `getAlt` for now.
+Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping.
 ```ts
 /*Get track v2*/
 const track = await soundcloud.tracks.getV2("succducc/azure")
