@@ -34,7 +34,6 @@ export class Resolve {
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
             id = data[data.length - 1]?.data?.[0]?.id ? data[data.length - 1].data[0].id : data[data.length - 2].data[0].id
         }
-        console.log(id)
         return id
     }
 }
