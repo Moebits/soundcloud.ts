@@ -14,6 +14,6 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
     // const result = await soundcloud.util.streamLink("imtenpi/snowflake")
     // const result = await soundcloud.util.downloadSongCover("https://soundcloud.com/imtenpi/rainfall", "./tracks")
-    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/colbreakz/my-universe", "./tracks")
+    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/colbreakz/my-universe", "./tracks/audio.mp3")
     console.log(result)
 })()

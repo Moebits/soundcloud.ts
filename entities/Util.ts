@@ -1,7 +1,6 @@
 import axios from "axios"
 import * as fs from "fs"
 import * as path from "path"
-import * as stream from "stream"
 import api from "../API"
 import {SoundcloudTrack, SoundcloudTrackV2} from "../types"
 import {Playlists, Tracks, Users} from "./index"
@@ -40,7 +39,7 @@ export class Util {
     /**
      * Downloads the mp3 stream of a track as readable stream.
      */
-    private downloadTrackReadableStream = async (songUrl: string): Promise<stream.Readable> => {
+    private downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
         const headers = {
             "referer": "soundcloud.com",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
@@ -67,9 +66,9 @@ export class Util {
     /**
      * Downloads the mp3 stream of a track.
      */
-    public downloadTrackStream = async (songUrl: string, title: string, folder: string) => {
+    public downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
-        const finalMP3 = path.join(folder, `${title}.mp3`)
+        const finalMP3 = path.extname(dest) ? dest : path.join(dest, `${title}.mp3`)
 
         const stream = await this.downloadTrackReadableStream(songUrl);
         const writeStream = fs.createWriteStream(finalMP3)
@@ -96,24 +95,25 @@ export class Util {
     /**
      * Downloads a track on Soundcloud.
      */
-    public downloadTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
-        if (!folder) folder = "./"
+    public downloadTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string) => {
+        if (!dest) dest = "./"
+        const folder = path.dirname(dest)
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         let track: SoundcloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID}})
-                const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
+                dest = path.extname(dest) ? dest : path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
                 fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
                 return dest
             } else {
-                return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
+                return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), dest)
             }
         } else {
             const url = trackResolvable as string
             const title = await this.getTitle(url)
-            return this.downloadTrackStream(url, title, folder)
+            return this.downloadTrackStream(url, title, dest)
         }
     }
 
@@ -160,35 +160,9 @@ export class Util {
     }
 
     /**
-     * Same as downloadTrack, but it returns a readable stream.
+     * Returns a readable stream to the track.
      */
-    public streamTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
-        if (!folder) folder = "./"
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        let track: SoundcloudTrack
-        if (trackResolvable.hasOwnProperty("downloadable")) {
-            track = trackResolvable as SoundcloudTrack
-            if (track.downloadable === true) {
-                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
-                const dest = path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
-                fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
-                return fs.createReadStream(dest)
-            } else {
-                const dest = await this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), folder)
-                return fs.createReadStream(dest)
-            }
-        } else {
-            const url = trackResolvable as string
-            const title = await this.getTitle(url)
-            const dest = await this.downloadTrackStream(url, title, folder)
-            return fs.createReadStream(dest)
-        }
-    }
-
-    /**
-     * Similar to streamTrack, but it does not download the track, only returns readable stream.
-     */
-    public streamTrackDirectly = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2): Promise<stream.Readable> => {
+    public streamTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
         let track: SoundcloudTrack
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundcloudTrack
@@ -206,8 +180,9 @@ export class Util {
     /**
      * Downloads a track's song cover.
      */
-    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, folder?: string) => {
-        if (!folder) folder = "./"
+    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string) => {
+        if (!dest) dest = "./"
+        const folder = path.dirname(dest)
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         let track: SoundcloudTrackV2
         if (trackResolvable.hasOwnProperty("artwork_url")) {
@@ -218,20 +193,10 @@ export class Util {
         let artwork = track.artwork_url ? track.artwork_url : track.user.avatar_url
         artwork = artwork.replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/\//g, "")
-        const dest = path.join(folder, `${title}.png`)
+        dest = path.extname(dest) ? dest : path.join(folder, `${title}.png`)
         const arrayBuffer = await axios.get(artwork, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
-    }
-
-    /**
-     * Utility for awaiting a stream.Writable
-     */
-    private readonly awaitStream = async (writeStream: stream.Writable) => {
-        return new Promise((resolve, reject) => {
-            writeStream.on("finish", resolve)
-            writeStream.on("error", reject)
-        })
     }
 
     /**
