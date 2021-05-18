@@ -27,10 +27,13 @@ export class Util {
         const client_id = await this.api.getClientID()
         const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         if (match) {
-            url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
-            .catch(() => {
-                return Promise.reject("client id expired")
-            })
+            try {
+                url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+            } catch {
+                const client_id = await this.api.getClientID(true)
+                const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+                url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+            }
         } else {
             return null
         }

@@ -1,7 +1,7 @@
 import SoundCloud from "./soundcloud"
 
 require("dotenv").config()
-const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
+const soundcloud = new SoundCloud();
 (async () => {
     // const result = await soundcloud.tracks.search({q: "virtual riot"})
     // await soundcloud.util.downloadPlaylist("https://soundcloud.com/tenpimusic/sets/my-songs", "./tracks")
@@ -14,6 +14,6 @@ const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID);
     // const result = await soundcloud.users.getV2("https://soundcloud.com/imtenpi/sets/my-songs")
     // const result = await soundcloud.util.streamLink("imtenpi/snowflake")
     // const result = await soundcloud.util.downloadSongCover("https://soundcloud.com/imtenpi/rainfall", "./tracks")
-    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/colbreakz/my-universe", "./tracks/audio.mp3")
+    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/colbreakz/my-universe", "./tracks")
     console.log(result)
 })()

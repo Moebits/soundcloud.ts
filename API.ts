@@ -96,7 +96,7 @@ export default class API {
                 script = await axios.get(urls.pop()).then((r) => r.data)
             } while (!script.includes(",client_id:\"") && urls.length > 0)
             this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
-            if (!this.clientID) throw new Error("Unable to fetch a SoundCloud API key!")
+            if (!this.clientID) Promise.reject("Unable to fetch a SoundCloud API key!")
         }
         return this.clientID
     }
