@@ -1,8 +1,6 @@
 import api from "./API"
 import {Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util} from "./entities/index"
 
-const publicID = "BeGVhOrGmfboy1LtiHTQF6Ejpt9ULJCI"
-
 /**
  * The main class for interacting with the Soundcloud API.
  */
@@ -23,8 +21,6 @@ export default class Soundcloud {
         if (clientID) {
             Soundcloud.clientID = clientID
             if (oauthToken) Soundcloud.oauthToken = oauthToken
-        } else {
-            Soundcloud.clientID = publicID
         }
         this.api = new api(Soundcloud.clientID, Soundcloud.oauthToken)
         this.tracks = new Tracks(this.api)

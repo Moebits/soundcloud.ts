@@ -53,7 +53,7 @@ const playlists = await soundcloud.playlists.searchV2({q: "cool playlist name"})
 import Soundcloud from "soundcloud.ts"
 
 async function useAPI() {
-  /*Credentials are optional, a public client id will be used if they are omitted.*/
+  /*Credentials are optional, client id is manually found if omitted.*/
   const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 
   /*You can get tracks by URL or ID (which can only be gotten from the API)*/

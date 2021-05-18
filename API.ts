@@ -13,7 +13,7 @@ export default class API {
      */
     public get = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
@@ -26,7 +26,7 @@ export default class API {
      */
     public getV2 = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiV2URL + endpoint
@@ -39,7 +39,7 @@ export default class API {
      */
     public getWebsite = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = webURL + endpoint
@@ -52,14 +52,14 @@ export default class API {
      */
     public getURI = async (URI: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         return axios.get(URI, {params, headers: API.headers})
     }
 
     public post = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
@@ -69,7 +69,7 @@ export default class API {
 
     public put = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
@@ -79,11 +79,25 @@ export default class API {
 
     public delete = async (endpoint: string, params?: any) => {
         if (!params) params = {}
-        params.client_id = this.clientID
+        params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
         const response = await axios.delete(endpoint, {params, headers: API.headers}).then((r) => r.data)
         return response
+    }
+
+    public getClientID = async (reset?: boolean) => {
+        if (!this.clientID || reset) {
+            const response = await axios.get("https://soundcloud.com/").then((r) => r.data)
+            const urls = response.match(/(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*\.js)(?=">)/g)
+            let script: string
+            do {
+                script = await axios.get(urls.pop()).then((r) => r.data)
+            } while (!script.includes(",client_id:\"") && urls.length > 0)
+            this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
+            if (!this.clientID) Promise.reject("Unable to fetch a SoundCloud API key!")
+        }
+        return this.clientID
     }
 }
