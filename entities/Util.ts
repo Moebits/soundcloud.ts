@@ -24,7 +24,8 @@ export class Util {
         const html = await axios.get(songUrl, {headers})
         const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
         let url: string
-        const connect = match.includes("secret_token") ? `&client_id=${this.api.clientID}` : `?client_id=${this.api.clientID}`
+        const client_id = await this.api.getClientID()
+        const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         if (match) {
             url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
             .catch(() => {
@@ -44,21 +45,7 @@ export class Util {
             "referer": "soundcloud.com",
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
         }
-        if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
-        if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await axios.get(songUrl, {headers})
-        // const match = html.data.match(/(?<="transcodings":\[{"url":")(.*?)(?=")/)?.[0]
-        const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
-        let url: string
-        const connect = match.includes("secret_token") ? `&client_id=${this.api.clientID}` : `?client_id=${this.api.clientID}`
-        if (match) {
-            url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
-            .catch(() => {
-                return Promise.reject("client id expired")
-            })
-        } else {
-            return null
-        }
+        const url = await this.streamLink(songUrl)
         const readable = await axios.get(url, {headers, responseType: "stream"}).then((r) => r.data)
         return readable
     }
@@ -70,7 +57,7 @@ export class Util {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
         const finalMP3 = path.extname(dest) ? dest : path.join(dest, `${title}.mp3`)
 
-        const stream = await this.downloadTrackReadableStream(songUrl);
+        const stream = await this.downloadTrackReadableStream(songUrl)
         const writeStream = fs.createWriteStream(finalMP3)
         stream.pipe(writeStream)
 
@@ -103,7 +90,8 @@ export class Util {
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
-                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id: this.api.clientID}})
+                const client_id = await this.api.getClientID()
+                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id}})
                 dest = path.extname(dest) ? dest : path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
                 fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
                 return dest
@@ -167,7 +155,8 @@ export class Util {
         if (trackResolvable.hasOwnProperty("downloadable")) {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
-                return await axios.get(track.download_url, {responseType: "stream", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}})
+                const client_id = await this.api.getClientID()
+                return await axios.get(track.download_url, {responseType: "stream", params: {client_id, oauth_token: this.api.oauthToken}})
             } else {
                 return await this.downloadTrackReadableStream(track.permalink_url)
             }
@@ -194,7 +183,8 @@ export class Util {
         artwork = artwork.replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/\//g, "")
         dest = path.extname(dest) ? dest : path.join(folder, `${title}.png`)
-        const arrayBuffer = await axios.get(artwork, {responseType: "arraybuffer", params: {client_id: this.api.clientID, oauth_token: this.api.oauthToken}}).then((r) => r.data)
+        const client_id = await this.api.getClientID()
+        const arrayBuffer = await axios.get(artwork, {responseType: "arraybuffer", params: {client_id, oauth_token: this.api.oauthToken}}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
     }
