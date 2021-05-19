@@ -17,8 +17,14 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
-        const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
+        try { 
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        } catch {
+            params.client_id = await this.getClientID(true)
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        }
     }
 
     /**
@@ -30,8 +36,15 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiV2URL + endpoint
-        const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
+        try {
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        } catch {
+            params.client_id = await this.getClientID(true)
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        }
+        
     }
 
     /**
@@ -43,8 +56,14 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = webURL + endpoint
-        const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
+        try {
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        } catch {
+            params.client_id = await this.getClientID(true) 
+            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
+            return response
+        }
     }
 
     /**
@@ -54,7 +73,14 @@ export default class API {
         if (!params) params = {}
         params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
-        return axios.get(URI, {params, headers: API.headers})
+        try {
+            const response = await axios.get(URI, {params, headers: API.headers})
+            return response
+        } catch {
+            params.client_id = await this.getClientID(true)
+            const response =  await axios.get(URI, {params, headers: API.headers})
+            return response
+        }
     }
 
     public post = async (endpoint: string, params?: any) => {
