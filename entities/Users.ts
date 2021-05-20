@@ -40,7 +40,7 @@ export class Users {
      * Fetches a user from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getAlt(userResolvable)
+        const userID = await this.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/${userID}`)
         return response as Promise<SoundcloudUserV2>
     }
