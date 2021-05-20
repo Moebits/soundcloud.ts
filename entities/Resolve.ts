@@ -36,4 +36,20 @@ export class Resolve {
         }
         return id
     }
+
+    /**
+     * Gets the ID of a user/playlist/track from the Soundcloud URL using the v2 API.
+     */
+    public getV2 = async (resolvable: string | number, full?: boolean) => {
+        if (!String(resolvable).match(/\d{8,}/) && !String(resolvable).includes("soundcloud")) {
+            resolvable = `https://soundcloud.com/${resolvable}`
+        }
+        let id = resolvable
+        if (String(resolvable).includes("soundcloud")) {
+            const resolved = await this.api.getV2(`resolve`, {url: resolvable})
+            if (full) return resolved
+            id = resolved.id
+        }
+        return id
+    }
 }

@@ -38,7 +38,7 @@ export class Tracks {
      * Fetches a track from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (trackResolvable: string | number) => {
-        const trackID = await this.resolve.getAlt(trackResolvable)
+        const trackID = await this.resolve.getV2(trackResolvable)
         const response = await this.api.getV2(`/tracks/${trackID}`)
         return response as Promise<SoundcloudTrackV2>
     }
@@ -125,4 +125,12 @@ export class Tracks {
         return track as Promise<SoundcloudTrackV2>
     }
 
+    /**
+     * Gets all related tracks of a track using the v2 API.
+     */
+    public relatedV2 = async (trackResolvable: string | number, limit?: number) => {
+        const trackID = await this.resolve.getV2(trackResolvable)
+        const response = await this.api.getV2(`/tracks/${trackID}/related`, {limit})
+        return response.collection as Promise<SoundcloudTrackV2>
+    }
 }

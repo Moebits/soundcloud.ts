@@ -39,7 +39,7 @@ export class Playlists {
      * Fetches a playlist from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (playlistResolvable: string | number) => {
-        const playlistID = await this.resolve.getAlt(playlistResolvable)
+        const playlistID = await this.resolve.getV2(playlistResolvable)
         const response = await this.api.getV2(`/playlists/${playlistID}`)
         return response as Promise<SoundcloudPlaylistV2>
     }
