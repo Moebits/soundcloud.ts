@@ -25,8 +25,8 @@ export class Util {
         const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
         let url: string
         let client_id = await this.api.getClientID()
-        let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         if (match) {
+            let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
                 url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
             } catch {
