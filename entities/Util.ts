@@ -24,14 +24,14 @@ export class Util {
         const html = await axios.get(songUrl, {headers})
         const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
         let url: string
-        const client_id = await this.api.getClientID()
-        const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+        let client_id = await this.api.getClientID()
+        let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         if (match) {
             try {
                 url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
             } catch {
-                const client_id = await this.api.getClientID(true)
-                const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+                client_id = await this.api.getClientID(true)
+                connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
                 url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
             }
         } else {
