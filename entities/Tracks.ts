@@ -125,4 +125,12 @@ export class Tracks {
         return track as Promise<SoundcloudTrackV2>
     }
 
+    /**
+     * Gets all related tracks of a track using the v2 API.
+     */
+    public relatedV2 = async (trackResolvable: string | number, limit?: number) => {
+        const trackID = await this.resolve.getAlt(trackResolvable)
+        const response = await this.api.getV2(`/tracks/${trackID}/related`, {limit})
+        return response.collection as Promise<SoundcloudTrackV2>
+    }
 }
