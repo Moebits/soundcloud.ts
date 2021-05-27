@@ -7,7 +7,8 @@ import {Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util} fro
 export default class Soundcloud {
     public static clientID: string
     public static oauthToken: string
-    public api = new api(Soundcloud.clientID, Soundcloud.oauthToken)
+    public static proxy: string
+    public api = new api(Soundcloud.clientID, Soundcloud.oauthToken, Soundcloud.proxy)
     public tracks = new Tracks(this.api)
     public users = new Users(this.api)
     public playlists = new Playlists(this.api)
@@ -17,12 +18,13 @@ export default class Soundcloud {
     public comments = new Comments(this.api)
     public apps = new Apps(this.api)
     public util = new Util(this.api)
-    public constructor(clientID?: string, oauthToken?: string) {
+    public constructor(clientID?: string, oauthToken?: string, options?: {proxy?: string}) {
         if (clientID) {
             Soundcloud.clientID = clientID
             if (oauthToken) Soundcloud.oauthToken = oauthToken
         }
-        this.api = new api(Soundcloud.clientID, Soundcloud.oauthToken)
+        if (options?.proxy) Soundcloud.proxy = options.proxy
+        this.api = new api(Soundcloud.clientID, Soundcloud.oauthToken, Soundcloud.proxy)
         this.tracks = new Tracks(this.api)
         this.users = new Users(this.api)
         this.playlists = new Playlists(this.api)

@@ -56,7 +56,7 @@ export class Util {
     /**
      * Downloads the mp3 stream of a track.
      */
-    public downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
+    private downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
         const finalMP3 = path.extname(dest) ? dest : path.join(dest, `${title}.mp3`)
 

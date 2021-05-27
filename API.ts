@@ -6,7 +6,7 @@ const webURL = "https://www.soundcloud.com/"
 
 export default class API {
     public static headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-    public constructor(public clientID: string, public oauthToken: string) {}
+    public constructor(public clientID: string, public oauthToken: string, public proxy: string) {}
 
     /**
      * Gets an endpoint from the Soundcloud API.
@@ -17,6 +17,7 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
+        if (this.proxy) endpoint = this.proxy + endpoint
         try { 
             const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
             return response
@@ -36,6 +37,7 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiV2URL + endpoint
+        if (this.proxy) endpoint = this.proxy + endpoint
         try {
             const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
             return response
@@ -56,6 +58,7 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = webURL + endpoint
+        if (this.proxy) endpoint = this.proxy + endpoint
         try {
             const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
             return response
@@ -73,6 +76,7 @@ export default class API {
         if (!params) params = {}
         params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
+        if (this.proxy) URI = this.proxy + URI
         try {
             const response = await axios.get(URI, {params, headers: API.headers})
             return response
@@ -89,33 +93,16 @@ export default class API {
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         endpoint = apiURL + endpoint
+        if (this.proxy) endpoint = this.proxy + endpoint
         const response = await axios.post(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
-    }
-
-    public put = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = apiURL + endpoint
-        const response = await axios.put(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
-    }
-
-    public delete = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = apiURL + endpoint
-        const response = await axios.delete(endpoint, {params, headers: API.headers}).then((r) => r.data)
         return response
     }
 
     public getClientID = async (reset?: boolean) => {
         if (!this.clientID || reset) {
-            const response = await axios.get("https://soundcloud.com/").then((r) => r.data)
+            let url = webURL
+            if (this.proxy) url = this.proxy + url
+            const response = await axios.get(url).then((r) => r.data)
             const urls = response.match(/(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*\.js)(?=">)/g)
             let script: string
             do {
