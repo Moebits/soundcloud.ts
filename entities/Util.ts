@@ -159,20 +159,20 @@ export class Util {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const client_id = await this.api.getClientID()
-                return await axios.get(track.download_url, {responseType: "stream", params: {client_id, oauth_token: this.api.oauthToken}})
+                return axios.get(track.download_url, {responseType: "stream", params: {client_id, oauth_token: this.api.oauthToken}})
             } else {
-                return await this.downloadTrackReadableStream(track.permalink_url)
+                return this.downloadTrackReadableStream(track.permalink_url)
             }
         } else {
             const url = trackResolvable as string
-            return await this.downloadTrackReadableStream(url)
+            return this.downloadTrackReadableStream(url)
         }
     }
 
     /**
      * Downloads a track's song cover.
      */
-    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string) => {
+    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = path.dirname(dest)
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
@@ -187,30 +187,10 @@ export class Util {
         const title = track.title.replace(/\//g, "")
         dest = path.extname(dest) ? dest : path.join(folder, `${title}.png`)
         const client_id = await this.api.getClientID()
-        const arrayBuffer = await axios.get(artwork, {responseType: "arraybuffer", params: {client_id, oauth_token: this.api.oauthToken}}).then((r) => r.data)
+        const url = `${artwork}?client_id=${client_id}`
+        if (noDL) return url
+        const arrayBuffer = await axios.get(url, {responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
-    }
-
-    /**
-     * Removes a directory recursively
-     */
-    private readonly removeDirectory = (dir: string) => {
-        if (dir === "/" || dir === "./") return
-        if (fs.existsSync(dir)) {
-            fs.readdirSync(dir).forEach(function(entry) {
-                const entryPath = path.join(dir, entry)
-                if (fs.lstatSync(entryPath).isDirectory()) {
-                    this.removeDirectory(entryPath)
-                } else {
-                    fs.unlinkSync(entryPath)
-                }
-            })
-            try {
-                fs.rmdirSync(dir)
-            } catch (e) {
-                console.log(e)
-            }
-        }
     }
 }
