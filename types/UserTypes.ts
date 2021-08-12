@@ -1,4 +1,4 @@
-import {SoundcloudSearchV2} from "./index"
+import {SoundcloudSearchV2, SoundcloudFilterV2} from "./index"
 export interface SoundcloudUserFilter {
     q?: string
 }
@@ -123,4 +123,8 @@ export interface SoundcloudCreatorSubscription {
     product: {
         id: string
     }
+}
+
+export interface SoundcloudUserFilterV2 extends SoundcloudFilterV2 {
+    "filter.place"?: string
 }

@@ -51,3 +51,9 @@ export interface SoundcloudSearchV2 {
     next_href: string
     query_urn: string
 }
+
+export interface SoundcloudFilterV2 {
+    q: string
+    limit?: number
+    offset?: number
+}
