@@ -1,4 +1,4 @@
-import {SoundcloudSearchV2, SoundcloudUserMini, SoundcloudUserV2} from "./index"
+import {SoundcloudSearchV2, SoundcloudUserMini, SoundcloudUserV2, SoundcloudFilterV2} from "./index"
 
 export type SoundcloudLicense =
     | "no-rights-reserved"
@@ -170,4 +170,11 @@ export interface SoundcloudTranscoding {
         mime_type: string
     }
     quality: string
+}
+
+export interface SoundcloudTrackFilterV2 extends SoundcloudFilterV2 {
+    "filter.genre_or_tag"?: string
+    "filter.duration"?: "short" | "medium" | "long" | "epic"
+    "filter.created_at"?: "last_hour" | "last_day" | "last_week" | "last_month" | "last_year"
+    "filter.license"?: "to_modify_commercially" | "to_share" | "to_use_commercially"
 }

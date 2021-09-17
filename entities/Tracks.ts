@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundcloudComment, SoundcloudSecretToken, SoundcloudTrack, SoundcloudTrackFilter, SoundcloudTrackSearchV2, SoundcloudTrackV2, SoundcloudUser} from "../types"
+import {SoundcloudComment, SoundcloudSecretToken, SoundcloudTrack, SoundcloudTrackFilter, SoundcloudTrackFilterV2, SoundcloudTrackSearchV2, SoundcloudTrackV2, SoundcloudUser} from "../types"
 import {Resolve} from "./index"
 export class Tracks {
     private readonly resolve = new Resolve(this.api)
@@ -18,7 +18,7 @@ export class Tracks {
     /**
      * Searches for tracks using the v2 API.
      */
-    public searchV2 = async (params?: SoundcloudTrackFilter) => {
+    public searchV2 = async (params?: SoundcloudTrackFilterV2) => {
         const response = await this.api.getV2(`search/tracks`, params)
         return response as Promise<SoundcloudTrackSearchV2>
     }

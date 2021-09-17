@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
+import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserFilterV2, SoundcloudUserSearchV2,
 SoundcloudUserV2, SoundcloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
@@ -20,7 +20,7 @@ export class Users {
     /**
      * Searches for users using the v2 API.
      */
-    public searchV2 = async (params?: SoundcloudUserFilter) => {
+    public searchV2 = async (params?: SoundcloudUserFilterV2) => {
         const response = await this.api.getV2(`search/users`, params)
         return response as Promise<SoundcloudUserSearchV2>
     }
