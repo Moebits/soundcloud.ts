@@ -70,9 +70,9 @@ export default class API {
     }
 
     /**
-     * Gets a URI, such as download, stream, attachment, etc.
+     * Gets a URL, such as download, stream, attachment, etc.
      */
-    public getURI = async (URI: string, params?: any) => {
+    public getURL = async (URI: string, params?: any) => {
         if (!params) params = {}
         params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
