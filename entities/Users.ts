@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudUserTrackCollectionV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
+import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
 SoundcloudUserV2, SoundcloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
@@ -59,14 +59,13 @@ export class Users {
      */
     public tracksV2 = async (userResolvable: string | number) => {
         const userID = await this.resolve.getV2(userResolvable)
-        const response = await this.api.getV2(`/users/${userID}/tracks`) as SoundcloudUserTrackCollectionV2
+        const response = await this.api.getV2(`/users/${userID}/tracks`)
         let nextHref = response.next_href;
         while (nextHref) {
-            const nextPage = (await this.api.getURI(nextHref)).data as SoundcloudUserTrackCollectionV2;
-            response.collection.push(...nextPage.collection)
+            const nextPage = await this.api.getURL(nextHref).then((r) => r.data)
             nextHref = nextPage.next_href;
         }
-        return response.collection;
+        return response.collection as Promise<SoundcloudTrackV2[]>;
     }
 
     /**
