@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserFilterV2, SoundcloudUserSearchV2,
+import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserFilterV2, SoundcloudUserSearchV2,
 SoundcloudUserV2, SoundcloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
@@ -53,6 +53,20 @@ export class Users {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/tracks`)
         return response as Promise<SoundcloudTrack[]>
+    }
+    /**
+     * Gets all the tracks by the user using Soundcloud v2 API.
+     */
+    public tracksV2 = async (userResolvable: string | number) => {
+        const userID = await this.resolve.getV2(userResolvable)
+        const response = await this.api.getV2(`/users/${userID}/tracks`)
+        let nextHref = response.next_href
+        while (nextHref) {
+            const nextPage = await this.api.getURL(nextHref)
+            response.collection.push(...nextPage.collection)
+            nextHref = nextPage.next_href
+        }
+        return response.collection as Promise<SoundcloudTrackV2[]>
     }
 
     /**
@@ -159,8 +173,8 @@ export class Users {
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
             const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
-            const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-            const user = data[data.length - 1].data[0]
+            const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
+            const user = json[json.length - 1].data
             scrape.push(user)
         }
         return scrape as Promise<SoundcloudUserV2[]>
@@ -173,8 +187,8 @@ export class Users {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
-        const data = JSON.parse(songHTML.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
-        const user = data[data.length - 1].data[0]
+        const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
+        const user = json[json.length - 1].data
         return user as Promise<SoundcloudUserV2>
     }
 

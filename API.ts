@@ -70,19 +70,19 @@ export default class API {
     }
 
     /**
-     * Gets a URI, such as download, stream, attachment, etc.
+     * Gets a URL, such as download, stream, attachment, etc.
      */
-    public getURI = async (URI: string, params?: any) => {
+    public getURL = async (URI: string, params?: any) => {
         if (!params) params = {}
         params.client_id = await this.getClientID()
         if (this.oauthToken) params.oauth_token = this.oauthToken
         if (this.proxy) URI = this.proxy + URI
         try {
-            const response = await axios.get(URI, {params, headers: API.headers})
+            const response = await axios.get(URI, {params, headers: API.headers}).then((r) => r.data)
             return response
         } catch {
             params.client_id = await this.getClientID(true)
-            const response =  await axios.get(URI, {params, headers: API.headers})
+            const response =  await axios.get(URI, {params, headers: API.headers}).then((r) => r.data)
             return response
         }
     }
