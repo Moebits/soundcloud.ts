@@ -1,6 +1,6 @@
 import axios from "axios"
 import api from "../API"
-import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
+import {SoundcloudComment, SoundcloudPlaylist, SoundcloudTrack, SoundcloudUserTrackCollectionV2, SoundcloudUser, SoundcloudUserCollection, SoundcloudUserFilter, SoundcloudUserSearchV2,
 SoundcloudUserV2, SoundcloudWebProfile} from "../types"
 import {Resolve} from "./index"
 
@@ -53,6 +53,14 @@ export class Users {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/tracks`)
         return response as Promise<SoundcloudTrack[]>
+    }
+    /**
+     * Gets all the tracks by the user using Soundcloud v2 API.
+     */
+    public tracksV2 = async (userResolvable: string | number) => {
+        const userID = await this.resolve.getV2(userResolvable)
+        const response = await this.api.getV2(`/users/${userID}/tracks`)
+        return response as Promise<SoundcloudUserTrackCollectionV2[]>
     }
 
     /**

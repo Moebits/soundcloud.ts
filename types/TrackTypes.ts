@@ -153,6 +153,11 @@ export interface SoundcloudTrackSearchV2 extends SoundcloudSearchV2 {
     collection: SoundcloudTrackV2[]
 }
 
+export interface SoundcloudUserTrackCollectionV2 {
+    collection: SoundcloudTrackV2[]
+    next_href: string | null
+}
+
 export interface SoundcloudSecretToken {
     kind: "secret-token"
     token: string
