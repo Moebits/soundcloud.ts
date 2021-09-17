@@ -59,8 +59,14 @@ export class Users {
      */
     public tracksV2 = async (userResolvable: string | number) => {
         const userID = await this.resolve.getV2(userResolvable)
-        const response = await this.api.getV2(`/users/${userID}/tracks`)
-        return response as Promise<SoundcloudUserTrackCollectionV2[]>
+        const response = await this.api.getV2(`/users/${userID}/tracks`) as SoundcloudUserTrackCollectionV2
+        let nextHref = response.next_href;
+        while (nextHref) {
+            const nextPage = (await this.api.getURI(nextHref)).data as SoundcloudUserTrackCollectionV2;
+            response.collection.push(...nextPage.collection)
+            nextHref = nextPage.next_href;
+        }
+        return response.collection;
     }
 
     /**
