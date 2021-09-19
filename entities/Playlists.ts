@@ -1,11 +1,28 @@
 import axios from "axios"
 import api from "../API"
 import {SoundcloudPlaylist, SoundcloudPlaylistFilter, SoundcloudPlaylistSearchV2, SoundcloudPlaylistV2, SoundcloudPlaylistFilterV2, SoundcloudSecretToken} from "../types"
-import {Resolve} from "./index"
+import {Resolve, Tracks} from "./index"
 
 export class Playlists {
     private readonly resolve = new Resolve(this.api)
+    private readonly tracks = new Tracks(this.api)
     public constructor(private readonly api: api) {}
+
+    /**
+     * Return playlist with all tracks fetched.
+     */
+    public fetch = async (playlist: SoundcloudPlaylistV2) => {
+        for (let i = 0; i < playlist.tracks.length; i++) {
+            if (!playlist.tracks[i].title) {
+                try {
+                    playlist.tracks[i] = await this.tracks.getV2(playlist.tracks[i].id)
+                } catch {
+                    // Ignore
+                }
+            }
+        }
+        return playlist
+    }
 
     /**
      * @deprecated use searchV2
@@ -41,7 +58,7 @@ export class Playlists {
     public getV2 = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.getV2(playlistResolvable)
         const response = await this.api.getV2(`/playlists/${playlistID}`)
-        return response as Promise<SoundcloudPlaylistV2>
+        return this.fetch(response) as Promise<SoundcloudPlaylistV2>
     }
 
     /**
@@ -67,8 +84,8 @@ export class Playlists {
         for (let i = 0; i < urls.length; i++) {
             const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
-            const track = json[json.length - 1].data
-            scrape.push(track)
+            const playlist = json[json.length - 1].data
+            scrape.push(playlist)
         }
         return scrape as Promise<SoundcloudPlaylistV2[]>
     }
@@ -82,6 +99,6 @@ export class Playlists {
         const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const playlist = json[json.length - 1].data
-        return playlist as Promise<SoundcloudPlaylistV2>
+        return this.fetch(playlist) as Promise<SoundcloudPlaylistV2>
     }
 }
