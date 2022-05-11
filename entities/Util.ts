@@ -2,7 +2,9 @@ import axios from "axios"
 import * as fs from "fs"
 import * as path from "path"
 import api from "../API"
+import * as audioconcat from "audioconcat"
 import {SoundcloudTrack, SoundcloudTrackV2} from "../types"
+import {Readable} from "stream"
 import {Playlists, Tracks, Users} from "./index"
 
 export class Util {
@@ -21,8 +23,12 @@ export class Util {
         }
         if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await axios.get(songUrl, {headers})
-        const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
+        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
+        const track = json[json.length - 1].data
+    
+        //  const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
+        let match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "progressive")?.url
         let url: string
         let client_id = await this.api.getClientID()
         if (match) {
@@ -41,6 +47,44 @@ export class Util {
     }
 
     /**
+     * Readable stream of m3u playlists.
+     */
+     private m3uReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
+        const headers = {
+            "referer": "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+        }
+        if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
+        if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
+        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
+        const track = json[json.length - 1].data
+        let client_id = await this.api.getClientID()
+        let match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "hls")?.url
+        if (!match) return null
+        let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+        const m3uLink = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+        const m3u = await axios.get(m3uLink, {headers}).then((r) => r.data)
+        const urls = m3u.match(/(http).*?(?=\s)/gm)
+        const destDir = path.join(__dirname, "temp")
+        if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, {recursive: true})
+        const output = `${destDir}/temp.mp3`
+        const chunks = []
+        for (let i = 0; i < urls.length; i++) {
+            const arrayBuffer = await axios.get(urls[i], {headers, responseType: "arraybuffer"}).then((r) => r.data)
+            fs.writeFileSync(`${destDir}/${i}.mp3`, arrayBuffer)
+            chunks.push(`${destDir}/${i}.mp3`)
+        }
+        await new Promise<void>((resolve) => {
+            audioconcat(chunks).concat(output)
+            .on("end", () => resolve())
+        })
+        const stream = Readable.from(fs.readFileSync(output))
+        Util.removeDirectory(destDir)
+        return stream
+    }
+
+    /**
      * Downloads the mp3 stream of a track as readable stream.
      */
     private downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
@@ -49,6 +93,7 @@ export class Util {
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
         }
         const url = await this.streamLink(songUrl)
+        if (!url) return this.m3uReadableStream(songUrl)
         const readable = await axios.get(url, {headers, responseType: "stream"}).then((r) => r.data)
         return readable
     }
@@ -192,5 +237,22 @@ export class Util {
         const arrayBuffer = await axios.get(url, {responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
+    }
+
+    private static removeDirectory = (dir: string) => {
+        if (!fs.existsSync(dir)) return
+        fs.readdirSync(dir).forEach((file) => {
+            const current = path.join(dir, file)
+            if (fs.lstatSync(current).isDirectory()) {
+                Util.removeDirectory(current)
+            } else {
+                fs.unlinkSync(current)
+            }
+        })
+        try {
+            fs.rmdirSync(dir)
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
