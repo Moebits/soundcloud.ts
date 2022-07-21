@@ -12,15 +12,10 @@ export class Playlists {
      * Return playlist with all tracks fetched.
      */
     public fetch = async (playlist: SoundcloudPlaylistV2) => {
-        for (let i = 0; i < playlist.tracks.length; i++) {
-            if (!playlist.tracks[i].title) {
-                try {
-                    playlist.tracks[i] = await this.tracks.getV2(playlist.tracks[i].id)
-                } catch {
-                    // Ignore
-                }
-            }
-        }
+        const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
+        if (unresolvedTracks.length === 0) return playlist
+        playlist.tracks = playlist.tracks.concat(await this.tracks.getArrayV2(unresolvedTracks))
+        console.log(playlist.tracks.length)
         return playlist
     }
 
