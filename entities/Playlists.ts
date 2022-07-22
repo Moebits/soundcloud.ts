@@ -15,7 +15,6 @@ export class Playlists {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
         playlist.tracks = playlist.tracks.concat(await this.tracks.getArrayV2(unresolvedTracks))
-        console.log(playlist.tracks.length)
         return playlist
     }
 
