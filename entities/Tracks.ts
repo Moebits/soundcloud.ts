@@ -44,6 +44,20 @@ export class Tracks {
     }
 
     /**
+     * Fetches tracks from an array of ID using Soundcloud v2 API.
+     */
+    public getArrayV2 = async (trackIds: number[]) => {
+        if (trackIds.length === 0) return []
+        // Max 50 ids per request => split into chunks of 50 ids
+        const chunks: number[][] = []
+        let i = 0
+        while (i < trackIds.length) chunks.push(trackIds.slice(i, (i += 50)))
+        const response: SoundcloudTrackV2[] = []
+        const tracks = await Promise.all(chunks.map(chunk => this.api.getV2(`/tracks`, { ids: chunk.join(",") })))
+        return response.concat(...tracks)
+    }
+
+    /**
      * @deprecated
      * Fetches all comments on a track.
      */
