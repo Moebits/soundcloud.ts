@@ -1,4 +1,4 @@
-import {SoundcloudLicense, SoundcloudSearchV2, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUserMini, SoundcloudUserV2, SoundcloudFilterV2} from "./index"
+import {SoundcloudFilterV2, SoundcloudLicense, SoundcloudSearchV2, SoundcloudTrack, SoundcloudTrackV2, SoundcloudUserMini, SoundcloudUserV2} from "./index"
 
 export interface SoundcloudPlaylistFilter {
     representation?: "compact" | "id"

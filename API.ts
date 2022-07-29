@@ -1,116 +1,126 @@
-import axios from "axios"
+import {Agent, Dispatcher, Pool, request, setGlobalDispatcher} from "undici"
 
-const apiURL = "https://api.soundcloud.com/"
-const apiV2URL = "https://api-v2.soundcloud.com/"
-const webURL = "https://www.soundcloud.com/"
+const apiURL = "https://api.soundcloud.com"
+const apiV2URL = "https://api-v2.soundcloud.com"
+const webURL = "https://soundcloud.com"
+
+setGlobalDispatcher(new Agent({pipelining: 50}))
 
 export default class API {
-    public static headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-    public constructor(public clientID: string, public oauthToken: string, public proxy: string) {}
+  public static headers = {
+    "user-agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+  }
+  public api = new Pool(apiURL)
+  public apiV2 = new Pool(apiV2URL)
+  public web = new Pool(webURL)
+  public proxy?: Pool
+  constructor(public clientID?: string, public oauthToken?: string, proxy?: string) {
+    if (proxy) this.proxy = new Pool(proxy)
+  }
 
-    /**
-     * Gets an endpoint from the Soundcloud API.
-     */
-    public get = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = apiURL + endpoint
-        if (this.proxy) endpoint = this.proxy + endpoint
-        try { 
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        } catch {
-            params.client_id = await this.getClientID(true)
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        }
-    }
+  /**
+   * Gets an endpoint from the Soundcloud API.
+   */
+  public get = (endpoint: string, params?: any) => {
+    return this.makeGet(this.api, apiURL, endpoint, params)
+  }
 
-    /**
-     * Gets an endpoint from the Soundcloud V2 API.
-     */
-    public getV2 = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = apiV2URL + endpoint
-        if (this.proxy) endpoint = this.proxy + endpoint
-        try {
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        } catch {
-            params.client_id = await this.getClientID(true)
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        }
-        
-    }
+  /**
+   * Gets an endpoint from the Soundcloud V2 API.
+   */
+  public getV2 = (endpoint: string, params?: any) => {
+    return this.makeGet(this.apiV2, apiV2URL, endpoint, params)
+  }
 
-    /**
-     * Some endpoints use the main website as the URL.
-     */
-    public getWebsite = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = webURL + endpoint
-        if (this.proxy) endpoint = this.proxy + endpoint
-        try {
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        } catch {
-            params.client_id = await this.getClientID(true) 
-            const response = await axios.get(endpoint, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        }
-    }
+  /**
+   * Some endpoints use the main website as the URL.
+   */
+  public getWebsite = (endpoint: string, params?: any) => {
+    return this.makeGet(this.web, webURL, endpoint, params)
+  }
 
-    /**
-     * Gets a URL, such as download, stream, attachment, etc.
-     */
-    public getURL = async (URI: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (this.proxy) URI = this.proxy + URI
-        try {
-            const response = await axios.get(URI, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        } catch {
-            params.client_id = await this.getClientID(true)
-            const response =  await axios.get(URI, {params, headers: API.headers}).then((r) => r.data)
-            return response
-        }
+  /**
+   * Gets a URL, such as download, stream, attachment, etc.
+   */
+  public getURL = (URI: string, params?: any) => {
+    if (this.proxy) return this.makeRequest(this.proxy, this.buildOptions(URI, "GET", params))
+    const options = {
+      query: params || {},
+      headers: API.headers,
+      maxRedirections: 5
     }
+    if (this.clientID) options.query.client_id = this.clientID
+    if (this.oauthToken) options.query.oauth_token = this.oauthToken
+    return request(URI, options).then((r) => {
+      if (r.statusCode.toString().startsWith("2")) {
+        if (r.headers["content-type"] === "application/json") return r.body.json()
+        return r.body.text()
+      }
+      throw new Error("Status code " + r.statusCode)
+    })
+  }
 
-    public post = async (endpoint: string, params?: any) => {
-        if (!params) params = {}
-        params.client_id = await this.getClientID()
-        if (this.oauthToken) params.oauth_token = this.oauthToken
-        if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        endpoint = apiURL + endpoint
-        if (this.proxy) endpoint = this.proxy + endpoint
-        const response = await axios.post(endpoint, {params, headers: API.headers}).then((r) => r.data)
-        return response
+  private readonly makeGet = async (pool: Pool, origin: string, endpoint: string, params?: any) => {
+    if (!this.clientID) await this.getClientID()
+    if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
+    const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "GET", params)
+    try {
+      return await this.makeRequest(this.proxy || pool, options)
+    } catch {
+      await this.getClientID(true)
+      return this.makeRequest(this.proxy || pool, options)
     }
+  }
 
-    public getClientID = async (reset?: boolean) => {
-        if (!this.clientID || reset) {
-            let url = webURL
-            if (this.proxy) url = this.proxy + url
-            const response = await axios.get(url).then((r) => r.data)
-            const urls = response.match(/(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*\.js)(?=">)/g)
-            let script: string
-            do {
-                script = await axios.get(urls.pop()).then((r) => r.data)
-            } while (!script.includes(",client_id:\"") && urls.length > 0)
-            this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
-            if (!this.clientID) Promise.reject("Unable to fetch a SoundCloud API key!")
-        }
-        return this.clientID
+  public post = async (endpoint: string, params?: any) => {
+    if (!this.clientID) await this.getClientID()
+    if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
+    const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "POST", params)
+    return this.makeRequest(this.proxy || this.api, options)
+  }
+
+  public getClientID = async (reset?: boolean) => {
+    if (!this.clientID || reset) {
+      const response = await (this.proxy
+        ? this.proxy.request(this.buildOptions(webURL))
+        : this.web.request(this.buildOptions("/"))
+      ).then((r) => r.body.text())
+      const urls = response.match(
+        /(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*\.js)(?=">)/g
+      )
+      if (urls.length === 0) throw new Error("Could not find client ID")
+      let script: string
+      do {
+        script = await request(urls.pop()).then((r) => r.body.text())
+      } while (!script.includes(",client_id:\"") && urls.length > 0)
+      this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
+      if (!this.clientID) throw new Error("Could not find client ID")
     }
+    return this.clientID
+  }
+
+  private readonly buildOptions = (path: string, method: Dispatcher.HttpMethod = "GET", params?: Record<string, any>) => {
+    const options: Dispatcher.RequestOptions = {
+      query: (method == "GET" && params) || {},
+      headers: API.headers,
+      method,
+      path,
+      maxRedirections: 5
+    }
+    if (method === "POST" && params) options.body = JSON.stringify(params)
+    if (this.clientID) options.query.client_id = this.clientID
+    if (this.oauthToken) options.query.oauth_token = this.oauthToken
+    return options
+  }
+
+  private readonly makeRequest = (pool: Pool, options: Dispatcher.RequestOptions) => {
+    return pool.request(options).then((r) => {
+      if (r.statusCode.toString().startsWith("2")) {
+        if (r.headers["content-type"].includes("application/json")) return r.body.json()
+        return r.body.text()
+      }
+      throw new Error("Status code " + r.statusCode)
+    })
+  }
 }
