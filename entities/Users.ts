@@ -153,12 +153,11 @@ export class Users {
     }
 
     /**
-     * @deprecated
      * Gets all the web profiles on a users sidebar.
      */
     public webProfiles = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
-        const response = await this.api.get(`/users/${userID}/web-profiles`)
+        const userID = await this.resolve.getV2(userResolvable)
+        const response = await this.api.getV2(`/users/${userID}/web-profiles`)
         return response as Promise<SoundcloudWebProfile[]>
     }
 
