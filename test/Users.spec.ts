@@ -64,6 +64,6 @@ describe("Users", async function() {
 
     it("should get a users web profiles", async function() {
         const response = await soundcloud.users.webProfiles("https://soundcloud.com/tenpimusic")
-        // assert(response[0].hasOwnProperty("description"))
+        assert(response[0].hasOwnProperty("url"))
     })
 })
