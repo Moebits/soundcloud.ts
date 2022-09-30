@@ -157,7 +157,7 @@ export class Users {
      */
     public webProfiles = async (userResolvable: string | number) => {
         const userID = await this.resolve.getV2(userResolvable)
-        const response = await this.api.getV2(`/users/${userID}/web-profiles`)
+        const response = await this.api.getV2(`/users/soundcloud:users:${userID}/web-profiles`)
         return response as Promise<SoundcloudWebProfile[]>
     }
 
