@@ -99,13 +99,10 @@ export interface SoundcloudUserSearchV2 extends SoundcloudSearchV2 {
 }
 
 export interface SoundcloudWebProfile {
-    kind: "web-profile"
-    id: number
-    service: string
+    network: string
     title: string
     url: string
     username: string | null
-    created_at: string
 }
 
 export interface SoundcloudUserCollection {
