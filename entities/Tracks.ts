@@ -1,7 +1,17 @@
-import axios from "axios"
-import api from "../API"
-import {SoundcloudComment, SoundcloudSecretToken, SoundcloudTrack, SoundcloudTrackFilter, SoundcloudTrackFilterV2, SoundcloudTrackSearchV2, SoundcloudTrackV2, SoundcloudUser} from "../types"
-import {Resolve} from "./index"
+import type api from "../API"
+import type {
+    SoundcloudComment,
+    SoundcloudSecretToken,
+    SoundcloudTrack,
+    SoundcloudTrackFilter,
+    SoundcloudTrackFilterV2,
+    SoundcloudTrackSearchV2,
+    SoundcloudTrackV2,
+    SoundcloudUser,
+} from "../types"
+import { request } from "undici"
+import { Resolve } from "./index"
+
 export class Tracks {
     private readonly resolve = new Resolve(this.api)
     public constructor(private readonly api: api) {}
@@ -11,7 +21,7 @@ export class Tracks {
      * Searches for tracks.
      */
     public search = async (params?: SoundcloudTrackFilter) => {
-        const response = await this.api.get(`/tracks`, params)
+        const response = await this.api.get("/tracks", params)
         return response as Promise<SoundcloudTrack[]>
     }
 
@@ -19,7 +29,7 @@ export class Tracks {
      * Searches for tracks using the v2 API.
      */
     public searchV2 = async (params?: SoundcloudTrackFilterV2) => {
-        const response = await this.api.getV2(`search/tracks`, params)
+        const response = await this.api.getV2("search/tracks", params)
         return response as Promise<SoundcloudTrackSearchV2>
     }
 
@@ -29,7 +39,7 @@ export class Tracks {
      */
     public get = async (trackResolvable: string | number) => {
         const id = await this.resolve.get(trackResolvable, true)
-        if (id.hasOwnProperty("id")) return id
+        if (Object.prototype.hasOwnProperty.call(id, "id")) return id
         const response = await this.api.get(`/tracks/${id}`)
         return response as Promise<SoundcloudTrack>
     }
@@ -53,7 +63,7 @@ export class Tracks {
         let i = 0
         while (i < trackIds.length) chunks.push(trackIds.slice(i, (i += 50)))
         const response: SoundcloudTrackV2[] = []
-        const tracks = await Promise.all(chunks.map(chunk => this.api.getV2(`/tracks`, { ids: chunk.join(",") })))
+        const tracks = await Promise.all(chunks.map(chunk => this.api.getV2("/tracks", { ids: chunk.join(",") })))
         return response.concat(...tracks)
     }
 
@@ -104,8 +114,9 @@ export class Tracks {
      */
     public secretToken = async (trackResolvable: string | number) => {
         const trackID = await this.resolve.get(trackResolvable)
-        const response = await this.api.get(`/tracks/${trackID}/secret-token`)
-        .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
+        const response = await this.api
+            .get(`/tracks/${trackID}/secret-token`)
+            .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
         return response as Promise<SoundcloudSecretToken>
     }
 
@@ -113,13 +124,15 @@ export class Tracks {
      * Searches for tracks (web scraping)
      */
     public searchAlt = async (query: string) => {
-        const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-        const html = await axios.get(`https://soundcloud.com/search/sounds?q=${query}`, {headers}).then((r) => r.data)
+        const headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        }
+        const html = await request(`https://soundcloud.com/search/sounds?q=${query}`, { headers }).then(r => r.body.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
-            const songHTML = await axios.get(urls[i], {headers}).then((r: any) => r.data)
+            const songHTML = await request(urls[i], { headers }).then(r => r.body.text())
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
             const track = json[json.length - 1].data
             scrape.push(track)
@@ -132,8 +145,10 @@ export class Tracks {
      */
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
-        const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-        const songHTML = await axios.get(url, {headers}).then((r: any) => r.data)
+        const headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        }
+        const songHTML = await request(url, { headers }).then(r => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const track = json[json.length - 1].data
         return track as Promise<SoundcloudTrackV2>
@@ -144,7 +159,7 @@ export class Tracks {
      */
     public relatedV2 = async (trackResolvable: string | number, limit?: number) => {
         const trackID = await this.resolve.getV2(trackResolvable)
-        const response = await this.api.getV2(`/tracks/${trackID}/related`, {limit})
+        const response = await this.api.getV2(`/tracks/${trackID}/related`, { limit })
         return response.collection as Promise<SoundcloudTrackV2[]>
     }
 }

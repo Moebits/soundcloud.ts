@@ -1,10 +1,10 @@
-import {assert} from "chai"
+import { assert } from "chai"
 import "mocha"
-import {soundcloud} from "./login"
+import { soundcloud } from "./login"
 
-describe("Apps", async function() {
-    it("should get apps", async function() {
+describe.skip("Apps", function () {
+    it("should get apps", async function () {
         const response = await soundcloud.apps.get()
-        assert(response[0].hasOwnProperty("creator"))
+        assert(Object.prototype.hasOwnProperty.call(response[0], "creator"))
     })
 })

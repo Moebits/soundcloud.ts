@@ -1,13 +1,4 @@
-export type SoundcloudImageFormats =
-    | "t500x500"
-    | "crop"
-    | "t300x300"
-    | "large"
-    | "t67x67"
-    | "badge"
-    | "small"
-    | "tiny"
-    | "mini"
+export type SoundcloudImageFormats = "t500x500" | "crop" | "t300x300" | "large" | "t67x67" | "badge" | "small" | "tiny" | "mini"
 
 export interface SoundcloudApp {
     id: number

@@ -1,6 +1,6 @@
-import api from "../API"
-import {SoundcloudActivityCollection, SoundcloudConnection, SoundcloudUser} from "../types"
-import {Users} from "./index"
+import type api from "../API"
+import type { SoundcloudActivityCollection, SoundcloudConnection, SoundcloudUser } from "../types"
+import { Users } from "./index"
 
 export class Me {
     private readonly users = new Users(this.api)
@@ -11,7 +11,7 @@ export class Me {
      * Gets your own profile, or your ID if pass in a true param.
      */
     public get = async <B extends boolean>(returnID?: B): Promise<B extends true ? number : SoundcloudUser> => {
-        const response = await this.api.get(`/me`)
+        const response = await this.api.get("/me")
         if (returnID) return response.id
         return response
     }
@@ -21,7 +21,7 @@ export class Me {
      * Gets activities from your homepage.
      */
     public activities = async () => {
-        const response = await this.api.get(`/me/activities`)
+        const response = await this.api.get("/me/activities")
         return response as Promise<SoundcloudActivityCollection>
     }
 
@@ -30,7 +30,7 @@ export class Me {
      * Gets affiliated activities.
      */
     public activitiesAffiliated = async () => {
-        const response = await this.api.get(`/me/activities/tracks/affiliated`)
+        const response = await this.api.get("/me/activities/tracks/affiliated")
         return response as Promise<SoundcloudActivityCollection>
     }
 
@@ -39,7 +39,7 @@ export class Me {
      * Gets exclusive activities.
      */
     public activitiesExclusive = async () => {
-        const response = await this.api.get(`/me/activities/tracks/exclusive`)
+        const response = await this.api.get("/me/activities/tracks/exclusive")
         return response as Promise<SoundcloudActivityCollection>
     }
 
@@ -48,7 +48,7 @@ export class Me {
      * Gets your own activities only.
      */
     public activitiesOwn = async () => {
-        const response = await this.api.get(`/me/activities/all/own`)
+        const response = await this.api.get("/me/activities/all/own")
         return response as Promise<SoundcloudActivityCollection>
     }
 
@@ -57,8 +57,7 @@ export class Me {
      * Gets your app connections, id any.
      */
     public connections = async () => {
-        const id = await this.get(true)
-        const response = await this.api.get(`/me/connections`)
+        const response = await this.api.get("/me/connections")
         return response as Promise<SoundcloudConnection[]>
     }
 
@@ -67,7 +66,6 @@ export class Me {
      * Gets a connection from its ID.
      */
     public connection = async (connectionID: number) => {
-        const id = await this.get(true)
         const response = await this.api.get(`/me/connections/${connectionID}`)
         return response as Promise<SoundcloudConnection>
     }
@@ -161,5 +159,4 @@ export class Me {
         const id = await this.get(true)
         return this.users.webProfiles(id)
     }
-
 }

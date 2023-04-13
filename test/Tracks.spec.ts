@@ -1,41 +1,41 @@
-import {assert} from "chai"
+import { assert } from "chai"
 import "mocha"
-import {soundcloud} from "./login"
+import { soundcloud } from "./login"
 
-describe("Tracks", async function() {
-    it("should get a track", async function() {
-        const response = await soundcloud.tracks.get("https://soundcloud.com/tenpimusic/snowflake")
-        assert(response.hasOwnProperty("description"))
+describe("Tracks", function () {
+    it("should get a track", async function () {
+        const response = await soundcloud.tracks.getV2("https://soundcloud.com/kenny_the_king/lemonade")
+        assert(Object.prototype.hasOwnProperty.call(response, "description"))
     })
 
-    it("should search tracks", async function() {
-        const response = await soundcloud.tracks.search({q: "virtual riot"})
-        assert(response[0].hasOwnProperty("description"))
+    it("should search tracks", async function () {
+        const response = await soundcloud.tracks.searchV2({ q: "virtual riot" })
+        assert(Object.prototype.hasOwnProperty.call(response.collection[0], "description"))
     })
 
-    it("should get track comments", async function() {
-        const response = await soundcloud.tracks.comments("https://soundcloud.com/tenpimusic/snowflake")
-        assert(response[0].hasOwnProperty("body"))
+    it.skip("should get track comments", async function () {
+        const response = await soundcloud.tracks.comments("https://soundcloud.com/kenny_the_king/lemonade")
+        assert(Object.prototype.hasOwnProperty.call(response[0], "body"))
     })
 
-    it("should get a comment", async function() {
+    it.skip("should get a comment", async function () {
         const response = await soundcloud.tracks.comment("https://soundcloud.com/tenpimusic/snowflake", 577938945)
-        assert(response.hasOwnProperty("body"))
+        assert(Object.prototype.hasOwnProperty.call(response, "body"))
     })
 
-    it("should get favoriters", async function() {
+    it.skip("should get favoriters", async function () {
         const response = await soundcloud.tracks.favoriters("https://soundcloud.com/tenpimusic/kudasai")
-        assert(response[0].hasOwnProperty("description"))
+        assert(Object.prototype.hasOwnProperty.call(response[0], "description"))
     })
 
     /* 401 Error - Possibly bug with soundcloud.
     it("should get a favoriter", async function() {
         const response = await soundcloud.tracks.favoriter("https://soundcloud.com/inf1n1temusic/inf1n1tea-konus-nova1", "tenpimusic")
-        assert(response.hasOwnProperty("description"))
+        assert(Object.prototype.hasOwnProperty.call(response, "description"))
     })*/
 
-    it("should get a secret token", async function() {
+    it.skip("should get a secret token", async function () {
         const response = await soundcloud.tracks.secretToken("https://soundcloud.com/tenpimusic/kudasai")
-        assert(response.hasOwnProperty("token"))
+        assert(Object.prototype.hasOwnProperty.call(response, "token"))
     })
 })

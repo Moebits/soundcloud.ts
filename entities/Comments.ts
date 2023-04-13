@@ -1,10 +1,11 @@
-import api from "../API"
-import {SoundcloudComment} from "../types"
+import type api from "../API"
+import type { SoundcloudComment } from "../types"
 
 export class Comments {
     public constructor(private readonly api: api) {}
 
     /**
+     * @deprecated use getV2
      * Gets a comment using its ID.
      */
     public get = async (commentID: number) => {

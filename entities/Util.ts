@@ -1,11 +1,19 @@
-import axios from "axios"
+import * as audioconcat from "audioconcat"
 import * as fs from "fs"
 import * as path from "path"
-import api from "../API"
-import * as audioconcat from "audioconcat"
-import {SoundcloudTrack, SoundcloudTrackV2} from "../types"
-import {Readable} from "stream"
-import {Playlists, Tracks, Users} from "./index"
+import { Readable } from "stream"
+import { request } from "undici"
+import type api from "../API"
+import type { SoundcloudTrack, SoundcloudTrackV2 } from "../types"
+import { Playlists, Tracks, Users } from "./index"
+
+const makeRequest = async (...args: Parameters<typeof request>) => {
+    const response = await request(...args).then(r => {
+        if (r.statusCode.toString().startsWith("2")) return r.body
+        throw new Error(`Status code ${r.statusCode}`)
+    })
+    return response
+}
 
 export class Util {
     private readonly playlists = new Playlists(this.api)
@@ -18,27 +26,31 @@ export class Util {
      */
     public streamLink = async (songUrl: string) => {
         const headers = {
-            "referer": "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+            referer: "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         }
         if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
         const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
         const track = json[json.length - 1].data
-    
+
         //  const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
-        let match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "progressive")?.url
+        const match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "progressive")?.url
         let url: string
         let client_id = await this.api.getClientID()
         if (match) {
             let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
-                url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+                url = await makeRequest(match + connect, { headers })
+                    .then(r => r.json())
+                    .then(r => r.url)
             } catch {
                 client_id = await this.api.getClientID(true)
                 connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-                url = await axios.get(match + connect, {headers}).then((r) => r.data.url)
+                url = await makeRequest(match + connect, { headers })
+                    .then(r => r.json())
+                    .then(r => r.url)
             }
         } else {
             return null
@@ -49,35 +61,38 @@ export class Util {
     /**
      * Readable stream of m3u playlists.
      */
-     private m3uReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
+    private readonly m3uReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
         const headers = {
-            "referer": "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+            referer: "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         }
         if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
         const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
         const track = json[json.length - 1].data
-        let client_id = await this.api.getClientID()
-        let match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "hls")?.url
+        const client_id = await this.api.getClientID()
+        const match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "hls")?.url
         if (!match) return null
-        let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-        const m3uLink = await axios.get(match + connect, {headers}).then((r) => r.data.url)
-        const m3u = await axios.get(m3uLink, {headers}).then((r) => r.data)
+        const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+        const m3uLink = await makeRequest(match + connect, { headers })
+            .then(r => r.json())
+            .then(r => r.url)
+        const m3u = await makeRequest(m3uLink, { headers }).then(r => r.text())
         const urls = m3u.match(/(http).*?(?=\s)/gm)
         const destDir = path.join(__dirname, "temp")
-        if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, {recursive: true})
+        if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
         const output = `${destDir}/temp.mp3`
         const chunks = []
         for (let i = 0; i < urls.length; i++) {
-            const arrayBuffer = await axios.get(urls[i], {headers, responseType: "arraybuffer"}).then((r) => r.data)
-            fs.writeFileSync(`${destDir}/${i}.mp3`, arrayBuffer)
+            const arrayBuffer = await request(urls[i], { headers }).then(r => r.body.arrayBuffer())
+            fs.writeFileSync(`${destDir}/${i}.mp3`, Buffer.from(arrayBuffer))
             chunks.push(`${destDir}/${i}.mp3`)
         }
-        await new Promise<void>((resolve) => {
-            audioconcat(chunks).concat(output)
-            .on("end", () => resolve())
+        await new Promise<void>(resolve => {
+            audioconcat(chunks)
+                .concat(output)
+                .on("end", () => resolve())
         })
         const stream = Readable.from(fs.readFileSync(output))
         Util.removeDirectory(destDir)
@@ -87,21 +102,21 @@ export class Util {
     /**
      * Downloads the mp3 stream of a track as readable stream.
      */
-    private downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
+    private readonly downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
         const headers = {
-            "referer": "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+            referer: "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         }
         const url = await this.streamLink(songUrl)
         if (!url) return this.m3uReadableStream(songUrl)
-        const readable = await axios.get(url, {headers, responseType: "stream"}).then((r) => r.data)
+        const readable = await makeRequest(url, { headers })
         return readable
     }
 
     /**
      * Downloads the mp3 stream of a track.
      */
-    private downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
+    private readonly downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
         if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
         const finalMP3 = path.extname(dest) ? dest : path.join(dest, `${title}.mp3`)
 
@@ -110,7 +125,7 @@ export class Util {
         stream.pipe(writeStream)
 
         await new Promise<void>(resolve => stream.on("end", () => resolve()))
-        
+
         return finalMP3
     }
 
@@ -119,10 +134,10 @@ export class Util {
      */
     public getTitle = async (songUrl: string) => {
         const headers = {
-            "referer": "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+            referer: "soundcloud.com",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
         }
-        const html = await axios.get(songUrl, {headers}).then((r) => r.data)
+        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
         const title = html.match(/(?<="og:title" content=")(.*?)(?=")/)?.[0]?.replace(/\//g, "")
         return title
     }
@@ -133,15 +148,15 @@ export class Util {
     public downloadTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string) => {
         if (!dest) dest = "./"
         const folder = path.dirname(dest)
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
         let track: SoundcloudTrack
-        if (trackResolvable.hasOwnProperty("downloadable")) {
+        if (Object.prototype.hasOwnProperty.call(trackResolvable, "downloadable")) {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const client_id = await this.api.getClientID()
-                const result = await axios.get(track.download_url, {responseType: "arraybuffer", params: {client_id}})
+                const result = await request(track.download_url, { query: { client_id } })
                 dest = path.extname(dest) ? dest : path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
-                fs.writeFileSync(dest, Buffer.from(result.data, "binary"))
+                fs.writeFileSync(dest, Buffer.from(await result.body.arrayBuffer()))
                 return dest
             } else {
                 return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), dest)
@@ -174,7 +189,7 @@ export class Util {
      * Downloads all the tracks from the search query.
      */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.tracks.searchV2({q: query})
+        const tracks = await this.tracks.searchV2({ q: query })
         return this.downloadTracks(tracks.collection, dest, limit)
     }
 
@@ -200,11 +215,11 @@ export class Util {
      */
     public streamTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
         let track: SoundcloudTrack
-        if (trackResolvable.hasOwnProperty("downloadable")) {
+        if (Object.prototype.hasOwnProperty.call(trackResolvable, "downloadable")) {
             track = trackResolvable as SoundcloudTrack
             if (track.downloadable === true) {
                 const client_id = await this.api.getClientID()
-                return axios.get(track.download_url, {responseType: "stream", params: {client_id, oauth_token: this.api.oauthToken}})
+                return makeRequest(track.download_url, { query: { client_id, oauth_token: this.api.oauthToken } })
             } else {
                 return this.downloadTrackReadableStream(track.permalink_url)
             }
@@ -220,9 +235,9 @@ export class Util {
     public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = path.dirname(dest)
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
         let track: SoundcloudTrackV2
-        if (trackResolvable.hasOwnProperty("artwork_url")) {
+        if (Object.prototype.hasOwnProperty.call(trackResolvable, "artwork_url")) {
             track = trackResolvable as SoundcloudTrackV2
         } else {
             track = await this.tracks.getV2(trackResolvable as string)
@@ -234,14 +249,14 @@ export class Util {
         const client_id = await this.api.getClientID()
         const url = `${artwork}?client_id=${client_id}`
         if (noDL) return url
-        const arrayBuffer = await axios.get(url, {responseType: "arraybuffer"}).then((r) => r.data)
-        fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
+        const arrayBuffer = await makeRequest(url).then(r => r.arrayBuffer())
+        fs.writeFileSync(dest, Buffer.from(arrayBuffer))
         return dest
     }
 
-    private static removeDirectory = (dir: string) => {
+    private static readonly removeDirectory = (dir: string) => {
         if (!fs.existsSync(dir)) return
-        fs.readdirSync(dir).forEach((file) => {
+        fs.readdirSync(dir).forEach(file => {
             const current = path.join(dir, file)
             if (fs.lstatSync(current).isDirectory()) {
                 Util.removeDirectory(current)
@@ -252,7 +267,8 @@ export class Util {
         try {
             fs.rmdirSync(dir)
         } catch (error) {
-            console.log(error)
+            // eslint-disable-next-line no-console
+            console.error(error)
         }
     }
 }

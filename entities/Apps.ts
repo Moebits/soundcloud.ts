@@ -1,5 +1,5 @@
-import api from "../API"
-import {SoundcloudApp} from "../types"
+import type api from "../API"
+import type { SoundcloudApp } from "../types"
 
 export class Apps {
     public constructor(private readonly api: api) {}
@@ -9,7 +9,7 @@ export class Apps {
      * Gets Soundcloud apps.
      */
     public get = async () => {
-        const response = await this.api.get(`/apps`)
+        const response = await this.api.get("/apps")
         return response as Promise<SoundcloudApp[]>
     }
 }

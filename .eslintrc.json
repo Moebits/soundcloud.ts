@@ -1,0 +1,20 @@
+{
+    "parserOptions": {
+        "project": "./tsconfig.eslint.json"
+    },
+    "extends": "distube",
+    "rules": {
+        "jsdoc/check-tag-names": "off",
+        "jsdoc/check-types": "off",
+        "valid-jsdoc": "off",
+        "max-len": [
+            "error",
+            {
+                "code": 150,
+                "ignoreRegExpLiterals": true,
+                "ignoreUrls": true
+            }
+        ],
+        "indent": ["error", 4]
+    }
+}

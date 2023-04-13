@@ -1,4 +1,4 @@
-import {SoundcloudSearchV2, SoundcloudUserMini, SoundcloudUserV2, SoundcloudFilterV2} from "./index"
+import type { SoundcloudFilterV2, SoundcloudSearchV2, SoundcloudUserMini, SoundcloudUserV2 } from "./index"
 
 export type SoundcloudLicense =
     | "no-rights-reserved"
