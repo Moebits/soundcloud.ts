@@ -1,4 +1,4 @@
-import {request} from "undici"
+import { request } from "undici"
 import API from "../API"
 
 export class Resolve {
@@ -14,7 +14,7 @@ export class Resolve {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const resolved = await this.api.get(`resolve`, {url: resolvable})
+            const resolved = await this.api.get("resolve", { url: resolvable })
             if (full) return resolved
             id = resolved.id
         }
@@ -30,7 +30,7 @@ export class Resolve {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const html = await request(String(resolvable), {headers: API.headers}).then((r) => r.body.text())
+            const html = await request(String(resolvable), { headers: API.headers }).then(r => r.body.text())
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
             id = data[data.length - 1]?.data?.[0]?.id ? data[data.length - 1].data[0].id : data[data.length - 2].data[0].id
         }
@@ -46,7 +46,7 @@ export class Resolve {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const resolved = await this.api.getV2(`resolve`, {url: resolvable})
+            const resolved = await this.api.getV2("resolve", { url: resolvable })
             if (full) return resolved
             id = resolved.id
         }

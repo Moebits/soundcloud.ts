@@ -1,0 +1,33 @@
+name: Test
+on: [push, pull_request]
+jobs:
+    test:
+        name: Test on node v${{ matrix.node-version }} (${{ matrix.os }})
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                node-version: [16, 18]
+                os: [ubuntu-latest]
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Install Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Linting
+              run: npm run lint
+
+            - name: Run TypeScript compiler
+              run: npm run build:check
+
+            - name: Run tests
+              run: npm run test
+
+            - name: Upload Coverage
+              uses: codecov/codecov-action@v3

@@ -1,4 +1,4 @@
-import {SoundcloudUserMini} from "./index"
+import type { SoundcloudUserMini } from "./index"
 export interface SoundcloudComment {
     kind: "comment"
     id: number

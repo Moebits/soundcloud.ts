@@ -3,4 +3,5 @@ node_modules
 dist
 .vscode
 tracks
-tracks/*
+coverage
+.nyc_output

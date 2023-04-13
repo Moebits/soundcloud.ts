@@ -1,4 +1,4 @@
-import {SoundcloudPlaylist} from "./index"
+import type { SoundcloudPlaylist } from "./index"
 
 export interface SoundcloudActivityCollection {
     collection: SoundcloudActivity[]
@@ -8,7 +8,7 @@ export interface SoundcloudActivityCollection {
 
 export interface SoundcloudActivity {
     origin: SoundcloudPlaylist
-    tags: string | null,
+    tags: string | null
     created_at: string
     type: string
 }
@@ -18,7 +18,7 @@ export interface SoundcloudConnection {
     display_name: string
     id: number
     post_favorite: boolean
-    post_publish: false,
+    post_publish: false
     service: string
     type: string
     uri: string

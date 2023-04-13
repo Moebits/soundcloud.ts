@@ -1,7 +1,14 @@
-import {request} from "undici"
-import api from "../API"
-import {SoundcloudPlaylist, SoundcloudPlaylistFilter, SoundcloudPlaylistFilterV2, SoundcloudPlaylistSearchV2, SoundcloudPlaylistV2, SoundcloudSecretToken} from "../types"
-import {Resolve, Tracks} from "./index"
+import type api from "../API"
+import type {
+    SoundcloudPlaylist,
+    SoundcloudPlaylistFilter,
+    SoundcloudPlaylistFilterV2,
+    SoundcloudPlaylistSearchV2,
+    SoundcloudPlaylistV2,
+    SoundcloudSecretToken,
+} from "../types"
+import { request } from "undici"
+import { Resolve, Tracks } from "./index"
 
 export class Playlists {
     private readonly resolve = new Resolve(this.api)
@@ -12,7 +19,7 @@ export class Playlists {
      * Return playlist with all tracks fetched.
      */
     public fetch = async (playlist: SoundcloudPlaylistV2) => {
-        const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex((t) => !t.title)).map((t) => t.id)
+        const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
         playlist.tracks = playlist.tracks.concat(await this.tracks.getArrayV2(unresolvedTracks))
         return playlist
@@ -23,7 +30,7 @@ export class Playlists {
      * Searches for playlists.
      */
     public search = async (params?: SoundcloudPlaylistFilter) => {
-        const response = await this.api.get(`/playlists`, params)
+        const response = await this.api.get("/playlists", params)
         return response as Promise<SoundcloudPlaylist[]>
     }
 
@@ -31,7 +38,7 @@ export class Playlists {
      * Searches for playlists using the v2 API.
      */
     public searchV2 = async (params?: SoundcloudPlaylistFilterV2) => {
-        const response = await this.api.getV2(`search/playlists`, params)
+        const response = await this.api.getV2("search/playlists", params)
         return response as Promise<SoundcloudPlaylistSearchV2>
     }
 
@@ -41,7 +48,7 @@ export class Playlists {
      */
     public get = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.get(playlistResolvable, true)
-        if (playlistID.hasOwnProperty("id")) return playlistID
+        if (Object.prototype.hasOwnProperty.call(playlistID, "id")) return playlistID
         const response = await this.api.get(`/playlists/${playlistID}`)
         return response as Promise<SoundcloudPlaylist>
     }
@@ -61,8 +68,9 @@ export class Playlists {
      */
     public secretToken = async (playlistResolvable: string | number) => {
         const playlistID = await this.resolve.get(playlistResolvable)
-        const response = await this.api.get(`/playlists/${playlistID}/secret-token`)
-        .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
+        const response = await this.api
+            .get(`/playlists/${playlistID}/secret-token`)
+            .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
         return response as Promise<SoundcloudSecretToken>
     }
 
@@ -70,13 +78,15 @@ export class Playlists {
      * Searches for playlists (web scraping)
      */
     public searchAlt = async (query: string) => {
-        const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-        const html = await request(`https://soundcloud.com/search/sets?q=${query}`, {headers}).then((r) => r.body.text())
+        const headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        }
+        const html = await request(`https://soundcloud.com/search/sets?q=${query}`, { headers }).then(r => r.body.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
-            const songHTML = await request(urls[i], {headers}).then((r) => r.body.text())
+            const songHTML = await request(urls[i], { headers }).then(r => r.body.text())
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
             const playlist = json[json.length - 1].data
             scrape.push(playlist)
@@ -89,8 +99,10 @@ export class Playlists {
      */
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
-        const headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-        const songHTML = await request(url, {headers}).then((r: any) => r.body.text())
+        const headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        }
+        const songHTML = await request(url, { headers }).then((r: any) => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const playlist = json[json.length - 1].data
         return this.fetch(playlist) as Promise<SoundcloudPlaylistV2>
