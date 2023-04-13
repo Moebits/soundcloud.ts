@@ -1,8 +1,11 @@
 {
-    "mode": "file",
     "out": "docs",
-    "exclude": "**/{test,node_modules,dist}/**/*.ts",
-    "ignoreCompilerErrors": true,
-    "externalPattern": "**/node_modules/**",
-    "excludeExternals": true
+    "name": "soundcloud.ts",
+    "exclude": ["**/{test,node_modules,dist}/**/*.ts"],
+    "externalPattern": ["**/node_modules/**"],
+    "excludeExternals": true,
+    "entryPoints": ["soundcloud.ts"],
+    "hideGenerator": true,
+    "excludePrivate": true,
+    "categorizeByGroup": false
 }
