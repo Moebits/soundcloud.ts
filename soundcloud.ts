@@ -32,6 +32,8 @@ export default class Soundcloud {
             opts.clientId = clientID
             opts.oauthToken = oauthToken
             opts.proxy = options?.proxy
+        } else {
+            Object.assign(opts, clientID)
         }
         if (opts.clientId) {
             Soundcloud.clientId = opts.clientId
@@ -42,7 +44,7 @@ export default class Soundcloud {
     }
 }
 
-module.exports.default = Soundcloud
 export * from "./entities"
 export * from "./types"
 export * from "./API"
+module.exports.default = Soundcloud

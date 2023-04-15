@@ -15,6 +15,7 @@ export class API {
     public web = new Pool(webURL)
     public proxy?: Pool
     constructor(public clientID?: string, public oauthToken?: string, proxy?: string) {
+        if (oauthToken) API.headers.Authorization = `OAuth ${oauthToken}`
         if (proxy) this.proxy = new Pool(proxy)
     }
 
