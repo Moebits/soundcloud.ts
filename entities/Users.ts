@@ -1,4 +1,3 @@
-import type api from "../API"
 import type {
     SoundcloudComment,
     SoundcloudPlaylist,
@@ -12,14 +11,11 @@ import type {
     SoundcloudUserV2,
     SoundcloudWebProfile,
 } from "../types"
+import { Base } from "."
 import { URL } from "url"
 import { request } from "undici"
-import { Resolve } from "./index"
 
-export class Users {
-    private readonly resolve = new Resolve(this.api)
-    constructor(private readonly api: api) {}
-
+export class Users extends Base {
     /**
      * @deprecated use searchV2
      * Searches for users.
@@ -42,7 +38,7 @@ export class Users {
      * Gets a user by URL or ID.
      */
     public get = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable, true)
+        const userID = await this.sc.resolve.get(userResolvable, true)
         if (Object.prototype.hasOwnProperty.call(userID, "id")) return userID
         const response = await this.api.get(`/users/${userID}`)
         return response as Promise<SoundcloudUser>
@@ -52,7 +48,7 @@ export class Users {
      * Fetches a user from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
+        const userID = await this.sc.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/${userID}`)
         return response as Promise<SoundcloudUserV2>
     }
@@ -62,7 +58,7 @@ export class Users {
      * Gets all the tracks by the user.
      */
     public tracks = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/tracks`)
         return response as Promise<SoundcloudTrack[]>
     }
@@ -70,7 +66,7 @@ export class Users {
      * Gets all the tracks by the user using Soundcloud v2 API.
      */
     public tracksV2 = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
+        const userID = await this.sc.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/${userID}/tracks`)
         let nextHref = response.next_href
         while (nextHref) {
@@ -89,7 +85,7 @@ export class Users {
      * Gets all the playlists by the user.
      */
     public playlists = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/playlists`)
         return response as Promise<SoundcloudPlaylist[]>
     }
@@ -99,7 +95,7 @@ export class Users {
      * Gets all the users the user is following.
      */
     public followings = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/followings`)
         return response as Promise<SoundcloudUserCollection>
     }
@@ -109,8 +105,8 @@ export class Users {
      * Gets a specific following.
      */
     public following = async (userResolvable: string | number, anotherUserResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
-        const followingID = await this.resolve.get(anotherUserResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
+        const followingID = await this.sc.resolve.get(anotherUserResolvable)
         const response = await this.api.get(`/users/${userID}/followings/${followingID}`)
         return response as Promise<SoundcloudUser>
     }
@@ -120,7 +116,7 @@ export class Users {
      * Gets all of a users followers.
      */
     public followers = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/followers`)
         return response as Promise<SoundcloudUserCollection>
     }
@@ -130,8 +126,8 @@ export class Users {
      * Gets a specific follower.
      */
     public follower = async (userResolvable: string | number, anotherUserResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
-        const followerID = await this.resolve.get(anotherUserResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
+        const followerID = await this.sc.resolve.get(anotherUserResolvable)
         const response = await this.api.get(`/users/${userID}/followers/${followerID}`)
         return response as Promise<SoundcloudUser>
     }
@@ -141,7 +137,7 @@ export class Users {
      * Gets all comments by the user.
      */
     public comments = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/comments`)
         return response as Promise<SoundcloudComment[]>
     }
@@ -151,7 +147,7 @@ export class Users {
      * Gets all of a users favorite tracks.
      */
     public favorites = async (userResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/favorites`)
         return response as Promise<SoundcloudTrack[]>
     }
@@ -161,8 +157,8 @@ export class Users {
      * Gets a specific favorite track.
      */
     public favorite = async (userResolvable: string | number, trackResolvable: string | number) => {
-        const userID = await this.resolve.get(userResolvable)
-        const trackID = await this.resolve.get(trackResolvable)
+        const userID = await this.sc.resolve.get(userResolvable)
+        const trackID = await this.sc.resolve.get(trackResolvable)
         const response = await this.api.get(`/users/${userID}/favorites/${trackID}`)
         return response as Promise<SoundcloudTrack>
     }
@@ -171,7 +167,7 @@ export class Users {
      * Gets all the web profiles on a users sidebar.
      */
     public webProfiles = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
+        const userID = await this.sc.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/soundcloud:users:${userID}/web-profiles`)
         return response as Promise<SoundcloudWebProfile[]>
     }
@@ -180,9 +176,7 @@ export class Users {
      * Searches for users (web scraping)
      */
     public searchAlt = async (query: string) => {
-        const headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         const html = await request(`https://soundcloud.com/search/people?q=${query}`, { headers }).then(r => r.body.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
@@ -201,9 +195,7 @@ export class Users {
      */
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
-        const headers = {
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         const songHTML = await request(url, { headers }).then(r => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const user = json[json.length - 1].data

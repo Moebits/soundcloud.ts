@@ -1,9 +1,7 @@
-import type api from "../API"
 import type { SoundcloudComment } from "../types"
+import { Base } from "./Base"
 
-export class Comments {
-    public constructor(private readonly api: api) {}
-
+export class Comments extends Base {
     /**
      * @deprecated use getV2
      * Gets a comment using its ID.

@@ -10,6 +10,10 @@ export interface SoundcloudApp {
     creator: string
 }
 
+export interface SoundcloudAppV2 {
+    collection: SoundcloudApp[]
+}
+
 export interface SoundcloudOembedFilter {
     url: string
     format?: string

@@ -1,9 +1,7 @@
+import { Base } from "."
 import { request } from "undici"
-import API from "../API"
 
-export class Resolve {
-    public constructor(private readonly api: API) {}
-
+export class Resolve extends Base {
     /**
      * @deprecated
      * Gets the ID of a user/playlist/track from the Soundcloud URL.
@@ -30,7 +28,7 @@ export class Resolve {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const html = await request(String(resolvable), { headers: API.headers }).then(r => r.body.text())
+            const html = await request(String(resolvable), { headers: this.api.headers }).then(r => r.body.text())
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
             id = data[data.length - 1]?.data?.[0]?.id ? data[data.length - 1].data[0].id : data[data.length - 2].data[0].id
         }

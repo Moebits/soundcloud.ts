@@ -1,9 +1,7 @@
-import type api from "../API"
+import { Base } from "."
 import type { SoundcloudOembed, SoundcloudOembedFilter } from "../types"
 
-export class Oembed {
-    public constructor(private readonly api: api) {}
-
+export class Oembed extends Base {
     /**
      * Gets the Oembed for a track, playlist, or user.
      */

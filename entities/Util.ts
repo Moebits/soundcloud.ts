@@ -1,11 +1,10 @@
+import type { SoundcloudTrack, SoundcloudTrackV2 } from "../types"
 import * as audioconcat from "audioconcat"
 import * as fs from "fs"
 import * as path from "path"
-import { Readable } from "stream"
+import { Base } from "."
 import { request } from "undici"
-import type api from "../API"
-import type { SoundcloudTrack, SoundcloudTrackV2 } from "../types"
-import { Playlists, Tracks, Users } from "./index"
+import { Readable } from "stream"
 
 const makeRequest = async (...args: Parameters<typeof request>) => {
     const response = await request(...args).then(r => {
@@ -15,20 +14,12 @@ const makeRequest = async (...args: Parameters<typeof request>) => {
     return response
 }
 
-export class Util {
-    private readonly playlists = new Playlists(this.api)
-    private readonly users = new Users(this.api)
-    private readonly tracks = new Tracks(this.api)
-    constructor(private readonly api: api) {}
-
+export class Util extends Base {
     /**
      * Gets the direct streaming link of a track.
      */
     public streamLink = async (songUrl: string) => {
-        const headers = {
-            referer: "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
         const html = await makeRequest(songUrl, { headers }).then(r => r.text())
@@ -62,10 +53,7 @@ export class Util {
      * Readable stream of m3u playlists.
      */
     private readonly m3uReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
-        const headers = {
-            referer: "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
         if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
         const html = await makeRequest(songUrl, { headers }).then(r => r.text())
@@ -103,10 +91,7 @@ export class Util {
      * Downloads the mp3 stream of a track as readable stream.
      */
     private readonly downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
-        const headers = {
-            referer: "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         const url = await this.streamLink(songUrl)
         if (!url) return this.m3uReadableStream(songUrl)
         const readable = await makeRequest(url, { headers })
@@ -133,10 +118,7 @@ export class Util {
      * Gets a track title from the page
      */
     public getTitle = async (songUrl: string) => {
-        const headers = {
-            referer: "soundcloud.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
-        }
+        const headers = this.api.headers
         const html = await makeRequest(songUrl, { headers }).then(r => r.text())
         const title = html.match(/(?<="og:title" content=")(.*?)(?=")/)?.[0]?.replace(/\//g, "")
         return title
@@ -189,7 +171,7 @@ export class Util {
      * Downloads all the tracks from the search query.
      */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.tracks.searchV2({ q: query })
+        const tracks = await this.sc.tracks.searchV2({ q: query })
         return this.downloadTracks(tracks.collection, dest, limit)
     }
 
@@ -198,7 +180,7 @@ export class Util {
      * Downloads all of a users favorites.
      */
     public downloadFavorites = async (userResolvable: string | number, dest?: string, limit?: number) => {
-        const tracks = await this.users.favorites(userResolvable)
+        const tracks = await this.sc.users.favorites(userResolvable)
         return this.downloadTracks(tracks, dest, limit)
     }
 
@@ -206,7 +188,7 @@ export class Util {
      * Downloads all the tracks in a playlist.
      */
     public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
-        const playlist = await this.playlists.getAlt(playlistResolvable)
+        const playlist = await this.sc.playlists.getAlt(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
@@ -240,7 +222,7 @@ export class Util {
         if (Object.prototype.hasOwnProperty.call(trackResolvable, "artwork_url")) {
             track = trackResolvable as SoundcloudTrackV2
         } else {
-            track = await this.tracks.getV2(trackResolvable as string)
+            track = await this.sc.tracks.getV2(trackResolvable as string)
         }
         let artwork = track.artwork_url ? track.artwork_url : track.user.avatar_url
         artwork = artwork.replace(".jpg", ".png").replace("-large", "-t500x500")

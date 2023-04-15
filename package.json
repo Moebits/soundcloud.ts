@@ -1,7 +1,7 @@
 {
     "name": "soundcloud.ts",
     "version": "0.4.9",
-    "description": "Wrapper for the Soundcloud API with typings",
+    "description": "Soundcloud API and API-v2 wrapper with typings",
     "main": "dist/soundcloud.js",
     "types": "dist/soundcloud.d.ts",
     "scripts": {
@@ -25,7 +25,9 @@
         "typescript",
         "ts",
         "audio",
-        "music"
+        "music",
+        "api",
+        "api-v2"
     ],
     "author": "Tenpi (https://github.com/Tenpi)",
     "contributors": [

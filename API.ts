@@ -6,7 +6,8 @@ const apiV2URL = "https://api-v2.soundcloud.com"
 const webURL = "https://soundcloud.com"
 
 export default class API {
-    public static headers = {
+    public static headers: Record<string, any> = {
+        referer: "soundcloud.com",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
     }
     public api = new Pool(apiURL)
@@ -17,31 +18,35 @@ export default class API {
         if (proxy) this.proxy = new Pool(proxy)
     }
 
+    get headers() {
+        return API.headers
+    }
+
     /**
      * Gets an endpoint from the Soundcloud API.
      */
-    public get = (endpoint: string, params?: any) => {
+    public get = (endpoint: string, params?: Record<string, any>) => {
         return this.makeGet(this.api, apiURL, endpoint, params)
     }
 
     /**
      * Gets an endpoint from the Soundcloud V2 API.
      */
-    public getV2 = (endpoint: string, params?: any) => {
+    public getV2 = (endpoint: string, params?: Record<string, any>) => {
         return this.makeGet(this.apiV2, apiV2URL, endpoint, params)
     }
 
     /**
      * Some endpoints use the main website as the URL.
      */
-    public getWebsite = (endpoint: string, params?: any) => {
+    public getWebsite = (endpoint: string, params?: Record<string, any>) => {
         return this.makeGet(this.web, webURL, endpoint, params)
     }
 
     /**
      * Gets a URL, such as download, stream, attachment, etc.
      */
-    public getURL = (URI: string, params?: any) => {
+    public getURL = (URI: string, params?: Record<string, any>) => {
         if (this.proxy) return this.makeRequest(this.proxy, this.buildOptions(URI, "GET", params))
         const options = {
             query: params || {},
@@ -59,7 +64,7 @@ export default class API {
         })
     }
 
-    private readonly makeGet = async (pool: Pool, origin: string, endpoint: string, params?: any) => {
+    private readonly makeGet = async (pool: Pool, origin: string, endpoint: string, params?: Record<string, any>) => {
         if (!this.clientID) await this.getClientID()
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "GET", params)
@@ -71,7 +76,7 @@ export default class API {
         }
     }
 
-    public post = async (endpoint: string, params?: any) => {
+    public post = async (endpoint: string, params?: Record<string, any>) => {
         if (!this.clientID) await this.getClientID()
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "POST", params)

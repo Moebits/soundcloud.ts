@@ -1,6 +1,6 @@
 import type { SoundcloudOptions } from "./types"
-import api from "./API"
-import { Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util } from "./entities/index"
+import API from "./API"
+import { Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util } from "./entities"
 
 /**
  * The main class for interacting with the Soundcloud API.
@@ -9,16 +9,17 @@ export default class Soundcloud {
     public static clientId?: string
     public static oauthToken?: string
     public static proxy?: string
-    public api: api
-    public tracks: Tracks
-    public users: Users
-    public playlists: Playlists
-    public oembed: Oembed
-    public resolve: Resolve
-    public me: Me
-    public comments: Comments
-    public apps: Apps
-    public util: Util
+    public api: API
+    public apps = new Apps(this)
+    public comments = new Comments(this)
+    public me = new Me(this)
+    public oembed = new Oembed(this)
+    public playlists = new Playlists(this)
+    public resolve = new Resolve(this)
+    public tracks = new Tracks(this)
+    public users = new Users(this)
+    public util = new Util(this)
+    public constructor(options?: SoundcloudOptions)
     /**
      * @param clientID The client ID of your app
      * @param oauthToken The oauth token of the user
@@ -48,19 +49,10 @@ export default class Soundcloud {
             if (opts.oauthToken) Soundcloud.oauthToken = opts.oauthToken
         }
         if (opts.proxy) Soundcloud.proxy = opts.proxy
-        this.api = new api(Soundcloud.clientId, Soundcloud.oauthToken, Soundcloud.proxy)
-        this.tracks = new Tracks(this.api)
-        this.users = new Users(this.api)
-        this.playlists = new Playlists(this.api)
-        this.oembed = new Oembed(this.api)
-        this.resolve = new Resolve(this.api)
-        this.me = new Me(this.api)
-        this.comments = new Comments(this.api)
-        this.apps = new Apps(this.api)
-        this.util = new Util(this.api)
+        this.api = new API(Soundcloud.clientId, Soundcloud.oauthToken, Soundcloud.proxy)
     }
 }
 
 module.exports.default = Soundcloud
-export * from "./entities/index"
-export * from "./types/index"
+export * from "./entities"
+export * from "./types"

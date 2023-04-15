@@ -1,19 +1,23 @@
-import type api from "../API"
 import type { SoundcloudActivityCollection, SoundcloudConnection, SoundcloudUser } from "../types"
-import { Users } from "./index"
+import { Base } from "."
 
-export class Me {
-    private readonly users = new Users(this.api)
-    public constructor(private readonly api: api) {}
-
+export class Me extends Base {
     /**
-     * @deprecated
+     * @deprecated use getV2
      * Gets your own profile, or your ID if pass in a true param.
      */
     public get = async <B extends boolean>(returnID?: B): Promise<B extends true ? number : SoundcloudUser> => {
         const response = await this.api.get("/me")
         if (returnID) return response.id
         return response
+    }
+
+    /**
+     * Gets your own profile, using the Soundcloud v2 API.
+     */
+    public getV2 = async () => {
+        const response = await this.api.getV2("/me")
+        return response as Promise<SoundcloudUser>
     }
 
     /**
@@ -76,7 +80,7 @@ export class Me {
      */
     public tracks = async () => {
         const id = await this.get(true)
-        return this.users.tracks(id)
+        return this.sc.users.tracks(id)
     }
 
     /**
@@ -85,7 +89,7 @@ export class Me {
      */
     public comments = async () => {
         const id = await this.get(true)
-        return this.users.comments(id)
+        return this.sc.users.comments(id)
     }
 
     /**
@@ -94,7 +98,7 @@ export class Me {
      */
     public favorites = async () => {
         const id = await this.get(true)
-        return this.users.favorites(id)
+        return this.sc.users.favorites(id)
     }
 
     /**
@@ -103,7 +107,7 @@ export class Me {
      */
     public favorite = async (userResolvable: string | number) => {
         const id = await this.get(true)
-        return this.users.favorite(id, userResolvable)
+        return this.sc.users.favorite(id, userResolvable)
     }
 
     /**
@@ -112,7 +116,7 @@ export class Me {
      */
     public followers = async () => {
         const id = await this.get(true)
-        return this.users.followers(id)
+        return this.sc.users.followers(id)
     }
 
     /**
@@ -121,7 +125,7 @@ export class Me {
      */
     public follower = async (userResolvable: string | number) => {
         const id = await this.get(true)
-        return this.users.follower(id, userResolvable)
+        return this.sc.users.follower(id, userResolvable)
     }
 
     /**
@@ -130,7 +134,7 @@ export class Me {
      */
     public followings = async () => {
         const id = await this.get(true)
-        return this.users.followings(id)
+        return this.sc.users.followings(id)
     }
 
     /**
@@ -139,7 +143,7 @@ export class Me {
      */
     public following = async (userResolvable: string | number) => {
         const id = await this.get(true)
-        return this.users.following(id, userResolvable)
+        return this.sc.users.following(id, userResolvable)
     }
 
     /**
@@ -148,7 +152,7 @@ export class Me {
      */
     public playlists = async () => {
         const id = await this.get(true)
-        return this.users.playlists(id)
+        return this.sc.users.playlists(id)
     }
 
     /**
@@ -157,6 +161,6 @@ export class Me {
      */
     public webProfiles = async () => {
         const id = await this.get(true)
-        return this.users.webProfiles(id)
+        return this.sc.users.webProfiles(id)
     }
 }
