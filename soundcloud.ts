@@ -1,5 +1,5 @@
 import type { SoundcloudOptions } from "./types"
-import API from "./API"
+import { API } from "./API"
 import { Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util } from "./entities"
 
 /**
@@ -21,20 +21,9 @@ export default class Soundcloud {
     public util = new Util(this)
     public constructor(options?: SoundcloudOptions)
     /**
-     * @param clientID The client ID of your app
-     * @param oauthToken The oauth token of the user
-     * @param options The options for the client
-     * @param options.proxy The proxy to use for requests
      * @deprecated Use `new Soundcloud({ clientId, oauthToken, proxy })` instead.
      */
     public constructor(clientID?: string, oauthToken?: string, options?: { proxy?: string })
-    /**
-     * @param options The options for the client
-     * @param options.clientId The client ID of your app
-     * @param options.oauthToken The oauth token of the user
-     * @param options.proxy The proxy to use for requests
-     */
-    public constructor(options?: SoundcloudOptions)
     public constructor(clientID?: string | SoundcloudOptions, oauthToken?: string, options?: { proxy?: string }) {
         const opts: SoundcloudOptions = {}
         if (typeof clientID === "string") {
@@ -56,3 +45,4 @@ export default class Soundcloud {
 module.exports.default = Soundcloud
 export * from "./entities"
 export * from "./types"
+export * from "./API"

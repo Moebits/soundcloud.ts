@@ -5,7 +5,7 @@ const apiURL = "https://api.soundcloud.com"
 const apiV2URL = "https://api-v2.soundcloud.com"
 const webURL = "https://soundcloud.com"
 
-export default class API {
+export class API {
     public static headers: Record<string, any> = {
         referer: "soundcloud.com",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",

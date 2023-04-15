@@ -5,3 +5,4 @@ dist
 tracks
 coverage
 .nyc_output
+*.tgz

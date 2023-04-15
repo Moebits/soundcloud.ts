@@ -6,7 +6,7 @@
     "types": "dist/soundcloud.d.ts",
     "scripts": {
         "start": "tsc && node dist/start.js",
-        "docs": "typedoc --out docs ./",
+        "docs": "typedoc",
         "build": "tsc",
         "build:check": "tsc --noEmit",
         "lint": "eslint .",
@@ -14,7 +14,7 @@
         "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
         "test:coverage": "nyc npm run test",
         "prettier": "prettier --write \"**/*.{ts,json,yml,yaml,md}\"",
-        "prepublishOnly": "npm run build"
+        "prepack": "npm run build"
     },
     "repository": {
         "type": "git",
@@ -38,28 +38,26 @@
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@tenpi/tslint": "^1.1.0",
         "@tenpi/typedoc": "0.0.3",
-        "@types/chai": "^4.2.18",
-        "@types/mocha": "^8.2.2",
-        "@types/node": "^15.3.0",
-        "chai": "^4.3.4",
-        "dotenv": "^9.0.2",
+        "@types/chai": "^4.3.4",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "^18.15.11",
+        "chai": "^4.3.7",
+        "dotenv": "^16.0.3",
         "eslint": "^8.38.0",
         "eslint-config-distube": "^1.6.4",
-        "mocha": "^8.4.0",
+        "mocha": "^10.2.0",
         "nyc": "^15.1.0",
         "prettier": "^2.8.7",
         "ts-mocha": "^10.0.0",
-        "typedoc": "^0.20.36",
-        "typescript": "^4.2.4"
+        "typedoc": "^0.24.1",
+        "typescript": "^5.0.4"
     },
     "dependencies": {
         "audioconcat": "^0.1.4",
-        "undici": "^5.8.0"
+        "undici": "^5.21.2"
     },
     "nyc": {
         "extends": "@istanbuljs/nyc-config-typescript",
-        "check-coverage": true,
-        "all": true,
         "include": [
             "**/!(*.test.*).ts"
         ],

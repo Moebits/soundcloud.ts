@@ -5,3 +5,8 @@ docs
 tracks
 coverage
 test
+*.tgz
+tsconfig.eslint.json
+tsconfig.json
+tslint.json
+typedoc.json
