@@ -45,15 +45,15 @@
         "dotenv": "^16.0.3",
         "eslint": "^8.38.0",
         "eslint-config-distube": "^1.6.4",
+        "ffmpeg-static": "^5.1.0",
         "mocha": "^10.2.0",
         "nyc": "^15.1.0",
         "prettier": "^2.8.7",
         "ts-mocha": "^10.0.0",
-        "typedoc": "^0.24.1",
+        "typedoc": "^0.24.0",
         "typescript": "^5.0.4"
     },
     "dependencies": {
-        "audioconcat": "^0.1.4",
         "undici": "^5.21.2"
     },
     "nyc": {

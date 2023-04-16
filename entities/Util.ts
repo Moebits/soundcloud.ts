@@ -1,10 +1,10 @@
-import type { SoundcloudTrack, SoundcloudTrackV2 } from "../types"
-import * as audioconcat from "audioconcat"
+import type { SoundcloudTrackV2, SoundcloudTranscoding } from "../types"
 import * as fs from "fs"
 import * as path from "path"
 import { Base } from "."
 import { request } from "undici"
 import { Readable } from "stream"
+import { spawnSync } from "child_process"
 
 const makeRequest = async (...args: Parameters<typeof request>) => {
     const response = await request(...args).then(r => {
@@ -14,146 +14,238 @@ const makeRequest = async (...args: Parameters<typeof request>) => {
     return response
 }
 
+let temp = 0
+const FFMPEG = { checked: false, path: "" }
+const SOURCES: (() => string)[] = [
+    () => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+        const ffmpeg = require("ffmpeg-static")
+        return ffmpeg?.path ?? ffmpeg
+    },
+    () => "ffmpeg",
+    () => "./ffmpeg",
+]
+
 export class Util extends Base {
+    private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrackV2) => {
+        return typeof trackResolvable === "string" ? await this.sc.tracks.getV2(trackResolvable) : trackResolvable
+    }
+    private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
+        const track = await this.resolveTrack(trackResolvable)
+        const transcodings = track.media.transcodings.sort(t => (t.quality === "hq" ? -1 : 1))
+        if (!protocol) return transcodings
+        return transcodings.filter(t => t.format.protocol === protocol)
+    }
+    private readonly getStreamLink = async (transcoding: SoundcloudTranscoding) => {
+        if (!transcoding?.url) return null
+        const url = transcoding.url
+        let client_id = await this.api.getClientID()
+        const headers = this.api.headers
+        let connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+        try {
+            return await makeRequest(url + connect, { headers })
+                .then(r => r.json())
+                .then(r => r.url as string)
+        } catch {
+            client_id = await this.api.getClientID(true)
+            connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+            try {
+                return await makeRequest(url + connect, { headers })
+                    .then(r => r.json())
+                    .then(r => r.url as string)
+            } catch {
+                return null
+            }
+        }
+    }
     /**
      * Gets the direct streaming link of a track.
      */
-    public streamLink = async (songUrl: string) => {
-        const headers = this.api.headers
-        if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
-        if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
-        const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
-        const track = json[json.length - 1].data
+    public streamLink = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
+        const track = await this.resolveTrack(trackResolvable)
+        const transcodings = await this.sortTranscodings(track, protocol)
+        if (!transcodings.length) return null
+        return this.getStreamLink(transcodings[0])
+    }
 
-        //  const match = html.data.match(/(?<=,{"url":")(.*?)(progressive)/)?.[0]
-        const match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "progressive")?.url
-        let url: string
-        let client_id = await this.api.getClientID()
-        if (match) {
-            let connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-            try {
-                url = await makeRequest(match + connect, { headers })
-                    .then(r => r.json())
-                    .then(r => r.url)
-            } catch {
-                client_id = await this.api.getClientID(true)
-                connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-                url = await makeRequest(match + connect, { headers })
-                    .then(r => r.json())
-                    .then(r => r.url)
-            }
-        } else {
-            return null
+    private readonly mergeFiles = async (files: string[], outputFile: string): Promise<void> => {
+        const outStream = fs.createWriteStream(outputFile)
+        const ret = new Promise<void>((resolve, reject) => {
+            outStream.on("finish", resolve)
+            outStream.on("error", reject)
+        })
+        for (const file of files) {
+            await new Promise((resolve, reject) => {
+                fs.createReadStream(file).on("error", reject).on("end", resolve).pipe(outStream, { end: false })
+            })
         }
-        return url
+        outStream.end()
+        return ret
+    }
+
+    private readonly checkFFmpeg = () => {
+        if (FFMPEG.checked) return !!FFMPEG.path
+        for (const fn of SOURCES) {
+            try {
+                const command = fn()
+                const result = spawnSync(command, ["-h"], { windowsHide: true, shell: true, encoding: "utf-8" })
+                if (result.error) throw result.error
+                if (result.stderr && !result.stdout) throw new Error(result.stderr)
+
+                const output = result.output.filter(Boolean).join("\n")
+                const version = /version (.+) Copyright/im.exec(output)?.[1]
+                if (!version) throw new Error(`Malformed FFmpeg command using ${command}`)
+                FFMPEG.path = command
+            } catch {}
+        }
+        FFMPEG.checked = true
+        if (!FFMPEG.path) {
+            /* eslint-disable no-console */
+            console.warn("FFmpeg not found, please install ffmpeg-static or add ffmpeg to your PATH.")
+            console.warn("Download m4a (hq) is disabled, use mp3 (sq) instead.")
+            /* eslint-enable no-console */
+        }
+        return !!FFMPEG.path
+    }
+
+    private readonly spawnFFmpeg = (argss: string[]) => {
+        try {
+            spawnSync(FFMPEG.path, argss, { windowsHide: true, shell: false })
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e)
+            throw "FFmpeg error"
+        }
     }
 
     /**
      * Readable stream of m3u playlists.
      */
-    private readonly m3uReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
+    private readonly m3uReadableStream = async (
+        trackResolvable: string | SoundcloudTrackV2
+    ): Promise<{
+        stream: NodeJS.ReadableStream
+        type: "m4a" | "mp3"
+    }> => {
+        const track = await this.resolveTrack(trackResolvable)
+        const transcodings = await this.sortTranscodings(track, "hls")
+        if (!transcodings.length) throw "No transcodings found"
+        let transcoding: { url: string; type: "m4a" | "mp3" }
+        for (const t of transcodings) {
+            if (t.format.mime_type.startsWith('audio/mp4; codecs="mp4a') && this.checkFFmpeg()) {
+                transcoding = { url: t.url, type: "m4a" }
+                break
+            }
+            if (t.format.mime_type.startsWith("audio/mpeg")) {
+                transcoding = { url: t.url, type: "mp3" }
+                break
+            }
+        }
+        if (!transcoding) {
+            // eslint-disable-next-line no-console
+            console.log(
+                `Support for this track is not yet implemented, please open an issue on GitHub.\nURL: ${
+                    track.permalink_url
+                }.\nType: ${track.media.transcodings.map(t => t.format.mime_type).join(" | ")}`
+            )
+            throw "No supported transcodings found"
+        }
         const headers = this.api.headers
-        if (songUrl.includes("m.soundcloud.com")) songUrl = songUrl.replace("m.soundcloud.com", "soundcloud.com")
-        if (!songUrl.includes("soundcloud.com")) songUrl = `https://soundcloud.com/${songUrl}`
-        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
-        const json = JSON.parse(html.match(/(\[{)(.*)(?=;)/gm)[0])
-        const track = json[json.length - 1].data
         const client_id = await this.api.getClientID()
-        const match = track.media.transcodings.find((t: any) => t.format.mime_type === "audio/mpeg" && t.format.protocol === "hls")?.url
-        if (!match) return null
-        const connect = match.includes("secret_token") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-        const m3uLink = await makeRequest(match + connect, { headers })
+        const connect = transcoding.url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
+        const m3uLink = await makeRequest(transcoding.url + connect, { headers: this.api.headers })
             .then(r => r.json())
             .then(r => r.url)
-        const m3u = await makeRequest(m3uLink, { headers }).then(r => r.text())
-        const urls = m3u.match(/(http).*?(?=\s)/gm)
-        const destDir = path.join(__dirname, "temp")
+        const destDir = path.join(__dirname, `tmp_${temp++}`)
         if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
-        const output = `${destDir}/temp.mp3`
-        const chunks = []
-        for (let i = 0; i < urls.length; i++) {
-            const arrayBuffer = await request(urls[i], { headers }).then(r => r.body.arrayBuffer())
-            fs.writeFileSync(`${destDir}/${i}.mp3`, Buffer.from(arrayBuffer))
-            chunks.push(`${destDir}/${i}.mp3`)
-        }
-        await new Promise<void>(resolve => {
-            audioconcat(chunks)
-                .concat(output)
-                .on("end", () => resolve())
-        })
-        const stream = Readable.from(fs.readFileSync(output))
-        Util.removeDirectory(destDir)
-        return stream
-    }
+        const output = path.join(destDir, `out.${transcoding.type}`)
 
-    /**
-     * Downloads the mp3 stream of a track as readable stream.
-     */
-    private readonly downloadTrackReadableStream = async (songUrl: string): Promise<NodeJS.ReadableStream> => {
-        const headers = this.api.headers
-        const url = await this.streamLink(songUrl)
-        if (!url) return this.m3uReadableStream(songUrl)
-        const readable = await makeRequest(url, { headers })
-        return readable
+        if (transcoding.type === "m4a") {
+            try {
+                this.spawnFFmpeg([
+                    "-y",
+                    "-loglevel",
+                    "warning",
+                    "-i",
+                    m3uLink,
+                    "-bsf:a",
+                    "aac_adtstoasc",
+                    "-vcodec",
+                    "copy",
+                    "-c",
+                    "copy",
+                    "-crf",
+                    "50",
+                    output,
+                ])
+            } catch {
+                // eslint-disable-next-line no-console
+                console.warn("Failed to transmux to m4a (hq), download as mp3 (hq) instead.")
+                FFMPEG.path = null
+                return this.m3uReadableStream(trackResolvable)
+            }
+        } else {
+            const m3u = await makeRequest(m3uLink, { headers }).then(r => r.text())
+            const urls = m3u.match(/(http).*?(?=\s)/gm)
+            const chunks: string[] = []
+            for (let i = 0; i < urls.length; i++) {
+                const arrayBuffer = await request(urls[i], { headers }).then(r => r.body.arrayBuffer())
+                const chunkPath = path.join(destDir, `${i}.${transcoding.type}`)
+                fs.writeFileSync(chunkPath, Buffer.from(arrayBuffer))
+                chunks.push(chunkPath)
+            }
+            await this.mergeFiles(chunks, output)
+        }
+        const stream: NodeJS.ReadableStream = Readable.from(fs.readFileSync(output))
+        Util.removeDirectory(destDir)
+        return { stream, type: transcoding.type }
     }
 
     /**
      * Downloads the mp3 stream of a track.
      */
-    private readonly downloadTrackStream = async (songUrl: string, title: string, dest: string) => {
-        if (title.endsWith(".mp3")) title = title.replace(".mp3", "")
-        const finalMP3 = path.extname(dest) ? dest : path.join(dest, `${title}.mp3`)
+    private readonly downloadTrackStream = async (trackResolvable: string | SoundcloudTrackV2, title: string, dest: string) => {
+        let result: {
+            stream: NodeJS.ReadableStream
+            type: string
+        }
+        const track = await this.resolveTrack(trackResolvable)
+        const transcodings = await this.sortTranscodings(track, "progressive")
+        if (!transcodings.length) {
+            result = await this.m3uReadableStream(trackResolvable)
+        } else {
+            const transcoding = transcodings[0]
+            const url = await this.getStreamLink(transcoding)
+            const headers = this.api.headers
+            const stream = await makeRequest(url, { headers })
+            const type = transcoding.format.mime_type.startsWith('audio/mp4; codecs="mp4a') ? "m4a" : "mp3"
+            result = { stream, type }
+        }
 
-        const stream = await this.downloadTrackReadableStream(songUrl)
-        const writeStream = fs.createWriteStream(finalMP3)
+        const stream = result.stream
+        const fileName = path.extname(dest) ? dest : path.join(dest, `${title}.${result.type}`)
+        const writeStream = fs.createWriteStream(fileName)
         stream.pipe(writeStream)
 
         await new Promise<void>(resolve => stream.on("end", () => resolve()))
 
-        return finalMP3
-    }
-
-    /**
-     * Gets a track title from the page
-     */
-    public getTitle = async (songUrl: string) => {
-        const headers = this.api.headers
-        const html = await makeRequest(songUrl, { headers }).then(r => r.text())
-        const title = html.match(/(?<="og:title" content=")(.*?)(?=")/)?.[0]?.replace(/\//g, "")
-        return title
+        return fileName
     }
 
     /**
      * Downloads a track on Soundcloud.
      */
-    public downloadTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string) => {
-        if (!dest) dest = "./"
-        const folder = path.dirname(dest)
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
-        let track: SoundcloudTrack
-        if (Object.prototype.hasOwnProperty.call(trackResolvable, "downloadable")) {
-            track = trackResolvable as SoundcloudTrack
-            if (track.downloadable === true) {
-                const client_id = await this.api.getClientID()
-                const result = await request(track.download_url, { query: { client_id } })
-                dest = path.extname(dest) ? dest : path.join(folder, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
-                fs.writeFileSync(dest, Buffer.from(await result.body.arrayBuffer()))
-                return dest
-            } else {
-                return this.downloadTrackStream(track.permalink_url, track.title.replace(/\//g, ""), dest)
-            }
-        } else {
-            const url = trackResolvable as string
-            const title = await this.getTitle(url)
-            return this.downloadTrackStream(url, title, dest)
-        }
+    public downloadTrack = async (trackResolvable: string | SoundcloudTrackV2, dest?: string) => {
+        if (!dest) dest = "./tracks"
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+        const track = await this.resolveTrack(trackResolvable)
+        return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)
     }
 
     /**
      * Downloads an array of tracks.
      */
-    public downloadTracks = async (tracks: SoundcloudTrack[] | SoundcloudTrackV2[] | string[], dest?: string, limit?: number) => {
+    public downloadTracks = async (tracks: SoundcloudTrackV2[] | string[], dest?: string, limit?: number) => {
         if (!limit) limit = tracks.length
         const resultArray: string[] = []
         for (let i = 0; i < limit; i++) {
@@ -176,11 +268,10 @@ export class Util extends Base {
     }
 
     /**
-     * @deprecated
-     * Downloads all of a users favorites.
+     * Download all liked tracks by a user.
      */
-    public downloadFavorites = async (userResolvable: string | number, dest?: string, limit?: number) => {
-        const tracks = await this.sc.users.favorites(userResolvable)
+    public downloadLikes = async (userResolvable: string | number, dest?: string, limit?: number) => {
+        const tracks = await this.sc.users.likes(userResolvable, limit)
         return this.downloadTracks(tracks, dest, limit)
     }
 
@@ -188,44 +279,29 @@ export class Util extends Base {
      * Downloads all the tracks in a playlist.
      */
     public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
-        const playlist = await this.sc.playlists.getAlt(playlistResolvable)
+        const playlist = await this.sc.playlists.getV2(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
     /**
      * Returns a readable stream to the track.
      */
-    public streamTrack = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
-        let track: SoundcloudTrack
-        if (Object.prototype.hasOwnProperty.call(trackResolvable, "downloadable")) {
-            track = trackResolvable as SoundcloudTrack
-            if (track.downloadable === true) {
-                const client_id = await this.api.getClientID()
-                return makeRequest(track.download_url, { query: { client_id, oauth_token: this.api.oauthToken } })
-            } else {
-                return this.downloadTrackReadableStream(track.permalink_url)
-            }
-        } else {
-            const url = trackResolvable as string
-            return this.downloadTrackReadableStream(url)
-        }
+    public streamTrack = async (trackResolvable: string | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
+        const url = await this.streamLink(trackResolvable, "progressive")
+        if (!url) return this.m3uReadableStream(trackResolvable).then(r => r.stream)
+        const readable = await makeRequest(url, { headers: this.api.headers })
+        return readable
     }
 
     /**
      * Downloads a track's song cover.
      */
-    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
+    public downloadSongCover = async (trackResolvable: string | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = path.dirname(dest)
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
-        let track: SoundcloudTrackV2
-        if (Object.prototype.hasOwnProperty.call(trackResolvable, "artwork_url")) {
-            track = trackResolvable as SoundcloudTrackV2
-        } else {
-            track = await this.sc.tracks.getV2(trackResolvable as string)
-        }
-        let artwork = track.artwork_url ? track.artwork_url : track.user.avatar_url
-        artwork = artwork.replace(".jpg", ".png").replace("-large", "-t500x500")
+        const track = await this.resolveTrack(trackResolvable)
+        const artwork = (track.artwork_url ? track.artwork_url : track.user.avatar_url).replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/\//g, "")
         dest = path.extname(dest) ? dest : path.join(folder, `${title}.png`)
         const client_id = await this.api.getClientID()

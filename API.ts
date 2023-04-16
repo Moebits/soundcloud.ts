@@ -85,7 +85,7 @@ export class API {
     }
 
     public getClientID = async (reset?: boolean) => {
-        if (!this.clientID || reset) {
+        if (!this.oauthToken && (!this.clientID || reset)) {
             const response = await (this.proxy ? this.proxy.request(this.buildOptions(webURL)) : this.web.request(this.buildOptions("/"))).then(r =>
                 r.body.text()
             )
