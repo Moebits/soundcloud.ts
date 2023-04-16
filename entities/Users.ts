@@ -143,13 +143,32 @@ export class Users extends Base {
     }
 
     /**
-     * @deprecated
+     * @deprecated use likes
      * Gets all of a users favorite tracks.
      */
     public favorites = async (userResolvable: string | number) => {
         const userID = await this.sc.resolve.get(userResolvable)
         const response = await this.api.get(`/users/${userID}/favorites`)
         return response as Promise<SoundcloudTrack[]>
+    }
+
+    /**
+     * Gets all of a users liked tracks.
+     */
+    public likes = async (userResolvable: string | number, limit?: number) => {
+        const userID = await this.sc.resolve.getV2(userResolvable)
+        const response = await this.api.getV2(`/users/${userID}/likes`, { limit: 50, offset: 0 })
+        const tracks: SoundcloudTrackV2[] = []
+        let nextHref = response.next_href
+        while (nextHref && (!limit || tracks.length < limit)) {
+            const url = new URL(nextHref)
+            const params = {}
+            url.searchParams.forEach((value, key) => (params[key] = value))
+            const nextPage = await this.api.getURL(url.origin + url.pathname, params)
+            tracks.push(...nextPage.collection)
+            nextHref = nextPage.next_href
+        }
+        return tracks
     }
 
     /**
