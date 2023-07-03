@@ -30,12 +30,14 @@ export class Util extends Base {
     private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrackV2) => {
         return typeof trackResolvable === "string" ? await this.sc.tracks.getV2(trackResolvable) : trackResolvable
     }
+
     private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = track.media.transcodings.sort(t => (t.quality === "hq" ? -1 : 1))
         if (!protocol) return transcodings
         return transcodings.filter(t => t.format.protocol === protocol)
     }
+
     private readonly getStreamLink = async (transcoding: SoundcloudTranscoding) => {
         if (!transcoding?.url) return null
         const url = transcoding.url
@@ -236,7 +238,7 @@ export class Util extends Base {
      * Downloads a track on Soundcloud.
      */
     public downloadTrack = async (trackResolvable: string | SoundcloudTrackV2, dest?: string) => {
-        if (!dest) dest = "./tracks"
+        if (!dest) dest = "./"
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
         const track = await this.resolveTrack(trackResolvable)
         return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)

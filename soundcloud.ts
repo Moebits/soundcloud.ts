@@ -5,7 +5,7 @@ import { Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util } f
 /**
  * The main class for interacting with the Soundcloud API.
  */
-export default class Soundcloud {
+export class Soundcloud {
     public static clientId?: string
     public static oauthToken?: string
     public static proxy?: string
@@ -47,4 +47,5 @@ export default class Soundcloud {
 export * from "./entities"
 export * from "./types"
 export * from "./API"
+export default Soundcloud
 module.exports.default = Soundcloud
