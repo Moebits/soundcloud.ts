@@ -86,19 +86,27 @@ export class API {
 
     public getClientID = async (reset?: boolean) => {
         if (!this.oauthToken && (!this.clientID || reset)) {
-            const response = await (this.proxy ? this.proxy.request(this.buildOptions(webURL)) : this.web.request(this.buildOptions("/"))).then(r =>
-                r.body.text()
+            const response = await (this.proxy ? this.proxy.request(this.buildOptions(webURL)) : this.web.request(this.buildOptions("/"))).then(
+                async r => {
+                    if (r.statusCode.toString().startsWith("2")) return r.body.text()
+                    const error = await r.body.text().catch(() => "")
+                    throw new Error(`Status code ${r.statusCode}${error ? `\n${error}` : ""}`)
+                }
             )
             const urls = response.match(
                 /(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*\.js)(?=">)/g
             )
-            if (urls.length === 0) throw new Error("Could not find client ID")
+            if (!urls || urls.length === 0) {
+                throw new Error("Could not find client ID. Please get it manually. (Guide: https://github.com/Tenpi/soundcloud.ts#getting-started)")
+            }
             let script: string
             do {
                 script = await request(urls.pop()).then(r => r.body.text())
             } while (urls.length > 0 && !script.includes(',client_id:"'))
             this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
-            if (!this.clientID) throw new Error("Could not find client ID")
+            if (!this.clientID) {
+                throw new Error("Could not find client ID. Please get it manually. (Guide: https://github.com/Tenpi/soundcloud.ts#getting-started)")
+            }
         }
         return this.clientID
     }
