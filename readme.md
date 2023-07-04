@@ -25,20 +25,24 @@ npm install soundcloud.ts
 
 ### Getting Started
 
-Authenticating with your account is **optional**, but I still recommend it. If you don't authenticate, you won't be able to use private endpoints such as `/me`. Soundcloud has closed down their API applications, but you are still able to get your
-client id and oauth token by inspecting the network traffic.
+Authenticating with your account is **optional**, but I still recommend it. If you don't authenticate, you won't be able to use private endpoints such as `/me`. Soundcloud has closed down their API applications, but you are still able to get your client id and oauth token by inspecting the network traffic.
 
--   Go to any track that has downloads enabled on Soundcloud, such as: https://soundcloud.com/imtenpi/starstruck
+-   Go to soundcloud.com and login (skip if you are already logged in)
 -   Open up the dev tools (Right click -> inspect) and go to the Network tab
--   Download the track (hamburger menu -> download file), and observe the network tab.
--   You will see something like `&client_id="client id"&oauth_token="token"`, grab these credentials!
--   Edit - the oauth_token no longer appears on track downloads, but you might be able to find it by inspecting the network tab while you login to soundcloud. It should be in the format d-dddddd-ddddddddd-aaaaaaaaaaaaaa, where d is a digit and a is an alphanumeric character.
+-   Go to soundcloud.com, and you should see a bunch of requests in the network tab
+-   Find the request that has the name `session` (you can filter by typing `session` in the filter box) and click on it
+-   Go to the Payload tab
+-   You should see your client id in the Query String Parameters section, and your oauth token (`access_token`) in the Request Payload section
 
 #### Update
 
 Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping.
 
 ```ts
+const soundcloud = new Soundcloud({
+    clientId: process.env.SOUNDCLOUD_CLIENT_ID,
+    oauthToken: process.env.SOUNDCLOUD_OAUTH_TOKEN,
+})
 /*Get track v2*/
 const track = await soundcloud.tracks.getV2("succducc/azure")
 /*Search tracks v2*/
@@ -62,7 +66,10 @@ import Soundcloud from "soundcloud.ts"
 
 async function useAPI() {
     /*Credentials are optional, client id is manually found if omitted.*/
-    const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
+    const soundcloud = new Soundcloud({
+        clientId: process.env.SOUNDCLOUD_CLIENT_ID,
+        oauthToken: process.env.SOUNDCLOUD_OAUTH_TOKEN,
+    })
 
     /*You can get tracks by URL or ID (which can only be gotten from the API)*/
     const track = await soundcloud.tracks.get("https://soundcloud.com/imtenpi/snowflake")

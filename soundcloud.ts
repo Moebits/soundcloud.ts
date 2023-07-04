@@ -23,17 +23,17 @@ export class Soundcloud {
     /**
      * @deprecated Use `new Soundcloud({ clientId, oauthToken, proxy })` instead.
      */
-    public constructor(clientID?: string, oauthToken?: string, options?: { proxy?: string })
-    public constructor(clientID?: string | SoundcloudOptions, oauthToken?: string, options?: { proxy?: string }) {
+    public constructor(clientId?: string, oauthToken?: string, options?: { proxy?: string })
+    public constructor(clientId?: string | SoundcloudOptions, oauthToken?: string, options?: { proxy?: string }) {
         const opts: SoundcloudOptions = {}
-        if (typeof clientID === "string") {
+        if (typeof clientId === "string") {
             // eslint-disable-next-line no-console
-            console.warn("`Soundcloud(clientID, oauthToken, options)` is deprecated. Use `Soundcloud({ clientId, oauthToken, proxy })` instead.")
-            opts.clientId = clientID
+            console.warn("`Soundcloud(clientId, oauthToken, options)` is deprecated. Use `Soundcloud({ clientId, oauthToken, proxy })` instead.")
+            opts.clientId = clientId
             opts.oauthToken = oauthToken
             opts.proxy = options?.proxy
         } else {
-            Object.assign(opts, clientID)
+            Object.assign(opts, clientId)
         }
         if (opts.clientId) {
             Soundcloud.clientId = opts.clientId

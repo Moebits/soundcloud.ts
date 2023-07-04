@@ -7,14 +7,16 @@ const webURL = "https://soundcloud.com"
 
 export class API {
     public static headers: Record<string, any> = {
-        referer: "soundcloud.com",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36",
+        Origin: "https://soundcloud.com",
+        Referer: "https://soundcloud.com/",
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67",
     }
     public api = new Pool(apiURL)
     public apiV2 = new Pool(apiV2URL)
     public web = new Pool(webURL)
     public proxy?: Pool
-    constructor(public clientID?: string, public oauthToken?: string, proxy?: string) {
+    constructor(public clientId?: string, public oauthToken?: string, proxy?: string) {
         if (oauthToken) API.headers.Authorization = `OAuth ${oauthToken}`
         if (proxy) this.proxy = new Pool(proxy)
     }
@@ -54,7 +56,7 @@ export class API {
             headers: API.headers,
             maxRedirections: 5,
         }
-        if (this.clientID) options.query.client_id = this.clientID
+        if (this.clientId) options.query.client_id = this.clientId
         if (this.oauthToken) options.query.oauth_token = this.oauthToken
         return request(URI, options).then(r => {
             if (r.statusCode.toString().startsWith("2")) {
@@ -66,49 +68,66 @@ export class API {
     }
 
     private readonly makeGet = async (pool: Pool, origin: string, endpoint: string, params?: Record<string, any>) => {
-        if (!this.clientID) await this.getClientID()
+        if (!this.clientId) await this.getClientId()
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "GET", params)
         try {
             return await this.makeRequest(this.proxy || pool, options)
         } catch {
-            await this.getClientID(true)
+            await this.getClientId(true)
             return this.makeRequest(this.proxy || pool, options)
         }
     }
 
     public post = async (endpoint: string, params?: Record<string, any>) => {
-        if (!this.clientID) await this.getClientID()
+        if (!this.clientId) await this.getClientId()
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
         const options = this.buildOptions(`${this.proxy ? origin : ""}/${endpoint}`, "POST", params)
         return this.makeRequest(this.proxy || this.api, options)
     }
 
-    public getClientID = async (reset?: boolean) => {
-        if (!this.oauthToken && (!this.clientID || reset)) {
-            const response = await (this.proxy ? this.proxy.request(this.buildOptions(webURL)) : this.web.request(this.buildOptions("/"))).then(
-                async r => {
-                    if (r.statusCode.toString().startsWith("2")) return r.body.text()
-                    const error = await r.body.text().catch(() => "")
-                    throw new Error(`Status code ${r.statusCode}${error ? `\n${error}` : ""}`)
-                }
+    public getClientIdWeb = async () => {
+        const response = await this.makeRequest(this.proxy || this.web, this.buildOptions(this.proxy ? webURL : "/"))
+        const urls = response.match(
+            /(?!<script.*?src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*\.js)(?=.*?>)/g
+        )
+        if (!urls || urls.length === 0) throw new Error("Could not find script URLs")
+        do {
+            const script = await (this.proxy
+                ? this.makeRequest(this.proxy, this.buildOptions(urls.pop()))
+                : request(urls.pop()).then(r => r.body.text()))
+            const clientId = script.match(/[{,]client_id:"(\w+)"/)?.[1]
+            if (typeof clientId === "string") return clientId
+        } while (urls.length > 0)
+        throw new Error("Could not find client ID in script URLs")
+    }
+
+    public getClientIdMobile = async () => {
+        const response = await request("https://m.soundcloud.com/", {
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5_1 like Mac OS X) " +
+                    "AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/99.0.4844.47 Mobile/15E148 Safari/604.1",
+            },
+        }).then(r => r.body.text())
+        const clientId = response.match(/"clientId":"(\w+?)"/)?.[1]
+        if (typeof clientId === "string") return clientId
+        throw new Error("Could not find client ID")
+    }
+
+    public getClientId = async (reset?: boolean) => {
+        if (!this.oauthToken && (!this.clientId || reset)) {
+            this.clientId = await this.getClientIdWeb().catch(webError =>
+                this.getClientIdMobile().catch(mobileError => {
+                    throw new Error(
+                        "Could not find client ID. Please provide one in the constructor. (Guide: https://github.com/Tenpi/soundcloud.ts#getting-started)" +
+                            `\nWeb error: ${webError}` +
+                            `\nMobile error: ${mobileError}`
+                    )
+                })
             )
-            const urls = response.match(
-                /(?!<script crossorigin src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*\.js)(?=">)/g
-            )
-            if (!urls || urls.length === 0) {
-                throw new Error("Could not find client ID. Please get it manually. (Guide: https://github.com/Tenpi/soundcloud.ts#getting-started)")
-            }
-            let script: string
-            do {
-                script = await request(urls.pop()).then(r => r.body.text())
-            } while (urls.length > 0 && !script.includes(',client_id:"'))
-            this.clientID = script.match(/,client_id:"(\w+)"/)?.[1]
-            if (!this.clientID) {
-                throw new Error("Could not find client ID. Please get it manually. (Guide: https://github.com/Tenpi/soundcloud.ts#getting-started)")
-            }
         }
-        return this.clientID
+        return this.clientId
     }
 
     private readonly buildOptions = (path: string, method: Dispatcher.HttpMethod = "GET", params?: Record<string, any>) => {
@@ -120,7 +139,7 @@ export class API {
             maxRedirections: 5,
         }
         if (method === "POST" && params) options.body = JSON.stringify(params)
-        if (this.clientID) options.query.client_id = this.clientID
+        if (this.clientId) options.query.client_id = this.clientId
         if (this.oauthToken) options.query.oauth_token = this.oauthToken
         return options
     }

@@ -41,7 +41,7 @@ export class Util extends Base {
     private readonly getStreamLink = async (transcoding: SoundcloudTranscoding) => {
         if (!transcoding?.url) return null
         const url = transcoding.url
-        let client_id = await this.api.getClientID()
+        let client_id = await this.api.getClientId()
         const headers = this.api.headers
         let connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         try {
@@ -49,7 +49,7 @@ export class Util extends Base {
                 .then(r => r.json())
                 .then(r => r.url as string)
         } catch {
-            client_id = await this.api.getClientID(true)
+            client_id = await this.api.getClientId(true)
             connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
                 return await makeRequest(url + connect, { headers })
@@ -153,7 +153,7 @@ export class Util extends Base {
             throw "No supported transcodings found"
         }
         const headers = this.api.headers
-        const client_id = await this.api.getClientID()
+        const client_id = await this.api.getClientId()
         const connect = transcoding.url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         const m3uLink = await makeRequest(transcoding.url + connect, { headers: this.api.headers })
             .then(r => r.json())
@@ -306,7 +306,7 @@ export class Util extends Base {
         const artwork = (track.artwork_url ? track.artwork_url : track.user.avatar_url).replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/\//g, "")
         dest = path.extname(dest) ? dest : path.join(folder, `${title}.png`)
-        const client_id = await this.api.getClientID()
+        const client_id = await this.api.getClientId()
         const url = `${artwork}?client_id=${client_id}`
         if (noDL) return url
         const arrayBuffer = await makeRequest(url).then(r => r.arrayBuffer())
