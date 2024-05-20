@@ -13,7 +13,7 @@ export class Playlists extends Base {
     public fetch = async (playlist: SoundcloudPlaylistV2) => {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
-        playlist.tracks = playlist.tracks.concat(await this.sc.tracks.getArrayV2(unresolvedTracks))
+        playlist.tracks = playlist.tracks.concat(await this.sc.tracks.getArrayV2(unresolvedTracks, true))
         return playlist
     }
 

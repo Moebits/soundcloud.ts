@@ -27,7 +27,7 @@ export class Tracks extends Base {
     /**
      * Fetches tracks from an array of ID using Soundcloud v2 API.
      */
-    public getArrayV2 = async (trackIds: number[]) => {
+    public getArrayV2 = async (trackIds: number[], keepOrder: boolean = false) => {
         if (trackIds.length === 0) return []
         // Max 50 ids per request => split into chunks of 50 ids
         const chunks: number[][] = []
@@ -35,7 +35,9 @@ export class Tracks extends Base {
         while (i < trackIds.length) chunks.push(trackIds.slice(i, (i += 50)))
         const response: SoundcloudTrackV2[] = []
         const tracks = <SoundcloudTrackV2[][]>await Promise.all(chunks.map(chunk => this.api.getV2("/tracks", { ids: chunk.join(",") })))
-        return response.concat(...tracks)
+        const result = response.concat(...tracks)
+        if (keepOrder) return result.sort((a, b) => trackIds.indexOf(a.id) - trackIds.indexOf(b.id));
+        return result
     }
 
     /**
