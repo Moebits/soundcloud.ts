@@ -12,9 +12,9 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
-        "test:coverage": "nyc npm run test",
+        "test:coverage": "nyc pnpm run test",
         "prettier": "prettier --write \"**/*.{ts,json,yml,yaml,md}\"",
-        "prepack": "npm run build"
+        "prepack": "pnpm run build"
     },
     "repository": {
         "type": "git",
@@ -39,25 +39,23 @@
     "license": "MIT",
     "devDependencies": {
         "@istanbuljs/nyc-config-typescript": "^1.0.2",
-        "@tenpi/tslint": "^1.1.0",
         "@tenpi/typedoc": "0.0.3",
-        "@types/chai": "^4.3.5",
-        "@types/mocha": "^10.0.1",
-        "@types/node": "^20.3.3",
-        "chai": "^4.3.7",
-        "dotenv": "^16.3.1",
-        "eslint": "^8.44.0",
-        "eslint-config-distube": "^1.6.4",
-        "ffmpeg-static": "^5.1.0",
-        "mocha": "^10.2.0",
+        "@types/chai": "^4.3.16",
+        "@types/mocha": "^10.0.6",
+        "@types/node": "^20.12.12",
+        "chai": "^4.4.1",
+        "dotenv": "^16.4.5",
+        "eslint": "^8.57.0",
+        "eslint-config-distube": "^1.7.0",
+        "mocha": "^10.4.0",
         "nyc": "^15.1.0",
-        "prettier": "^2.8.8",
+        "prettier": "^3.2.5",
         "ts-mocha": "^10.0.0",
-        "typedoc": "^0.24.8",
-        "typescript": "^5.1.6"
+        "typedoc": "^0.25.13",
+        "typescript": "^5.4.5"
     },
     "dependencies": {
-        "undici": "^5.22.1"
+        "undici": "^6.17.0"
     },
     "nyc": {
         "extends": "@istanbuljs/nyc-config-typescript",

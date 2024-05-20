@@ -1,43 +1,18 @@
 import type {
-    SoundcloudComment,
-    SoundcloudSecretToken,
-    SoundcloudTrack,
-    SoundcloudTrackFilter,
     SoundcloudTrackFilterV2,
     SoundcloudTrackSearchV2,
     SoundcloudTrackV2,
-    SoundcloudUser,
 } from "../types"
 import { Base } from "."
 import { request } from "undici"
 
 export class Tracks extends Base {
     /**
-     * @deprecated Use searchV2
-     * Searches for tracks.
-     */
-    public search = async (params?: SoundcloudTrackFilter) => {
-        const response = await this.api.get("/tracks", params)
-        return response as Promise<SoundcloudTrack[]>
-    }
-
-    /**
      * Searches for tracks using the v2 API.
      */
     public searchV2 = async (params?: SoundcloudTrackFilterV2) => {
         const response = await this.api.getV2("search/tracks", params)
         return response as Promise<SoundcloudTrackSearchV2>
-    }
-
-    /**
-     * @deprecated use getV2
-     * Fetches a track by URL or ID.
-     */
-    public get = async (trackResolvable: string | number) => {
-        const id = await this.sc.resolve.get(trackResolvable, true)
-        if (Object.prototype.hasOwnProperty.call(id, "id")) return id
-        const response = await this.api.get(`/tracks/${id}`)
-        return response as Promise<SoundcloudTrack>
     }
 
     /**
@@ -59,61 +34,8 @@ export class Tracks extends Base {
         let i = 0
         while (i < trackIds.length) chunks.push(trackIds.slice(i, (i += 50)))
         const response: SoundcloudTrackV2[] = []
-        const tracks = await Promise.all(chunks.map(chunk => this.api.getV2("/tracks", { ids: chunk.join(",") })))
+        const tracks = <SoundcloudTrackV2[][]>await Promise.all(chunks.map(chunk => this.api.getV2("/tracks", { ids: chunk.join(",") })))
         return response.concat(...tracks)
-    }
-
-    /**
-     * @deprecated
-     * Fetches all comments on a track.
-     */
-    public comments = async (trackResolvable: string | number) => {
-        const trackID = await this.sc.resolve.get(trackResolvable)
-        const response = await this.api.get(`/tracks/${trackID}/comments`)
-        return response as Promise<SoundcloudComment[]>
-    }
-
-    /**
-     * @deprecated
-     * Gets a specific comment.
-     */
-    public comment = async (trackResolvable: string | number, commentID: number) => {
-        const trackID = await this.sc.resolve.get(trackResolvable)
-        const response = await this.api.get(`/tracks/${trackID}/comments/${commentID}`)
-        return response as Promise<SoundcloudComment>
-    }
-
-    /**
-     * @deprecated
-     * Get all users who favorited the track.
-     */
-    public favoriters = async (trackResolvable: string | number) => {
-        const trackID = await this.sc.resolve.get(trackResolvable)
-        const response = await this.api.get(`/tracks/${trackID}/favoriters`)
-        return response as Promise<SoundcloudUser[]>
-    }
-
-    /**
-     * @deprecated
-     * Get a specific favoriter.
-     */
-    public favoriter = async (trackResolvable: string | number, userResolvable: string | number) => {
-        const trackID = await this.sc.resolve.get(trackResolvable)
-        const userID = await this.sc.resolve.get(userResolvable)
-        const response = await this.api.get(`/tracks/${trackID}/favoriters/${userID}`)
-        return response as Promise<SoundcloudUser>
-    }
-
-    /**
-     * @deprecated
-     * Requires Authentication - Gets the secret token from one of your own tracks.
-     */
-    public secretToken = async (trackResolvable: string | number) => {
-        const trackID = await this.sc.resolve.get(trackResolvable)
-        const response = await this.api
-            .get(`/tracks/${trackID}/secret-token`)
-            .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
-        return response as Promise<SoundcloudSecretToken>
     }
 
     /**
@@ -151,7 +73,7 @@ export class Tracks extends Base {
      */
     public relatedV2 = async (trackResolvable: string | number, limit?: number) => {
         const trackID = await this.sc.resolve.getV2(trackResolvable)
-        const response = await this.api.getV2(`/tracks/${trackID}/related`, { limit })
-        return response.collection as Promise<SoundcloudTrackV2[]>
+        const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/tracks/${trackID}/related`, { limit })
+        return response.collection
     }
 }

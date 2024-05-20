@@ -56,7 +56,7 @@ describe("Users", function () {
     */
 
     it("should get user tracks", async function () {
-        const response = await soundcloud.users.tracksV2("https://soundcloud.com/kenny_the_king")
+        const response = await soundcloud.users.tracksV2("https://soundcloud.com/nocopyrightsounds")
         assert(Object.prototype.hasOwnProperty.call(response[0], "description"))
     })
 

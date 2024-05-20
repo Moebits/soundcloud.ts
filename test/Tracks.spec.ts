@@ -4,7 +4,7 @@ import { soundcloud } from "./login"
 
 describe("Tracks", function () {
     it("should get a track", async function () {
-        const response = await soundcloud.tracks.getV2("https://soundcloud.com/kenny_the_king/lemonade")
+        const response = await soundcloud.tracks.getV2("https://soundcloud.com/nocopyrightsounds/jonth-soundclash-ncs-release")
         assert(Object.prototype.hasOwnProperty.call(response, "description"))
     })
 

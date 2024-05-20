@@ -47,14 +47,14 @@ export class Util extends Base {
         try {
             return await makeRequest(url + connect, { headers })
                 .then(r => r.json())
-                .then(r => r.url as string)
+                .then(r => (<{ url: string }>r).url)
         } catch {
             client_id = await this.api.getClientId(true)
             connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
                 return await makeRequest(url + connect, { headers })
                     .then(r => r.json())
-                    .then(r => r.url as string)
+                    .then(r => (<{ url: string }>r).url)
             } catch {
                 return null
             }
@@ -157,7 +157,7 @@ export class Util extends Base {
         const connect = transcoding.url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         const m3uLink = await makeRequest(transcoding.url + connect, { headers: this.api.headers })
             .then(r => r.json())
-            .then(r => r.url)
+            .then(r => (<{ url: string }>r).url)
         const destDir = path.join(__dirname, `tmp_${temp++}`)
         if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
         const output = path.join(destDir, `out.${transcoding.type}`)

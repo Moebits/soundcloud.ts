@@ -1,10 +1,7 @@
 import type {
-    SoundcloudPlaylist,
-    SoundcloudPlaylistFilter,
     SoundcloudPlaylistFilterV2,
     SoundcloudPlaylistSearchV2,
     SoundcloudPlaylistV2,
-    SoundcloudSecretToken,
 } from "../types"
 import { Base } from "."
 import { request } from "undici"
@@ -21,15 +18,6 @@ export class Playlists extends Base {
     }
 
     /**
-     * @deprecated use searchV2
-     * Searches for playlists.
-     */
-    public search = async (params?: SoundcloudPlaylistFilter) => {
-        const response = await this.api.get("/playlists", params)
-        return response as Promise<SoundcloudPlaylist[]>
-    }
-
-    /**
      * Searches for playlists using the v2 API.
      */
     public searchV2 = async (params?: SoundcloudPlaylistFilterV2) => {
@@ -38,35 +26,12 @@ export class Playlists extends Base {
     }
 
     /**
-     * @deprecated use getV2
-     * Fetches a playlist from URL or ID.
-     */
-    public get = async (playlistResolvable: string | number) => {
-        const playlistID = await this.sc.resolve.get(playlistResolvable, true)
-        if (Object.prototype.hasOwnProperty.call(playlistID, "id")) return playlistID
-        const response = await this.api.get(`/playlists/${playlistID}`)
-        return response as Promise<SoundcloudPlaylist>
-    }
-
-    /**
      * Fetches a playlist from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (playlistResolvable: string | number) => {
         const playlistID = await this.sc.resolve.getV2(playlistResolvable)
-        const response = await this.api.getV2(`/playlists/${playlistID}`)
+        const response = <SoundcloudPlaylistV2>await this.api.getV2(`/playlists/${playlistID}`)
         return this.fetch(response) as Promise<SoundcloudPlaylistV2>
-    }
-
-    /**
-     * @deprecated
-     * Requires Authentication - Gets the secret token from one of your playlists.
-     */
-    public secretToken = async (playlistResolvable: string | number) => {
-        const playlistID = await this.sc.resolve.get(playlistResolvable)
-        const response = await this.api
-            .get(`/playlists/${playlistID}/secret-token`)
-            .catch(() => Promise.reject("Oauth Token is required for this endpoint."))
-        return response as Promise<SoundcloudSecretToken>
     }
 
     /**

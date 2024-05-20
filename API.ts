@@ -88,6 +88,7 @@ export class API {
 
     public getClientIdWeb = async () => {
         const response = await this.makeRequest(this.proxy || this.web, this.buildOptions(this.proxy ? webURL : "/"))
+        if (!response || typeof response !== "string") throw new Error("Could not find client ID")
         const urls = response.match(
             /(?!<script.*?src=")https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*\.js)(?=.*?>)/g
         )
@@ -96,6 +97,7 @@ export class API {
             const script = await (this.proxy
                 ? this.makeRequest(this.proxy, this.buildOptions(urls.pop()))
                 : request(urls.pop()).then(r => r.body.text()))
+            if (!script || typeof script !== "string") continue
             const clientId = script.match(/[{,]client_id:"(\w+)"/)?.[1]
             if (typeof clientId === "string") return clientId
         } while (urls.length > 0)
