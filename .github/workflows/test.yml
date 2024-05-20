@@ -6,11 +6,16 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                node-version: [16, 18]
+                node-version: [18, 20]
                 os: [ubuntu-latest]
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v3
+              with:
+                version: latest
 
             - name: Install Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
