@@ -39,10 +39,7 @@ Authenticating with your account is **optional**, but I still recommend it. If y
 Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping.
 
 ```ts
-const soundcloud = new Soundcloud({
-    clientId: process.env.SOUNDCLOUD_CLIENT_ID,
-    oauthToken: process.env.SOUNDCLOUD_OAUTH_TOKEN,
-})
+const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 /*Get track v2*/
 const track = await soundcloud.tracks.getV2("succducc/azure")
 /*Search tracks v2*/
@@ -66,10 +63,7 @@ import Soundcloud from "soundcloud.ts"
 
 async function useAPI() {
     /*Credentials are optional, client id is manually found if omitted.*/
-    const soundcloud = new Soundcloud({
-        clientId: process.env.SOUNDCLOUD_CLIENT_ID,
-        oauthToken: process.env.SOUNDCLOUD_OAUTH_TOKEN,
-    })
+    const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 
     /*You can get tracks by URL or ID (which can only be gotten from the API)*/
     const track = await soundcloud.tracks.get("https://soundcloud.com/user/mysong")

@@ -1,7 +1,9 @@
 import type {SoundcloudAppV2} from "../types"
-import {Base} from "./Base"
+import {API} from "../API"
 
-export class Apps extends Base {
+export class Apps {
+    public constructor(private readonly api: API) {}
+
     /**
      * Gets Soundcloud apps, using the Soundcloud v2 API.
      */

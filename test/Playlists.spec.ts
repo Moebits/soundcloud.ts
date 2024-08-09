@@ -12,9 +12,4 @@ describe("Playlists", function () {
         const response = await soundcloud.playlists.searchV2({ q: "playlist", limit: 5 })
         assert(Object.prototype.hasOwnProperty.call(response.collection[0], "description"))
     })
-
-    it.skip("should get a secret token", async function () {
-        const response = await soundcloud.playlists.secretToken("https://soundcloud.com/tenpimusic/sets/my-songs")
-        assert(Object.prototype.hasOwnProperty.call(response, "token"))
-    })
 })

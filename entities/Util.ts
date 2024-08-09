@@ -1,7 +1,8 @@
 import type {SoundcloudTrackV2, SoundcloudTranscoding} from "../types"
 import * as fs from "fs"
 import * as path from "path"
-import {Base} from "."
+import {API} from "../API"
+import {Tracks, Users, Playlists} from "./index"
 import {request} from "undici"
 import {Readable} from "stream"
 import {spawnSync} from "child_process"
@@ -25,9 +26,15 @@ const SOURCES: (() => string)[] = [
     () => "./ffmpeg",
 ]
 
-export class Util extends Base {
+export class Util {
+    private readonly tracks = new Tracks(this.api)
+    private readonly users = new Users(this.api)
+    private readonly playlists = new Playlists(this.api)
+    public constructor(private readonly api: API) {}
+
+
     private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrackV2) => {
-        return typeof trackResolvable === "string" ? await this.soundcloud.tracks.getV2(trackResolvable) : trackResolvable
+        return typeof trackResolvable === "string" ? await this.tracks.getV2(trackResolvable) : trackResolvable
     }
 
     private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
@@ -85,7 +92,7 @@ export class Util extends Base {
     }
 
     private readonly checkFFmpeg = () => {
-        if (FFMPEG.checked) return !!FFMPEG.path
+        if (FFMPEG.checked) return true
         for (const fn of SOURCES) {
             try {
                 const command = fn()
@@ -101,12 +108,10 @@ export class Util extends Base {
         }
         FFMPEG.checked = true
         if (!FFMPEG.path) {
-            /* eslint-disable no-console */
             console.warn("FFmpeg not found, please install ffmpeg-static or add ffmpeg to your PATH.")
             console.warn("Download m4a (hq) is disabled, use mp3 (sq) instead.")
-            /* eslint-enable no-console */
         }
-        return !!FFMPEG.path
+        return true
     }
 
     private readonly spawnFFmpeg = (argss: string[]) => {
@@ -121,12 +126,7 @@ export class Util extends Base {
     /**
      * Readable stream of m3u playlists.
      */
-    private readonly m3uReadableStream = async (
-        trackResolvable: string | SoundcloudTrackV2
-    ): Promise<{
-        stream: NodeJS.ReadableStream
-        type: "m4a" | "mp3"
-    }> => {
+    private readonly m3uReadableStream = async (trackResolvable: string | SoundcloudTrackV2): Promise<{stream: NodeJS.ReadableStream, type: "m4a" | "mp3"}> => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "hls")
         if (!transcodings.length) throw "No transcodings found"
@@ -142,11 +142,9 @@ export class Util extends Base {
             }
         }
         if (!transcoding) {
-            console.log(
-                `Support for this track is not yet implemented, please open an issue on GitHub.\nURL: ${
-                    track.permalink_url
-                }.\nType: ${track.media.transcodings.map(t => t.format.mime_type).join(" | ")}`
-            )
+            console.log(`Support for this track is not yet implemented, please open an issue on GitHub.\n
+            URL: ${track.permalink_url}.\n
+            Type: ${track.media.transcodings.map(t => t.format.mime_type).join(" | ")}`)
             throw "No supported transcodings found"
         }
         const headers = this.api.headers
@@ -161,22 +159,7 @@ export class Util extends Base {
 
         if (transcoding.type === "m4a") {
             try {
-                this.spawnFFmpeg([
-                    "-y",
-                    "-loglevel",
-                    "warning",
-                    "-i",
-                    m3uLink,
-                    "-bsf:a",
-                    "aac_adtstoasc",
-                    "-vcodec",
-                    "copy",
-                    "-c",
-                    "copy",
-                    "-crf",
-                    "50",
-                    output,
-                ])
+                this.spawnFFmpeg(["-y", "-loglevel", "warning", "-i", m3uLink, "-bsf:a", "aac_adtstoasc", "-vcodec", "copy", "-c", "copy", "-crf", "50", output])
             } catch {
                 console.warn("Failed to transmux to m4a (hq), download as mp3 (hq) instead.")
                 FFMPEG.path = null
@@ -203,10 +186,7 @@ export class Util extends Base {
      * Downloads the mp3 stream of a track.
      */
     private readonly downloadTrackStream = async (trackResolvable: string | SoundcloudTrackV2, title: string, dest: string) => {
-        let result: {
-            stream: NodeJS.ReadableStream
-            type: string
-        }
+        let result: {stream: NodeJS.ReadableStream, type: string}
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "progressive")
         if (!transcodings.length) {
@@ -226,7 +206,6 @@ export class Util extends Base {
         stream.pipe(writeStream)
 
         await new Promise<void>(resolve => stream.on("end", () => resolve()))
-
         return fileName
     }
 
@@ -237,7 +216,20 @@ export class Util extends Base {
         if (!dest) dest = "./"
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
-        return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)
+        if (track.downloadable === true) {
+            try {
+                const downloadObj = await this.api.getV2(`/tracks/${track.id}/download`) as any
+                const result = await request(downloadObj.redirectUri)
+                dest = path.extname(dest) ? dest : path.join(dest, `${track.title.replace(/\//g, "")}.${result.headers["x-amz-meta-file-type"]}`)
+                const arrayBuffer = await result.body.arrayBuffer() as any
+                fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
+                return dest
+            } catch {
+                return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)
+            }
+        } else {
+            return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)
+        }
     }
 
     /**
@@ -261,7 +253,7 @@ export class Util extends Base {
      * Downloads all the tracks from the search query.
      */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.soundcloud.tracks.searchV2({q: query})
+        const tracks = await this.tracks.searchV2({q: query})
         return this.downloadTracks(tracks.collection, dest, limit)
     }
 
@@ -269,7 +261,7 @@ export class Util extends Base {
      * Download all liked tracks by a user.
      */
     public downloadLikes = async (userResolvable: string | number, dest?: string, limit?: number) => {
-        const tracks = await this.soundcloud.users.likes(userResolvable, limit)
+        const tracks = await this.users.likes(userResolvable, limit)
         return this.downloadTracks(tracks, dest, limit)
     }
 
@@ -277,7 +269,7 @@ export class Util extends Base {
      * Downloads all the tracks in a playlist.
      */
     public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
-        const playlist = await this.soundcloud.playlists.getV2(playlistResolvable)
+        const playlist = await this.playlists.getV2(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
@@ -296,7 +288,7 @@ export class Util extends Base {
      */
     public downloadSongCover = async (trackResolvable: string | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
-        const folder = path.dirname(dest)
+        const folder = dest
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
         const artwork = (track.artwork_url ? track.artwork_url : track.user.avatar_url).replace(".jpg", ".png").replace("-large", "-t500x500")

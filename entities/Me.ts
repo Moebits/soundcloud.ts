@@ -1,7 +1,9 @@
 import type {SoundcloudUser} from "../types"
-import {Base} from "."
+import {API} from "../API"
 
-export class Me extends Base {
+export class Me {
+    public constructor(private readonly api: API) {}
+    
     /**
      * Gets your own profile, using the Soundcloud v2 API.
      */

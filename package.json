@@ -1,6 +1,6 @@
 {
     "name": "soundcloud.ts",
-    "version": "0.5.4",
+    "version": "0.5.5",
     "description": "Soundcloud API v2 wrapper with typings.",
     "main": "dist/soundcloud.js",
     "types": "dist/soundcloud.d.ts",
@@ -8,7 +8,6 @@
         "start": "tsc && node dist/start.js",
         "docs": "typedoc",
         "build": "tsc",
-        "build:check": "tsc --noEmit",
         "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
         "prepack": "npm run build"
     },

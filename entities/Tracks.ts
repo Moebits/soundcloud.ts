@@ -1,12 +1,12 @@
-import type {
-    SoundcloudTrackFilterV2,
-    SoundcloudTrackSearchV2,
-    SoundcloudTrackV2,
-} from "../types"
-import {Base} from "."
+import type {SoundcloudTrackFilterV2, SoundcloudTrackSearchV2, SoundcloudTrackV2} from "../types"
+import {API} from "../API"
+import {Resolve} from "./index"
 import {request} from "undici"
 
-export class Tracks extends Base {
+export class Tracks {
+    private readonly resolve = new Resolve(this.api)
+    public constructor(private readonly api: API) {}
+
     /**
      * Searches for tracks using the v2 API.
      */
@@ -19,7 +19,7 @@ export class Tracks extends Base {
      * Fetches a track from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (trackResolvable: string | number) => {
-        const trackID = await this.soundcloud.resolve.getV2(trackResolvable)
+        const trackID = await this.resolve.getV2(trackResolvable)
         const response = await this.api.getV2(`/tracks/${trackID}`)
         return response as Promise<SoundcloudTrackV2>
     }
@@ -74,7 +74,7 @@ export class Tracks extends Base {
      * Gets all related tracks of a track using the v2 API.
      */
     public relatedV2 = async (trackResolvable: string | number, limit?: number) => {
-        const trackID = await this.soundcloud.resolve.getV2(trackResolvable)
+        const trackID = await this.resolve.getV2(trackResolvable)
         const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/tracks/${trackID}/related`, {limit})
         return response.collection
     }

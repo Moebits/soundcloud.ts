@@ -1,4 +1,3 @@
-import type {SoundcloudOptions} from "./types"
 import {API} from "./API"
 import {Apps, Comments, Me, Oembed, Playlists, Resolve, Tracks, Users, Util} from "./entities"
 
@@ -9,37 +8,32 @@ export class Soundcloud {
     public static clientId?: string
     public static oauthToken?: string
     public static proxy?: string
-    public api: API
-    public apps = new Apps(this)
-    public comments = new Comments(this)
-    public me = new Me(this)
-    public oembed = new Oembed(this)
-    public playlists = new Playlists(this)
-    public resolve = new Resolve(this)
-    public tracks = new Tracks(this)
-    public users = new Users(this)
-    public util = new Util(this)
-    public constructor(options?: SoundcloudOptions)
-    /**
-     * @deprecated Use `new Soundcloud({clientId, oauthToken, proxy})` instead.
-     */
-    public constructor(clientId?: string, oauthToken?: string, options?: {proxy?: string})
-    public constructor(clientId?: string | SoundcloudOptions, oauthToken?: string, options?: {proxy?: string}) {
-        const opts: SoundcloudOptions = {}
-        if (typeof clientId === "string") {
-            console.warn("`Soundcloud(clientId, oauthToken, options)` is deprecated. Use `Soundcloud({clientId, oauthToken, proxy})` instead.")
-            opts.clientId = clientId
-            opts.oauthToken = oauthToken
-            opts.proxy = options?.proxy
-        } else {
-            Object.assign(opts, clientId)
+    public api = new API(Soundcloud.clientId, Soundcloud.oauthToken)
+    public apps = new Apps(this.api)
+    public comments = new Comments(this.api)
+    public me = new Me(this.api)
+    public oembed = new Oembed(this.api)
+    public playlists = new Playlists(this.api)
+    public resolve = new Resolve(this.api)
+    public tracks = new Tracks(this.api)
+    public users = new Users(this.api)
+    public util = new Util(this.api)
+    public constructor(clientId?: string, oauthToken?: string, options?: {proxy?: string}) {
+        if (clientId) {
+            Soundcloud.clientId = clientId
+            if (oauthToken) Soundcloud.oauthToken = oauthToken
         }
-        if (opts.clientId) {
-            Soundcloud.clientId = opts.clientId
-            if (opts.oauthToken) Soundcloud.oauthToken = opts.oauthToken
-        }
-        if (opts.proxy) Soundcloud.proxy = opts.proxy
+        if (options?.proxy) Soundcloud.proxy = options.proxy
         this.api = new API(Soundcloud.clientId, Soundcloud.oauthToken, Soundcloud.proxy)
+        this.apps = new Apps(this.api)
+        this.comments = new Comments(this.api)
+        this.me = new Me(this.api)
+        this.oembed = new Oembed(this.api)
+        this.playlists = new Playlists(this.api)
+        this.resolve = new Resolve(this.api)
+        this.tracks = new Tracks(this.api)
+        this.users = new Users(this.api)
+        this.util = new Util(this.api)
     }
 }
 

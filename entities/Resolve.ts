@@ -1,7 +1,9 @@
-import {Base} from "."
 import {request} from "undici"
+import {API} from "../API"
 
-export class Resolve extends Base {
+export class Resolve {
+    public constructor(private readonly api: API) {}
+    
     /**
      * Gets the ID from the html source.
      */

@@ -1,19 +1,20 @@
-import type {
-    SoundcloudPlaylistFilterV2,
-    SoundcloudPlaylistSearchV2,
-    SoundcloudPlaylistV2,
-} from "../types"
-import {Base} from "."
+import type {SoundcloudPlaylistFilterV2, SoundcloudPlaylistSearchV2, SoundcloudPlaylistV2} from "../types"
+import {API} from "../API"
+import {Tracks, Resolve} from "./index"
 import {request} from "undici"
 
-export class Playlists extends Base {
+export class Playlists {
+    private readonly tracks = new Tracks(this.api)
+    private readonly resolve = new Resolve(this.api)
+    public constructor(private readonly api: API) {}
+
     /**
      * Return playlist with all tracks fetched.
      */
     public fetch = async (playlist: SoundcloudPlaylistV2) => {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
-        playlist.tracks = playlist.tracks.concat(await this.soundcloud.tracks.getArrayV2(unresolvedTracks, true))
+        playlist.tracks = playlist.tracks.concat(await this.tracks.getArrayV2(unresolvedTracks, true))
         return playlist
     }
 
@@ -29,7 +30,7 @@ export class Playlists extends Base {
      * Fetches a playlist from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (playlistResolvable: string | number) => {
-        const playlistID = await this.soundcloud.resolve.getV2(playlistResolvable)
+        const playlistID = await this.resolve.getV2(playlistResolvable)
         const response = <SoundcloudPlaylistV2>await this.api.getV2(`/playlists/${playlistID}`)
         return this.fetch(response) as Promise<SoundcloudPlaylistV2>
     }
