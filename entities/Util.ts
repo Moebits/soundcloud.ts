@@ -7,14 +7,6 @@ import {request} from "undici"
 import {Readable} from "stream"
 import {spawnSync} from "child_process"
 
-const makeRequest = async (...args: Parameters<typeof request>) => {
-    const response = await request(...args).then(r => {
-        if (r.statusCode.toString().startsWith("2")) return r.body
-        throw new Error(`Status code ${r.statusCode}`)
-    })
-    return response
-}
-
 let temp = 0
 const FFMPEG = {checked: false, path: ""}
 const SOURCES: (() => string)[] = [
@@ -51,15 +43,15 @@ export class Util {
         const headers = this.api.headers
         let connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         try {
-            return await makeRequest(url + connect, {headers})
-                .then(r => r.json())
+            return await request(url + connect, {headers})
+                .then(r => r.body.json())
                 .then(r => (<{url: string}>r).url)
         } catch {
             client_id = await this.api.getClientId(true)
             connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
-                return await makeRequest(url + connect, {headers})
-                    .then(r => r.json())
+                return await request(url + connect, {headers})
+                    .then(r => r.body.json())
                     .then(r => (<{url: string}>r).url)
             } catch {
                 return null
@@ -150,8 +142,8 @@ export class Util {
         const headers = this.api.headers
         const client_id = await this.api.getClientId()
         const connect = transcoding.url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-        const m3uLink = await makeRequest(transcoding.url + connect, {headers: this.api.headers})
-            .then(r => r.json())
+        const m3uLink = await request(transcoding.url + connect, {headers: this.api.headers})
+            .then(r => r.body.json())
             .then(r => (<{url: string }>r).url)
         const destDir = path.join(__dirname, `tmp_${temp++}`)
         if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, {recursive: true})
@@ -166,7 +158,7 @@ export class Util {
                 return this.m3uReadableStream(trackResolvable)
             }
         } else {
-            const m3u = await makeRequest(m3uLink, {headers}).then(r => r.text())
+            const m3u = await request(m3uLink, {headers}).then(r => r.body.text())
             const urls = m3u.match(/(http).*?(?=\s)/gm)
             const chunks: string[] = []
             for (let i = 0; i < urls.length; i++) {
@@ -195,7 +187,7 @@ export class Util {
             const transcoding = transcodings[0]
             const url = await this.getStreamLink(transcoding)
             const headers = this.api.headers
-            const stream = await makeRequest(url, {headers})
+            const stream = await request(url, {headers}).then((r) => r.body)
             const type = transcoding.format.mime_type.startsWith('audio/mp4; codecs="mp4a') ? "m4a" : "mp3"
             result = {stream, type}
         }
@@ -279,7 +271,7 @@ export class Util {
     public streamTrack = async (trackResolvable: string | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
         const url = await this.streamLink(trackResolvable, "progressive")
         if (!url) return this.m3uReadableStream(trackResolvable).then(r => r.stream)
-        const readable = await makeRequest(url, {headers: this.api.headers})
+        const readable = await request(url, {headers: this.api.headers}).then((r) => r.body)
         return readable
     }
 
@@ -297,7 +289,7 @@ export class Util {
         const client_id = await this.api.getClientId()
         const url = `${artwork}?client_id=${client_id}`
         if (noDL) return url
-        const arrayBuffer = await makeRequest(url).then(r => r.arrayBuffer())
+        const arrayBuffer = await request(url).then(r => r.body.arrayBuffer())
         fs.writeFileSync(dest, Buffer.from(arrayBuffer))
         return dest
     }
