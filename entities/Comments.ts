@@ -1,5 +1,5 @@
-import type { SoundcloudComment } from "../types"
-import { Base } from "./Base"
+import type {SoundcloudComment} from "../types"
+import {Base} from "./Base"
 
 export class Comments extends Base {
     /**

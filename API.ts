@@ -1,5 +1,5 @@
-import type { Dispatcher } from "undici"
-import { Pool, request } from "undici"
+import type {Dispatcher} from "undici"
+import {Pool, request} from "undici"
 
 const apiURL = "https://api.soundcloud.com"
 const apiV2URL = "https://api-v2.soundcloud.com"

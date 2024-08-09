@@ -6,9 +6,9 @@ import type {
     SoundcloudUserV2,
     SoundcloudWebProfile,
 } from "../types"
-import { Base } from "."
-import { URL } from "url"
-import { request } from "undici"
+import {Base} from "."
+import {URL} from "url"
+import {request} from "undici"
 
 export class Users extends Base {
     /**
@@ -23,7 +23,7 @@ export class Users extends Base {
      * Fetches a user from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (userResolvable: string | number) => {
-        const userID = await this.sc.resolve.getV2(userResolvable)
+        const userID = await this.soundcloud.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/${userID}`)
         return response as Promise<SoundcloudUserV2>
     }
@@ -32,7 +32,7 @@ export class Users extends Base {
      * Gets all the tracks by the user using Soundcloud v2 API.
      */
     public tracksV2 = async (userResolvable: string | number) => {
-        const userID = await this.sc.resolve.getV2(userResolvable)
+        const userID = await this.soundcloud.resolve.getV2(userResolvable)
         const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/users/${userID}/tracks`)
         let nextHref = response.next_href
         while (nextHref) {
@@ -50,8 +50,8 @@ export class Users extends Base {
      * Gets all of a users liked tracks.
      */
     public likes = async (userResolvable: string | number, limit?: number) => {
-        const userID = await this.sc.resolve.getV2(userResolvable)
-        const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/users/${userID}/likes`, { limit: 50, offset: 0 })
+        const userID = await this.soundcloud.resolve.getV2(userResolvable)
+        const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/users/${userID}/likes`, {limit: 50, offset: 0})
         const tracks: SoundcloudTrackV2[] = []
         let nextHref = response.next_href
         while (nextHref && (!limit || tracks.length < limit)) {
@@ -69,7 +69,7 @@ export class Users extends Base {
      * Gets all the web profiles on a users sidebar.
      */
     public webProfiles = async (userResolvable: string | number) => {
-        const userID = await this.sc.resolve.getV2(userResolvable)
+        const userID = await this.soundcloud.resolve.getV2(userResolvable)
         const response = await this.api.getV2(`/users/soundcloud:users:${userID}/web-profiles`)
         return <SoundcloudWebProfile[]>response
     }
@@ -79,12 +79,12 @@ export class Users extends Base {
      */
     public searchAlt = async (query: string) => {
         const headers = this.api.headers
-        const html = await request(`https://soundcloud.com/search/people?q=${query}`, { headers }).then(r => r.body.text())
+        const html = await request(`https://soundcloud.com/search/people?q=${query}`, {headers}).then(r => r.body.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
-            const songHTML = await request(urls[i], { headers }).then(r => r.body.text())
+            const songHTML = await request(urls[i], {headers}).then(r => r.body.text())
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
             const user = json[json.length - 1].data
             scrape.push(user)
@@ -98,7 +98,7 @@ export class Users extends Base {
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = this.api.headers
-        const songHTML = await request(url, { headers }).then(r => r.body.text())
+        const songHTML = await request(url, {headers}).then(r => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const user = json[json.length - 1].data
         return user as Promise<SoundcloudUserV2>

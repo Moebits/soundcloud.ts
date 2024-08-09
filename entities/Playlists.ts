@@ -3,8 +3,8 @@ import type {
     SoundcloudPlaylistSearchV2,
     SoundcloudPlaylistV2,
 } from "../types"
-import { Base } from "."
-import { request } from "undici"
+import {Base} from "."
+import {request} from "undici"
 
 export class Playlists extends Base {
     /**
@@ -13,7 +13,7 @@ export class Playlists extends Base {
     public fetch = async (playlist: SoundcloudPlaylistV2) => {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
-        playlist.tracks = playlist.tracks.concat(await this.sc.tracks.getArrayV2(unresolvedTracks, true))
+        playlist.tracks = playlist.tracks.concat(await this.soundcloud.tracks.getArrayV2(unresolvedTracks, true))
         return playlist
     }
 
@@ -29,7 +29,7 @@ export class Playlists extends Base {
      * Fetches a playlist from URL or ID using Soundcloud v2 API.
      */
     public getV2 = async (playlistResolvable: string | number) => {
-        const playlistID = await this.sc.resolve.getV2(playlistResolvable)
+        const playlistID = await this.soundcloud.resolve.getV2(playlistResolvable)
         const response = <SoundcloudPlaylistV2>await this.api.getV2(`/playlists/${playlistID}`)
         return this.fetch(response) as Promise<SoundcloudPlaylistV2>
     }
@@ -39,12 +39,12 @@ export class Playlists extends Base {
      */
     public searchAlt = async (query: string) => {
         const headers = this.api.headers
-        const html = await request(`https://soundcloud.com/search/sets?q=${query}`, { headers }).then(r => r.body.text())
+        const html = await request(`https://soundcloud.com/search/sets?q=${query}`, {headers}).then(r => r.body.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
-            const songHTML = await request(urls[i], { headers }).then(r => r.body.text())
+            const songHTML = await request(urls[i], {headers}).then(r => r.body.text())
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
             const playlist = json[json.length - 1].data
             scrape.push(playlist)
@@ -58,7 +58,7 @@ export class Playlists extends Base {
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = this.api.headers
-        const songHTML = await request(url, { headers }).then((r: any) => r.body.text())
+        const songHTML = await request(url, {headers}).then((r: any) => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const playlist = json[json.length - 1].data
         return this.fetch(playlist) as Promise<SoundcloudPlaylistV2>

@@ -1,5 +1,5 @@
-import { Base } from "."
-import type { SoundcloudOembed, SoundcloudOembedFilter } from "../types"
+import {Base} from "."
+import type {SoundcloudOembed, SoundcloudOembedFilter} from "../types"
 
 export class Oembed extends Base {
     /**

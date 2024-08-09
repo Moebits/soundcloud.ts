@@ -1,5 +1,5 @@
-import type { SoundcloudUser } from "../types"
-import { Base } from "."
+import type {SoundcloudUser} from "../types"
+import {Base} from "."
 
 export class Me extends Base {
     /**

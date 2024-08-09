@@ -1,6 +1,6 @@
-import { assert } from "chai"
+import {assert} from "chai"
 import "mocha"
-import { soundcloud } from "./login"
+import {soundcloud} from "./login"
 
 describe("Users", function () {
     it("should get a user", async function () {

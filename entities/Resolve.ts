@@ -1,5 +1,5 @@
-import { Base } from "."
-import { request } from "undici"
+import {Base} from "."
+import {request} from "undici"
 
 export class Resolve extends Base {
     /**
@@ -11,7 +11,7 @@ export class Resolve extends Base {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const html = await request(String(resolvable), { headers: this.api.headers }).then(r => r.body.text())
+            const html = await request(String(resolvable), {headers: this.api.headers}).then(r => r.body.text())
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
             id = data[data.length - 1]?.data?.[0]?.id ? data[data.length - 1].data[0].id : data[data.length - 2].data[0].id
         }
@@ -27,7 +27,7 @@ export class Resolve extends Base {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const resolved = <any>await this.api.getV2("resolve", { url: resolvable })
+            const resolved = <any>await this.api.getV2("resolve", {url: resolvable})
             if (full) return resolved
             id = resolved.id
         }

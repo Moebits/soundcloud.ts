@@ -1,6 +1,6 @@
 {
     "name": "soundcloud.ts",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "description": "Soundcloud API v2 wrapper with typings.",
     "main": "dist/soundcloud.js",
     "types": "dist/soundcloud.d.ts",
@@ -9,12 +9,8 @@
         "docs": "typedoc",
         "build": "tsc",
         "build:check": "tsc --noEmit",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
         "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
-        "test:coverage": "nyc pnpm run test",
-        "prettier": "prettier --write \"**/*.{ts,json,yml,yaml,md}\"",
-        "prepack": "pnpm run build"
+        "prepack": "npm run build"
     },
     "repository": {
         "type": "git",
@@ -37,40 +33,18 @@
         "Skick (https://github.com/skick1234)"
     ],
     "license": "MIT",
+    "dependencies": {
+        "undici": "^6.17.0"
+    },
     "devDependencies": {
-        "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@types/chai": "^4.3.16",
         "@types/mocha": "^10.0.6",
         "@types/node": "^20.12.12",
         "chai": "^4.4.1",
         "dotenv": "^16.4.5",
-        "eslint": "^8.57.0",
-        "eslint-config-distube": "^1.7.0",
         "mocha": "^10.4.0",
-        "nyc": "^15.1.0",
-        "prettier": "^3.2.5",
         "ts-mocha": "^10.0.0",
         "typedoc": "^0.25.13",
         "typescript": "^5.4.5"
-    },
-    "dependencies": {
-        "undici": "^6.17.0"
-    },
-    "nyc": {
-        "extends": "@istanbuljs/nyc-config-typescript",
-        "include": [
-            "**/!(*.test.*).ts"
-        ],
-        "exclude": [
-            "dist/**/*.*",
-            "test/**/*.*"
-        ],
-        "reporter": [
-            "html",
-            "lcov",
-            "text",
-            "text-summary"
-        ],
-        "report-dir": "coverage"
     }
 }

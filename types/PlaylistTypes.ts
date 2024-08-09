@@ -12,6 +12,7 @@ export interface SoundcloudPlaylistFilter {
     representation?: "compact" | "id"
     q?: string
 }
+
 export interface SoundcloudPlaylist {
     duration: number
     release_day: number | null

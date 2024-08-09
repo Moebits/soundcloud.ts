@@ -1,4 +1,5 @@
-import type { SoundcloudFilterV2, SoundcloudSearchV2 } from "./index"
+import type {SoundcloudFilterV2, SoundcloudSearchV2} from "./index"
+
 export interface SoundcloudUserFilter {
     q?: string
 }

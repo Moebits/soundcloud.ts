@@ -1,5 +1,5 @@
-import type { SoundcloudAppV2 } from "../types"
-import { Base } from "./Base"
+import type {SoundcloudAppV2} from "../types"
+import {Base} from "./Base"
 
 export class Apps extends Base {
     /**

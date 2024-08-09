@@ -1,10 +1,10 @@
-import type { SoundcloudTrackV2, SoundcloudTranscoding } from "../types"
+import type {SoundcloudTrackV2, SoundcloudTranscoding} from "../types"
 import * as fs from "fs"
 import * as path from "path"
-import { Base } from "."
-import { request } from "undici"
-import { Readable } from "stream"
-import { spawnSync } from "child_process"
+import {Base} from "."
+import {request} from "undici"
+import {Readable} from "stream"
+import {spawnSync} from "child_process"
 
 const makeRequest = async (...args: Parameters<typeof request>) => {
     const response = await request(...args).then(r => {
@@ -15,10 +15,9 @@ const makeRequest = async (...args: Parameters<typeof request>) => {
 }
 
 let temp = 0
-const FFMPEG = { checked: false, path: "" }
+const FFMPEG = {checked: false, path: ""}
 const SOURCES: (() => string)[] = [
     () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
         const ffmpeg = require("ffmpeg-static")
         return ffmpeg?.path ?? ffmpeg
     },
@@ -28,7 +27,7 @@ const SOURCES: (() => string)[] = [
 
 export class Util extends Base {
     private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrackV2) => {
-        return typeof trackResolvable === "string" ? await this.sc.tracks.getV2(trackResolvable) : trackResolvable
+        return typeof trackResolvable === "string" ? await this.soundcloud.tracks.getV2(trackResolvable) : trackResolvable
     }
 
     private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
@@ -45,16 +44,16 @@ export class Util extends Base {
         const headers = this.api.headers
         let connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
         try {
-            return await makeRequest(url + connect, { headers })
+            return await makeRequest(url + connect, {headers})
                 .then(r => r.json())
-                .then(r => (<{ url: string }>r).url)
+                .then(r => (<{url: string}>r).url)
         } catch {
             client_id = await this.api.getClientId(true)
             connect = url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
             try {
-                return await makeRequest(url + connect, { headers })
+                return await makeRequest(url + connect, {headers})
                     .then(r => r.json())
-                    .then(r => (<{ url: string }>r).url)
+                    .then(r => (<{url: string}>r).url)
             } catch {
                 return null
             }
@@ -78,7 +77,7 @@ export class Util extends Base {
         })
         for (const file of files) {
             await new Promise((resolve, reject) => {
-                fs.createReadStream(file).on("error", reject).on("end", resolve).pipe(outStream, { end: false })
+                fs.createReadStream(file).on("error", reject).on("end", resolve).pipe(outStream, {end: false})
             })
         }
         outStream.end()
@@ -90,7 +89,7 @@ export class Util extends Base {
         for (const fn of SOURCES) {
             try {
                 const command = fn()
-                const result = spawnSync(command, ["-h"], { windowsHide: true, shell: true, encoding: "utf-8" })
+                const result = spawnSync(command, ["-h"], {windowsHide: true, shell: true, encoding: "utf-8"})
                 if (result.error) throw result.error
                 if (result.stderr && !result.stdout) throw new Error(result.stderr)
 
@@ -112,9 +111,8 @@ export class Util extends Base {
 
     private readonly spawnFFmpeg = (argss: string[]) => {
         try {
-            spawnSync(FFMPEG.path, argss, { windowsHide: true, shell: false })
+            spawnSync(FFMPEG.path, argss, {windowsHide: true, shell: false})
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e)
             throw "FFmpeg error"
         }
@@ -132,19 +130,18 @@ export class Util extends Base {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "hls")
         if (!transcodings.length) throw "No transcodings found"
-        let transcoding: { url: string; type: "m4a" | "mp3" }
+        let transcoding: {url: string; type: "m4a" | "mp3"}
         for (const t of transcodings) {
             if (t.format.mime_type.startsWith('audio/mp4; codecs="mp4a') && this.checkFFmpeg()) {
-                transcoding = { url: t.url, type: "m4a" }
+                transcoding = {url: t.url, type: "m4a"}
                 break
             }
             if (t.format.mime_type.startsWith("audio/mpeg")) {
-                transcoding = { url: t.url, type: "mp3" }
+                transcoding = {url: t.url, type: "mp3"}
                 break
             }
         }
         if (!transcoding) {
-            // eslint-disable-next-line no-console
             console.log(
                 `Support for this track is not yet implemented, please open an issue on GitHub.\nURL: ${
                     track.permalink_url
@@ -155,11 +152,11 @@ export class Util extends Base {
         const headers = this.api.headers
         const client_id = await this.api.getClientId()
         const connect = transcoding.url.includes("?") ? `&client_id=${client_id}` : `?client_id=${client_id}`
-        const m3uLink = await makeRequest(transcoding.url + connect, { headers: this.api.headers })
+        const m3uLink = await makeRequest(transcoding.url + connect, {headers: this.api.headers})
             .then(r => r.json())
-            .then(r => (<{ url: string }>r).url)
+            .then(r => (<{url: string }>r).url)
         const destDir = path.join(__dirname, `tmp_${temp++}`)
-        if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true })
+        if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, {recursive: true})
         const output = path.join(destDir, `out.${transcoding.type}`)
 
         if (transcoding.type === "m4a") {
@@ -181,17 +178,16 @@ export class Util extends Base {
                     output,
                 ])
             } catch {
-                // eslint-disable-next-line no-console
                 console.warn("Failed to transmux to m4a (hq), download as mp3 (hq) instead.")
                 FFMPEG.path = null
                 return this.m3uReadableStream(trackResolvable)
             }
         } else {
-            const m3u = await makeRequest(m3uLink, { headers }).then(r => r.text())
+            const m3u = await makeRequest(m3uLink, {headers}).then(r => r.text())
             const urls = m3u.match(/(http).*?(?=\s)/gm)
             const chunks: string[] = []
             for (let i = 0; i < urls.length; i++) {
-                const arrayBuffer = await request(urls[i], { headers }).then(r => r.body.arrayBuffer())
+                const arrayBuffer = await request(urls[i], {headers}).then(r => r.body.arrayBuffer())
                 const chunkPath = path.join(destDir, `${i}.${transcoding.type}`)
                 fs.writeFileSync(chunkPath, Buffer.from(arrayBuffer))
                 chunks.push(chunkPath)
@@ -200,7 +196,7 @@ export class Util extends Base {
         }
         const stream: NodeJS.ReadableStream = Readable.from(fs.readFileSync(output))
         Util.removeDirectory(destDir)
-        return { stream, type: transcoding.type }
+        return {stream, type: transcoding.type}
     }
 
     /**
@@ -219,9 +215,9 @@ export class Util extends Base {
             const transcoding = transcodings[0]
             const url = await this.getStreamLink(transcoding)
             const headers = this.api.headers
-            const stream = await makeRequest(url, { headers })
+            const stream = await makeRequest(url, {headers})
             const type = transcoding.format.mime_type.startsWith('audio/mp4; codecs="mp4a') ? "m4a" : "mp3"
-            result = { stream, type }
+            result = {stream, type}
         }
 
         const stream = result.stream
@@ -239,7 +235,7 @@ export class Util extends Base {
      */
     public downloadTrack = async (trackResolvable: string | SoundcloudTrackV2, dest?: string) => {
         if (!dest) dest = "./"
-        if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true })
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
         return this.downloadTrackStream(track, track.title.replace(/\//g, ""), dest)
     }
@@ -265,7 +261,7 @@ export class Util extends Base {
      * Downloads all the tracks from the search query.
      */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.sc.tracks.searchV2({ q: query })
+        const tracks = await this.soundcloud.tracks.searchV2({q: query})
         return this.downloadTracks(tracks.collection, dest, limit)
     }
 
@@ -273,7 +269,7 @@ export class Util extends Base {
      * Download all liked tracks by a user.
      */
     public downloadLikes = async (userResolvable: string | number, dest?: string, limit?: number) => {
-        const tracks = await this.sc.users.likes(userResolvable, limit)
+        const tracks = await this.soundcloud.users.likes(userResolvable, limit)
         return this.downloadTracks(tracks, dest, limit)
     }
 
@@ -281,7 +277,7 @@ export class Util extends Base {
      * Downloads all the tracks in a playlist.
      */
     public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
-        const playlist = await this.sc.playlists.getV2(playlistResolvable)
+        const playlist = await this.soundcloud.playlists.getV2(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
@@ -291,7 +287,7 @@ export class Util extends Base {
     public streamTrack = async (trackResolvable: string | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
         const url = await this.streamLink(trackResolvable, "progressive")
         if (!url) return this.m3uReadableStream(trackResolvable).then(r => r.stream)
-        const readable = await makeRequest(url, { headers: this.api.headers })
+        const readable = await makeRequest(url, {headers: this.api.headers})
         return readable
     }
 
@@ -301,7 +297,7 @@ export class Util extends Base {
     public downloadSongCover = async (trackResolvable: string | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = path.dirname(dest)
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true })
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
         const artwork = (track.artwork_url ? track.artwork_url : track.user.avatar_url).replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/\//g, "")
@@ -327,7 +323,6 @@ export class Util extends Base {
         try {
             fs.rmdirSync(dir)
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error(error)
         }
     }

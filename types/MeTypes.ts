@@ -1,4 +1,4 @@
-import type { SoundcloudPlaylist } from "./index"
+import type {SoundcloudPlaylist} from "./index"
 
 export interface SoundcloudActivityCollection {
     collection: SoundcloudActivity[]
