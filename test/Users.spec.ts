@@ -4,21 +4,21 @@ import {soundcloud} from "./login"
 
 describe("Users", function () {
     it("should get a user", async function () {
-        const response = await soundcloud.users.getV2("https://soundcloud.com/yourparadis")
+        const response = await soundcloud.users.get("https://soundcloud.com/yourparadis")
         assert(Object.prototype.hasOwnProperty.call(response, "description"))
     })
 
     it("should search for users", async function () {
-        const response = await soundcloud.users.searchV2({ q: "virtual riot" })
+        const response = await soundcloud.users.search({ q: "virtual riot" })
         assert(Object.prototype.hasOwnProperty.call(response.collection[0], "description"))
     })
 
     it("should get user tracks", async function () {
-        const response = await soundcloud.users.tracksV2("https://soundcloud.com/nocopyrightsounds")
+        const response = await soundcloud.users.tracks("https://soundcloud.com/nocopyrightsounds")
         assert(Object.prototype.hasOwnProperty.call(response[0], "description"))
     })
 
-    it.skip("should get user likes", async function () {
+    it("should get user likes", async function () {
         const response = await soundcloud.users.likes("https://soundcloud.com/yourparadis")
         assert(Object.prototype.hasOwnProperty.call(response[0], "title"))
     })

@@ -4,7 +4,7 @@ import {soundcloud} from "./login"
 
 describe.skip("Me", function () {
     it("should get me", async function () {
-        const response = await soundcloud.me.getV2()
+        const response = await soundcloud.me.get()
         assert(Object.prototype.hasOwnProperty.call(response, "username"))
     })
 })

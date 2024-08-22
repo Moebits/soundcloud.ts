@@ -1,4 +1,4 @@
-import type {SoundcloudPlaylistFilterV2, SoundcloudPlaylistSearchV2, SoundcloudPlaylistV2} from "../types"
+import type {SoundcloudPlaylistFilter, SoundcloudPlaylistSearch, SoundcloudPlaylist} from "../types"
 import {API} from "../API"
 import {Tracks, Resolve} from "./index"
 import {request} from "undici"
@@ -11,28 +11,28 @@ export class Playlists {
     /**
      * Return playlist with all tracks fetched.
      */
-    public fetch = async (playlist: SoundcloudPlaylistV2) => {
+    public fetch = async (playlist: SoundcloudPlaylist) => {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
-        playlist.tracks = playlist.tracks.concat(await this.tracks.getArrayV2(unresolvedTracks, true))
+        playlist.tracks = playlist.tracks.concat(await this.tracks.getArray(unresolvedTracks, true))
         return playlist
     }
 
     /**
      * Searches for playlists using the v2 API.
      */
-    public searchV2 = async (params?: SoundcloudPlaylistFilterV2) => {
+    public search = async (params?: SoundcloudPlaylistFilter) => {
         const response = await this.api.getV2("search/playlists", params)
-        return response as Promise<SoundcloudPlaylistSearchV2>
+        return response as Promise<SoundcloudPlaylistSearch>
     }
 
     /**
      * Fetches a playlist from URL or ID using Soundcloud v2 API.
      */
-    public getV2 = async (playlistResolvable: string | number) => {
-        const playlistID = await this.resolve.getV2(playlistResolvable)
-        const response = <SoundcloudPlaylistV2>await this.api.getV2(`/playlists/${playlistID}`)
-        return this.fetch(response) as Promise<SoundcloudPlaylistV2>
+    public get = async (playlistResolvable: string | number) => {
+        const playlistID = await this.resolve.get(playlistResolvable)
+        const response = <SoundcloudPlaylist>await this.api.getV2(`/playlists/${playlistID}`)
+        return this.fetch(response) as Promise<SoundcloudPlaylist>
     }
 
     /**
@@ -50,7 +50,7 @@ export class Playlists {
             const playlist = json[json.length - 1].data
             scrape.push(playlist)
         }
-        return scrape as Promise<SoundcloudPlaylistV2[]>
+        return scrape as Promise<SoundcloudPlaylist[]>
     }
 
     /**
@@ -62,6 +62,6 @@ export class Playlists {
         const songHTML = await request(url, {headers}).then((r: any) => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const playlist = json[json.length - 1].data
-        return this.fetch(playlist) as Promise<SoundcloudPlaylistV2>
+        return this.fetch(playlist) as Promise<SoundcloudPlaylist>
     }
 }

@@ -34,26 +34,22 @@ Authenticating with your account is **optional**, but I still recommend it. If y
 -   Go to the Payload tab
 -   You should see your client id in the Query String Parameters section, and your oauth token (`access_token`) in the Request Payload section
 
-#### Update
-
-Most of the api endpoints are subject to breaking (or already broke), possibly because Soundcloud is migrating to a new v2 api. The alternative is to use `getV2` and `searchV2` which use the v2 endpoints or `getAlt` and `searchAlt` which get data by web scraping.
-
 ```ts
 const soundcloud = new Soundcloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN)
 /*Get track v2*/
-const track = await soundcloud.tracks.getV2("succducc/azure")
+const track = await soundcloud.tracks.get("succducc/azure")
 /*Search tracks v2*/
-const tracks = await soundcloud.tracks.searchV2({q: "cool track name"})
+const tracks = await soundcloud.tracks.search({q: "cool track name"})
 
 /*Get user v2*/
-const user = await soundcloud.playlists.getV2("someone")
+const user = await soundcloud.playlists.get("someone")
 /*Search users v2*/
-const users = await soundcloud.users.searchV2({q: "cool username"})
+const users = await soundcloud.users.search({q: "cool username"})
 
 /*Get playlist (web scraping)*/
 const playlist = await soundcloud.playlists.getAlt("virtual-riot/sets/throwback-ep")
 /*Search playlists v2*/
-const playlists = await soundcloud.playlists.searchV2({q: "cool playlist name"})
+const playlists = await soundcloud.playlists.search({q: "cool playlist name"})
 ```
 
 #### Searching for tracks and playlists
@@ -145,10 +141,10 @@ There are more less commonly used endpoints such as **me**, **apps**, and **oemb
 ### Common Types
 
 <details>
-<summary>SoundCloudTrackV2</summary>
+<summary>SoundCloudTrack</summary>
 
 ```ts
-export interface SoundcloudTrackV2 {
+export interface SoundcloudTrack {
     comment_count: number
     full_duration: number
     downloadable: boolean
@@ -196,7 +192,7 @@ export interface SoundcloudTrackV2 {
     waveform_url: string
     permalink: string
     permalink_url: string
-    user: SoundcloudUserV2
+    user: SoundcloudUser
     playback_count: number
 }
 ```
@@ -204,10 +200,10 @@ export interface SoundcloudTrackV2 {
 </details>
 
 <details>
-<summary>SoundCloudPlaylistV2</summary>
+<summary>SoundCloudPlaylist</summary>
 
 ```ts
-export interface SoundcloudPlaylistV2 {
+export interface SoundcloudPlaylist {
     duration: number
     permalink_url: string
     reposts_count: number
@@ -224,7 +220,7 @@ export interface SoundcloudPlaylistV2 {
     user_id: number
     last_modified: string
     license: SoundcloudLicense
-    tracks: SoundcloudTrackV2[]
+    tracks: SoundcloudTrack[]
     id: number
     release_date: string | null
     display_date: string
@@ -238,7 +234,7 @@ export interface SoundcloudPlaylistV2 {
     managed_by_feeds: boolean
     artwork_url: string | null
     is_album: boolean
-    user: SoundcloudUserV2
+    user: SoundcloudUser
     published_at: string | null
     embeddable_by: "all" | "me" | "none"
 }
@@ -247,10 +243,10 @@ export interface SoundcloudPlaylistV2 {
 </details>
 
 <details>
-<summary>SoundCloudUserV2</summary>
+<summary>SoundCloudUser</summary>
 
 ```ts
-export interface SoundcloudUserV2 {
+export interface SoundcloudUser {
     avatar_url: string
     city: string
     comments_count: number

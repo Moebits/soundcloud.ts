@@ -1,4 +1,4 @@
-import type {SoundcloudTrackV2, SoundcloudTranscoding} from "../types"
+import type {SoundcloudTrack, SoundcloudTranscoding} from "../types"
 import * as fs from "fs"
 import * as path from "path"
 import {API} from "../API"
@@ -25,11 +25,11 @@ export class Util {
     public constructor(private readonly api: API) {}
 
 
-    private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrackV2) => {
-        return typeof trackResolvable === "string" ? await this.tracks.getV2(trackResolvable) : trackResolvable
+    private readonly resolveTrack = async (trackResolvable: string | SoundcloudTrack) => {
+        return typeof trackResolvable === "string" ? await this.tracks.get(trackResolvable) : trackResolvable
     }
 
-    private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
+    private readonly sortTranscodings = async (trackResolvable: string | SoundcloudTrack, protocol?: "progressive" | "hls") => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = track.media.transcodings.sort(t => (t.quality === "hq" ? -1 : 1))
         if (!protocol) return transcodings
@@ -61,7 +61,7 @@ export class Util {
     /**
      * Gets the direct streaming link of a track.
      */
-    public streamLink = async (trackResolvable: string | SoundcloudTrackV2, protocol?: "progressive" | "hls") => {
+    public streamLink = async (trackResolvable: string | SoundcloudTrack, protocol?: "progressive" | "hls") => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, protocol)
         if (!transcodings.length) return null
@@ -118,7 +118,7 @@ export class Util {
     /**
      * Readable stream of m3u playlists.
      */
-    private readonly m3uReadableStream = async (trackResolvable: string | SoundcloudTrackV2): Promise<{stream: NodeJS.ReadableStream, type: "m4a" | "mp3"}> => {
+    private readonly m3uReadableStream = async (trackResolvable: string | SoundcloudTrack): Promise<{stream: NodeJS.ReadableStream, type: "m4a" | "mp3"}> => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "hls")
         if (!transcodings.length) throw "No transcodings found"
@@ -177,7 +177,7 @@ export class Util {
     /**
      * Downloads the mp3 stream of a track.
      */
-    private readonly downloadTrackStream = async (trackResolvable: string | SoundcloudTrackV2, title: string, dest: string) => {
+    private readonly downloadTrackStream = async (trackResolvable: string | SoundcloudTrack, title: string, dest: string) => {
         let result: {stream: NodeJS.ReadableStream, type: string}
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "progressive")
@@ -204,7 +204,7 @@ export class Util {
     /**
      * Downloads a track on Soundcloud.
      */
-    public downloadTrack = async (trackResolvable: string | SoundcloudTrackV2, dest?: string) => {
+    public downloadTrack = async (trackResolvable: string | SoundcloudTrack, dest?: string) => {
         if (!dest) dest = "./"
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
@@ -227,7 +227,7 @@ export class Util {
     /**
      * Downloads an array of tracks.
      */
-    public downloadTracks = async (tracks: SoundcloudTrackV2[] | string[], dest?: string, limit?: number) => {
+    public downloadTracks = async (tracks: SoundcloudTrack[] | string[], dest?: string, limit?: number) => {
         if (!limit) limit = tracks.length
         const resultArray: string[] = []
         for (let i = 0; i < limit; i++) {
@@ -245,7 +245,7 @@ export class Util {
      * Downloads all the tracks from the search query.
      */
     public downloadSearch = async (query: string, dest?: string, limit?: number) => {
-        const tracks = await this.tracks.searchV2({q: query})
+        const tracks = await this.tracks.search({q: query})
         return this.downloadTracks(tracks.collection, dest, limit)
     }
 
@@ -261,14 +261,14 @@ export class Util {
      * Downloads all the tracks in a playlist.
      */
     public downloadPlaylist = async (playlistResolvable: string, dest?: string, limit?: number) => {
-        const playlist = await this.playlists.getV2(playlistResolvable)
+        const playlist = await this.playlists.get(playlistResolvable)
         return this.downloadTracks(playlist.tracks, dest, limit)
     }
 
     /**
      * Returns a readable stream to the track.
      */
-    public streamTrack = async (trackResolvable: string | SoundcloudTrackV2): Promise<NodeJS.ReadableStream> => {
+    public streamTrack = async (trackResolvable: string | SoundcloudTrack): Promise<NodeJS.ReadableStream> => {
         const url = await this.streamLink(trackResolvable, "progressive")
         if (!url) return this.m3uReadableStream(trackResolvable).then(r => r.stream)
         const readable = await request(url, {headers: this.api.headers}).then((r) => r.body)
@@ -278,7 +278,7 @@ export class Util {
     /**
      * Downloads a track's song cover.
      */
-    public downloadSongCover = async (trackResolvable: string | SoundcloudTrackV2, dest?: string, noDL?: boolean) => {
+    public downloadSongCover = async (trackResolvable: string | SoundcloudTrack, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = dest
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})

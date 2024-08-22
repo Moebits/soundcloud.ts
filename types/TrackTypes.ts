@@ -1,4 +1,4 @@
-import type {SoundcloudFilterV2, SoundcloudSearchV2, SoundcloudUserMini, SoundcloudUserV2} from "./index"
+import type {SoundcloudFilter, SoundcloudSearch, SoundcloudUser} from "./index"
 
 export type SoundcloudLicense =
     | "no-rights-reserved"
@@ -25,80 +25,7 @@ export type SoundcloudTrackType =
     | "sample"
     | "other"
 
-export interface SoundcloudTrackFilter {
-    q?: string
-    tags?: string
-    filter?: "public" | "private" | "all"
-    license?: SoundcloudLicense
-    bpm_from?: number
-    bpm_to?: number
-    duration_from?: number
-    duration_to?: number
-    created_at_from?: Date
-    created_at_to?: Date
-    ids?: string
-    genres?: string
-    types?: string
-}
-
 export interface SoundcloudTrack {
-    comment_count: number
-    release: number | ""
-    original_content_size: number
-    track_type: SoundcloudTrackType | null
-    original_format: string
-    streamable: boolean
-    download_url: string | null
-    id: number
-    state: "processing" | "failed" | "finished"
-    last_modified: string
-    favoritings_count: number
-    kind: string
-    purchase_url: string
-    release_year: number | null
-    sharing: string
-    attachments_uri: string
-    license: SoundcloudLicense
-    user_id: number
-    user_favorite: boolean
-    waveform_url: string
-    permalink: string
-    permalink_url: string
-    playback_count: number
-    downloadable: boolean
-    created_at: string
-    description: string
-    title: string
-    duration: number
-    artwork_url: string
-    video_url: string | null
-    tag_list: string
-    release_month: number | null
-    genre: string
-    release_day: number | null
-    reposts_count: number
-    label_name: string | null
-    commentable: boolean
-    bpm: number | null
-    policy: string
-    key_signature: string
-    isrc: string | null
-    uri: string
-    download_count: number
-    likes_count: number
-    purchase_title: string
-    embeddable_by: string
-    monetization_model: string
-    user: SoundcloudUserMini
-    user_playback_count: number | null
-    stream_url: string
-    label?: SoundcloudUserMini
-    label_id: number | null
-    asset_data?: string
-    artwork_data?: string
-}
-
-export interface SoundcloudTrackV2 {
     comment_count: number
     full_duration: number
     downloadable: boolean
@@ -146,11 +73,11 @@ export interface SoundcloudTrackV2 {
     waveform_url: string
     permalink: string
     permalink_url: string
-    user: SoundcloudUserV2
+    user: SoundcloudUser
     playback_count: number
 }
-export interface SoundcloudTrackSearchV2 extends SoundcloudSearchV2 {
-    collection: SoundcloudTrackV2[]
+export interface SoundcloudTrackSearch extends SoundcloudSearch {
+    collection: SoundcloudTrack[]
 }
 
 export interface SoundcloudSecretToken {
@@ -172,7 +99,7 @@ export interface SoundcloudTranscoding {
     quality: string
 }
 
-export interface SoundcloudTrackFilterV2 extends SoundcloudFilterV2 {
+export interface SoundcloudTrackFilter extends SoundcloudFilter {
     "filter.genre_or_tag"?: string
     "filter.duration"?: "short" | "medium" | "long" | "epic"
     "filter.created_at"?: "last_hour" | "last_day" | "last_week" | "last_month" | "last_year"

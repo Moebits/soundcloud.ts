@@ -23,7 +23,7 @@ export class Resolve {
     /**
      * Gets the ID of a user/playlist/track from the Soundcloud URL using the v2 API.
      */
-    public getV2 = async (resolvable: string | number, full?: boolean) => {
+    public get = async (resolvable: string | number, full?: boolean) => {
         if (!String(resolvable).match(/\d{8,}/) && !String(resolvable).includes("soundcloud")) {
             resolvable = `https://soundcloud.com/${resolvable}`
         }

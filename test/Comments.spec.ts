@@ -4,7 +4,7 @@ import {soundcloud} from "./login"
 
 describe("Comments", function () {
     it("should get a comment", async function () {
-        const response = await soundcloud.comments.getV2(1916574994)
+        const response = await soundcloud.comments.get(1916574994)
         assert(Object.prototype.hasOwnProperty.call(response, "body"))
     })
 })

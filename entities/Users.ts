@@ -1,4 +1,4 @@
-import type {SoundcloudTrackSearchV2, SoundcloudTrackV2, SoundcloudUserFilterV2, SoundcloudUserSearchV2, SoundcloudUserV2, SoundcloudWebProfile} from "../types"
+import type {SoundcloudTrackSearch, SoundcloudTrack, SoundcloudUserFilter, SoundcloudUserSearch, SoundcloudUser, SoundcloudWebProfile} from "../types"
 import {API} from "../API"
 import {URL} from "url"
 import {Resolve} from "./index"
@@ -11,53 +11,53 @@ export class Users {
     /**
      * Searches for users using the v2 API.
      */
-    public searchV2 = async (params?: SoundcloudUserFilterV2) => {
+    public search = async (params?: SoundcloudUserFilter) => {
         const response = await this.api.getV2("search/users", params)
-        return response as Promise<SoundcloudUserSearchV2>
+        return response as Promise<SoundcloudUserSearch>
     }
 
     /**
      * Fetches a user from URL or ID using Soundcloud v2 API.
      */
-    public getV2 = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
+    public get = async (userResolvable: string | number) => {
+        const userID = await this.resolve.get(userResolvable)
         const response = await this.api.getV2(`/users/${userID}`)
-        return response as Promise<SoundcloudUserV2>
+        return response as Promise<SoundcloudUser>
     }
 
     /**
      * Gets all the tracks by the user using Soundcloud v2 API.
      */
-    public tracksV2 = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
-        const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/users/${userID}/tracks`)
+    public tracks = async (userResolvable: string | number) => {
+        const userID = await this.resolve.get(userResolvable)
+        const response = <SoundcloudTrackSearch>await this.api.getV2(`/users/${userID}/tracks`)
         let nextHref = response.next_href
         while (nextHref) {
             const url = new URL(nextHref)
             const params = {}
             url.searchParams.forEach((value, key) => (params[key] = value))
-            const nextPage = <SoundcloudTrackSearchV2>await this.api.getURL(url.origin + url.pathname, params)
+            const nextPage = <SoundcloudTrackSearch>await this.api.getURL(url.origin + url.pathname, params)
             response.collection.push(...nextPage.collection)
             nextHref = nextPage.next_href
         }
-        return response.collection as SoundcloudTrackV2[]
+        return response.collection as SoundcloudTrack[]
     }
 
     /**
      * Gets all of a users liked tracks.
      */
     public likes = async (userResolvable: string | number, limit?: number) => {
-        const userID = await this.resolve.getV2(userResolvable)
-        const response = <SoundcloudTrackSearchV2>await this.api.getV2(`/users/${userID}/likes`, {limit: 50, offset: 0})
-        const tracks: SoundcloudTrackV2[] = []
+        const userID = await this.resolve.get(userResolvable)
+        let response = await this.api.getV2(`/users/${userID}/likes`, {limit: 50, offset: 0}) as any
+        const tracks: SoundcloudTrack[] = []
         let nextHref = response.next_href
         while (nextHref && (!limit || tracks.length < limit)) {
+            tracks.push(...response.collection.map((r: any) => r.track))
             const url = new URL(nextHref)
             const params = {}
             url.searchParams.forEach((value, key) => (params[key] = value))
-            const nextPage = <SoundcloudTrackSearchV2>await this.api.getURL(url.origin + url.pathname, params)
-            tracks.push(...nextPage.collection)
-            nextHref = nextPage.next_href
+            response = await this.api.getURL(url.origin + url.pathname, params)
+            nextHref = response.next_href
         }
         return tracks
     }
@@ -66,7 +66,7 @@ export class Users {
      * Gets all the web profiles on a users sidebar.
      */
     public webProfiles = async (userResolvable: string | number) => {
-        const userID = await this.resolve.getV2(userResolvable)
+        const userID = await this.resolve.get(userResolvable)
         const response = await this.api.getV2(`/users/soundcloud:users:${userID}/web-profiles`)
         return <SoundcloudWebProfile[]>response
     }
@@ -86,7 +86,7 @@ export class Users {
             const user = json[json.length - 1].data
             scrape.push(user)
         }
-        return scrape as Promise<SoundcloudUserV2[]>
+        return scrape as Promise<SoundcloudUser[]>
     }
 
     /**
@@ -98,6 +98,6 @@ export class Users {
         const songHTML = await request(url, {headers}).then(r => r.body.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const user = json[json.length - 1].data
-        return user as Promise<SoundcloudUserV2>
+        return user as Promise<SoundcloudUser>
     }
 }

@@ -7,7 +7,7 @@ export class Me {
     /**
      * Gets your own profile, using the Soundcloud v2 API.
      */
-    public getV2 = async () => {
+    public get = async () => {
         const response = await this.api.getV2("/me")
         return response as Promise<SoundcloudUser>
     }

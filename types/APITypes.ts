@@ -10,10 +10,6 @@ export interface SoundcloudApp {
     creator: string
 }
 
-export interface SoundcloudAppV2 {
-    collection: SoundcloudApp[]
-}
-
 export interface SoundcloudOembedFilter {
     url: string
     format?: string
@@ -41,13 +37,13 @@ export interface SoundcloudOembed {
     author_url?: string
 }
 
-export interface SoundcloudSearchV2 {
+export interface SoundcloudSearch {
     total_results: number
     next_href: string
     query_urn: string
 }
 
-export interface SoundcloudFilterV2 {
+export interface SoundcloudFilter {
     q: string
     limit?: number
     offset?: number
