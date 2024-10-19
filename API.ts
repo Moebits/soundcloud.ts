@@ -59,7 +59,7 @@ export class API {
         if (this.oauthToken) options.query.oauth_token = this.oauthToken
         return request(URI, options).then(r => {
             if (r.statusCode.toString().startsWith("2")) {
-                if (r.headers["content-type"] === "application/json") return r.body.json()
+                if (r.headers["content-type"].includes("application/json")) return r.body.json()
                 return r.body.text()
             }
             throw new Error(`Status code ${r.statusCode}`)
