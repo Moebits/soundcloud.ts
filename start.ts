@@ -1,8 +1,8 @@
 import SoundCloud from "./soundcloud"
 
 require("dotenv").config()
-const soundcloud = new SoundCloud(process.env.SOUNDCLOUD_CLIENT_ID, process.env.SOUNDCLOUD_OAUTH_TOKEN);
+const soundcloud = new SoundCloud();
 (async () => {
-    const result = await soundcloud.users.tracks("gingaloid")
+    const result = await soundcloud.util.downloadTrack("https://soundcloud.com/5tereomanjpn/aire-tea-timestereoman-remix", "./tracks/test.mp3")
     console.log(result)
 })()

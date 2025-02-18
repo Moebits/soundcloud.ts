@@ -1,6 +1,6 @@
 {
     "name": "soundcloud.ts",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "description": "Soundcloud API v2 wrapper with typings.",
     "main": "dist/soundcloud.js",
     "types": "dist/soundcloud.d.ts",
@@ -32,9 +32,6 @@
         "Skick (https://github.com/skick1234)"
     ],
     "license": "MIT",
-    "dependencies": {
-        "undici": "^6.17.0"
-    },
     "devDependencies": {
         "@types/chai": "^4.3.16",
         "@types/mocha": "^10.0.6",

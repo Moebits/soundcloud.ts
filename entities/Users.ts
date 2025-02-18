@@ -2,7 +2,6 @@ import type {SoundcloudTrackSearch, SoundcloudTrack, SoundcloudUserFilter, Sound
 import {API} from "../API"
 import {URL} from "url"
 import {Resolve} from "./index"
-import {request} from "undici"
 
 export class Users {
     private readonly resolve = new Resolve(this.api)
@@ -72,16 +71,37 @@ export class Users {
     }
 
     /**
+     * Gets a user's followers.
+    */
+    public following = async (userResolvable: string | number, limit?: number) => {
+        const userID = await this.resolve.get(userResolvable)
+        let response = await this.api.getV2(`/users/${userID}/followings`, {limit: 50, offset: 0}) as any
+        const followers: SoundcloudUser[] = []
+        let nextHref = response.next_href
+        
+        while (nextHref && (!limit || followers.length < limit)) {
+            followers.push(...response.collection)
+            const url = new URL(nextHref)
+            const params = {}
+            url.searchParams.forEach((value, key) => (params[key] = value))
+            response = await this.api.getURL(url.origin + url.pathname, params)
+            nextHref = response.next_href
+        }
+        
+        return followers
+    }
+
+    /**
      * Searches for users (web scraping)
      */
     public searchAlt = async (query: string) => {
         const headers = this.api.headers
-        const html = await request(`https://soundcloud.com/search/people?q=${query}`, {headers}).then(r => r.body.text())
+        const html = await fetch(`https://soundcloud.com/search/people?q=${query}`, {headers}).then(r => r.text())
         const urls = html.match(/(?<=<li><h2><a href=")(.*?)(?=">)/gm)?.map((u: any) => `https://soundcloud.com${u}`)
         if (!urls) return []
         const scrape: any = []
         for (let i = 0; i < urls.length; i++) {
-            const songHTML = await request(urls[i], {headers}).then(r => r.body.text())
+            const songHTML = await fetch(urls[i], {headers}).then(r => r.text())
             const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
             const user = json[json.length - 1].data
             scrape.push(user)
@@ -95,7 +115,7 @@ export class Users {
     public getAlt = async (url: string) => {
         if (!url.startsWith("https://soundcloud.com/")) url = `https://soundcloud.com/${url}`
         const headers = this.api.headers
-        const songHTML = await request(url, {headers}).then(r => r.body.text())
+        const songHTML = await fetch(url, {headers}).then(r => r.text())
         const json = JSON.parse(songHTML.match(/(\[{)(.*)(?=;)/gm)[0])
         const user = json[json.length - 1].data
         return user as Promise<SoundcloudUser>
