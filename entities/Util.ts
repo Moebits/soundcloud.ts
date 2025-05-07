@@ -113,7 +113,7 @@ export class Util {
     /**
      * Readable stream of m3u playlists.
      */
-    private readonly m3uReadableStream = async (trackResolvable: string | SoundcloudTrack): Promise<{stream: NodeJS.ReadableStream, type: "m4a" | "mp3"}> => {
+    private readonly m3uReadableStream = async (trackResolvable: string | SoundcloudTrack): Promise<{stream: Readable, type: "m4a" | "mp3"}> => {
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "hls")
         if (!transcodings.length) throw "No transcodings found"
@@ -162,7 +162,7 @@ export class Util {
             }
             await this.mergeFiles(chunks, output)
         }
-        const stream: NodeJS.ReadableStream = Readable.from(fs.readFileSync(output))
+        const stream = Readable.from(fs.readFileSync(output))
         Util.removeDirectory(destDir)
         return {stream, type: transcoding.type}
     }
@@ -185,7 +185,7 @@ export class Util {
      * Downloads the mp3 stream of a track.
      */
     private readonly downloadTrackStream = async (trackResolvable: string | SoundcloudTrack, title: string, dest: string) => {
-        let result: {stream: NodeJS.ReadableStream, type: string}
+        let result: {stream: Readable, type: string}
         const track = await this.resolveTrack(trackResolvable)
         const transcodings = await this.sortTranscodings(track, "progressive")
         if (!transcodings.length) {
@@ -276,7 +276,7 @@ export class Util {
     /**
      * Returns a readable stream to the track.
      */
-    public streamTrack = async (trackResolvable: string | SoundcloudTrack): Promise<NodeJS.ReadableStream> => {
+    public streamTrack = async (trackResolvable: string | SoundcloudTrack): Promise<Readable> => {
         const url = await this.streamLink(trackResolvable, "progressive")
         if (!url) return this.m3uReadableStream(trackResolvable).then(r => r.stream)
         const readable = await fetch(url, {headers: this.api.headers}).then((r) => r.body)
