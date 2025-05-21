@@ -45,7 +45,9 @@ export class API {
         params.client_id = this.clientId
         if (this.oauthToken) params.oauth_token = this.oauthToken
         const query = params ? "?" + new URLSearchParams(params).toString() : ""
-        const response = await fetch(url + query, this.options(method, params))
+        url += query
+        if (this.proxy) url = this.proxy + url
+        const response = await fetch(url, this.options(method, params))
         if (!response.ok) throw new Error(`Status code ${response.status}`)
         const contentType = response.headers.get("content-type")
         return contentType && contentType.includes("application/json") ? response.json() : response.text()
@@ -56,7 +58,9 @@ export class API {
         if (!this.clientId) await this.getClientId()
         params.client_id = this.clientId
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        return this.fetchRequest(`${origin}/${endpoint}`, "GET", params)
+        let url = `${origin}/${endpoint}`
+        if (this.proxy) url = this.proxy + url
+        return this.fetchRequest(url, "GET", params)
     }
 
     public getClientIdWeb = async (): Promise<string> => {
