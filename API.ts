@@ -58,9 +58,7 @@ export class API {
         if (!this.clientId) await this.getClientId()
         params.client_id = this.clientId
         if (endpoint.startsWith("/")) endpoint = endpoint.slice(1)
-        let url = `${origin}/${endpoint}`
-        if (this.proxy) url = this.proxy + url
-        return this.fetchRequest(url, "GET", params)
+        return this.fetchRequest(`${origin}/${endpoint}`, "GET", params)
     }
 
     public getClientIdWeb = async (): Promise<string> => {
