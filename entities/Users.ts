@@ -1,4 +1,4 @@
-import type {SoundcloudTrackSearch, SoundcloudTrack, SoundcloudUserFilter, SoundcloudUserSearch, SoundcloudUser, SoundcloudWebProfile} from "../types"
+import type {SoundcloudTrackSearch, SoundcloudTrack, SoundcloudUserFilter, SoundcloudUserSearch, SoundcloudUser, SoundcloudWebProfile, SoundcloudPlaylist, SoundcloudPlaylistSearch} from "../types"
 import {API} from "../API"
 import {URL} from "url"
 import {Resolve} from "./index"
@@ -59,6 +59,24 @@ export class Users {
             nextHref = response.next_href
         }
         return tracks
+    }
+
+    /**
+     * Gets all the playlists by the user using Soundcloud v2 API.
+     */
+    public playlists = async (userResolvable: string | number) => {
+        const userID = await this.resolve.get(userResolvable)
+        const response = <SoundcloudPlaylistSearch>await this.api.getV2(`/users/${userID}/playlists`)
+        let nextHref = response.next_href
+        while (nextHref) {
+            const url = new URL(nextHref)
+            const params = {}
+            url.searchParams.forEach((value, key) => (params[key] = value))
+            const nextPage = <SoundcloudPlaylistSearch>await this.api.getURL(url.origin + url.pathname, params)
+            response.collection.push(...nextPage.collection)
+            nextHref = nextPage.next_href
+        }
+        return response.collection as SoundcloudPlaylist[]
     }
 
     /**
