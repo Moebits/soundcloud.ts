@@ -47,7 +47,7 @@ export class Users {
      */
     public likes = async (userResolvable: string | number, limit?: number) => {
         const userID = await this.resolve.get(userResolvable)
-        let response = await this.api.getV2(`/users/${userID}/likes`, {limit: 50, offset: 0}) as any
+        let response = <SoundcloudTrackSearch>await this.api.getV2(`/users/${userID}/likes`, {limit: 50, offset: 0})
         const tracks: SoundcloudTrack[] = []
         let nextHref = response.next_href
         while (nextHref && (!limit || tracks.length < limit)) {
@@ -55,7 +55,7 @@ export class Users {
             const url = new URL(nextHref)
             const params = {}
             url.searchParams.forEach((value, key) => (params[key] = value))
-            response = await this.api.getURL(url.origin + url.pathname, params)
+            response = <SoundcloudTrackSearch>await this.api.getURL(url.origin + url.pathname, params)
             nextHref = response.next_href
         }
         return tracks
@@ -85,7 +85,7 @@ export class Users {
     public webProfiles = async (userResolvable: string | number) => {
         const userID = await this.resolve.get(userResolvable)
         const response = await this.api.getV2(`/users/soundcloud:users:${userID}/web-profiles`)
-        return <SoundcloudWebProfile[]>response
+        return response as Promise<SoundcloudWebProfile[]>
     }
 
     /**

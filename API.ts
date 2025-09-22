@@ -3,7 +3,7 @@ const apiV2URL = "https://api-v2.soundcloud.com"
 const webURL = "https://soundcloud.com"
 
 export class API {
-    public static headers: Record<string, string> = {
+    public static headers: {[key: string]: string} = {
         Origin: "https://soundcloud.com",
         Referer: "https://soundcloud.com/",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.67"
@@ -23,13 +23,13 @@ export class API {
         return API.headers
     }
 
-    public get = (endpoint: string, params?: Record<string, any>) => this.getRequest(apiURL, endpoint, params)
-    public getV2 = (endpoint: string, params?: Record<string, any>) => this.getRequest(apiV2URL, endpoint, params)
-    public getWebsite = (endpoint: string, params?: Record<string, any>) => this.getRequest(webURL, endpoint, params)
-    public getURL = (URI: string, params?: Record<string, any>) => this.fetchRequest(URI, "GET", params)
-    public post = (endpoint: string, params?: Record<string, any>) => this.fetchRequest(`${apiURL}/${endpoint}`, "POST", params)
+    public get = (endpoint: string, params?: {[key: string]: any}) => this.getRequest(apiURL, endpoint, params)
+    public getV2 = (endpoint: string, params?: {[key: string]: any}) => this.getRequest(apiV2URL, endpoint, params)
+    public getWebsite = (endpoint: string, params?: {[key: string]: any}) => this.getRequest(webURL, endpoint, params)
+    public getURL = (URI: string, params?: {[key: string]: any}) => this.fetchRequest(URI, "GET", params)
+    public post = (endpoint: string, params?: {[key: string]: any}) => this.fetchRequest(`${apiURL}/${endpoint}`, "POST", params)
 
-    private options = (method: string, params?: Record<string, any>): RequestInit => {
+    private options = (method: string, params?: {[key: string]: any}) => {
         const options: RequestInit = {
             method,
             headers: {...API.headers},
@@ -39,7 +39,7 @@ export class API {
         return options
     }
 
-    private fetchRequest = async (url: string, method: string, params?: Record<string, any>) => {
+    private fetchRequest = async (url: string, method: string, params?: {[key: string]: any}) => {
         if (!params) params = {}
         if (!this.clientId) await this.getClientId()
         params.client_id = this.clientId
@@ -53,7 +53,7 @@ export class API {
         return contentType && contentType.includes("application/json") ? response.json() : response.text()
     }
 
-    private getRequest = async (origin: string, endpoint: string, params?: Record<string, any>) => {
+    private getRequest = async (origin: string, endpoint: string, params?: {[key: string]: any}) => {
         if (!params) params = {}
         if (!this.clientId) await this.getClientId()
         params.client_id = this.clientId
@@ -61,7 +61,7 @@ export class API {
         return this.fetchRequest(`${origin}/${endpoint}`, "GET", params)
     }
 
-    public getClientIdWeb = async (): Promise<string> => {
+    public getClientIdWeb = async () => {
         const response = await fetch(webURL).then((r) => r.text())
         if (!response || typeof response !== "string") throw new Error("Could not find client ID")
         const urls = response.match(/https?:\/\/[^\s"]+\.js/g)
@@ -74,7 +74,7 @@ export class API {
         throw new Error("Could not find client ID in script URLs")
     }
 
-    public getClientIdMobile = async (): Promise<string> => {
+    public getClientIdMobile = async () => {
         const response = await fetch("https://m.soundcloud.com/", {
             headers: {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/99.0.4844.47 Mobile/15E148 Safari/604.1"}
         }).then(r => r.text())
@@ -83,7 +83,7 @@ export class API {
         throw new Error("Could not find client ID")
     }
 
-    public getClientId = async (reset?: boolean): Promise<string> => {
+    public getClientId = async (reset?: boolean) => {
         if (!this.oauthToken && (!this.clientId || reset)) {
             try {
                 this.clientId = await this.getClientIdWeb()

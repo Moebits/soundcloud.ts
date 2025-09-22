@@ -29,7 +29,8 @@
     ],
     "author": "Moebits",
     "contributors": [
-        "Skick (https://github.com/skick1234)"
+        "Skick (https://github.com/skick1234)",
+        "Lioncat6 (https://github.com/Lioncat6)"
     ],
     "license": "MIT",
     "devDependencies": {

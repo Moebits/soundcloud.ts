@@ -19,7 +19,7 @@ describe("Users", function () {
     })
 
     it("should get user likes", async function () {
-        const response = await soundcloud.users.likes("https://soundcloud.com/yourparadis")
+        const response = await soundcloud.users.likes("https://soundcloud.com/moebytes")
         assert(Object.prototype.hasOwnProperty.call(response[0], "title"))
     })
 

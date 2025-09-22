@@ -16,7 +16,7 @@ export class Resolve {
             const data = JSON.parse(html.match(/(\[{"id")(.*?)(?=\);)/)?.[0])
             id = data[data.length - 1]?.data?.[0]?.id ? data[data.length - 1].data[0].id : data[data.length - 2].data[0].id
         }
-        return id
+        return id as unknown as Promise<number>
     }
 
     /**
@@ -28,10 +28,10 @@ export class Resolve {
         }
         let id = resolvable
         if (String(resolvable).includes("soundcloud")) {
-            const resolved = <any>await this.api.getV2("resolve", {url: resolvable})
+            const resolved = await this.api.getV2("resolve", {url: resolvable})
             if (full) return resolved
             id = resolved.id
         }
-        return id
+        return id as unknown as Promise<number>
     }
 }

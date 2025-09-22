@@ -8,7 +8,7 @@ export class Apps {
      * Gets Soundcloud apps, using the Soundcloud v2 API.
      */
     public get = async () => {
-        const response = await this.api.getV2("/apps") as any
+        const response = await this.api.getV2("/apps")
         return response.collection as Promise<SoundcloudApp>
     }
 }

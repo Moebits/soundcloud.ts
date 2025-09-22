@@ -14,7 +14,7 @@ export class Playlists {
         const unresolvedTracks = playlist.tracks.splice(playlist.tracks.findIndex(t => !t.title)).map(t => t.id)
         if (unresolvedTracks.length === 0) return playlist
         playlist.tracks = playlist.tracks.concat(await this.tracks.getArray(unresolvedTracks, true))
-        return playlist
+        return playlist as SoundcloudPlaylist
     }
 
     /**

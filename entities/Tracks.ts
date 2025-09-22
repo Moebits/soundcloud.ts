@@ -74,7 +74,7 @@ export class Tracks {
      */
     public related = async (trackResolvable: string | number, limit?: number) => {
         const trackID = await this.resolve.get(trackResolvable)
-        const response = <SoundcloudTrackSearch>await this.api.getV2(`/tracks/${trackID}/related`, {limit})
-        return response.collection
+        const response = await this.api.getV2(`/tracks/${trackID}/related`, {limit})
+        return response.collection as Promise<SoundcloudTrackSearch>
     }
 }
