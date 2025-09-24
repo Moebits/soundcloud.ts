@@ -49,7 +49,7 @@ export interface SoundcloudTrack {
         c_line: string
         c_line_for_display: string
         writer_composer: string
-        release_title: string,
+        release_title: string
         publisher: string
     }
     duration: number
