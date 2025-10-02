@@ -51,7 +51,7 @@ import {Test} from "test"
 ```
 
 **6. Use arrow functions** \
-Always use arrow functions for better this behavior. 
+Always use arrow functions to avoid binding this (when needed).
 
 ```ts
 // x Bad
