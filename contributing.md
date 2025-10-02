@@ -1,6 +1,7 @@
-## Style Guide
+## Typescript Style Guide
 
-If you wish to contribute to my repository, you must follow my style guide.
+If you want to contribute to my repository, I ask that you follow my code styling. If something doesn't appear in this guide then I have no specific preference 
+for it (but this may get updated in the future as needed).
 
 **1. Naming Scheme** \
 Variables and Functions - `camelCase` \
