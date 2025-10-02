@@ -52,7 +52,7 @@ import {Test} from "test"
 ```
 
 **6. Use arrow functions** \
-Always use arrow functions to avoid binding this (when needed).
+Always use arrow functions to avoid having to bind this.
 
 ```ts
 // x Bad
