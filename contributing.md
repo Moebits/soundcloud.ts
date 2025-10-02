@@ -156,3 +156,12 @@ for (let i = 0; i < a.length; i++) {
 a = a.map(x => x + 5)
 ```
 
+**15. Use index signature over record type** \
+Prefer index signature over Record.
+
+```ts
+// x Bad
+let x = {} as Record<string, number>
+// ✓ Good
+let x = {} as {[key: string]: number}
+```
