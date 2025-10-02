@@ -1,12 +1,21 @@
-## Typescript Style Guide
+# Typescript Style Guide
 
 If you want to contribute to my repository, I ask that you follow my code styling. If something doesn't appear in this guide then I have no specific preference 
 for it (but this may get updated in the future as needed).
 
 **1. Naming Scheme** \
-Variables and Functions - `camelCase` \
-Classes and Interfaces - `PascalCase` \
-Do not use underscores and numbers unless it is relevant eg. `let error404 = false`
+Variables and functions use `camelCase`. Classes and interfaces use `PascalCase`. 
+
+```ts
+// x Bad
+class aClass {}
+const Method = () => {}
+let Hi = 1
+// ✓ Good
+class AClass {}
+const method = () => {}
+let hi = 1
+```
 
 **2. Braces** \
 Always put the function brace on the same line.
