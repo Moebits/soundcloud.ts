@@ -1,6 +1,6 @@
 <div align="left">
   <p>
-    <a href="https://moebits.github.io/soundcloud.ts/"><img src="https://raw.githubusercontent.com/Moebits/soundcloud.ts/master/images/soundcloud.tslogo.gif" width="500" /></a>
+    <a href="https://moebytes.github.io/soundcloud.ts/"><img src="https://raw.githubusercontent.com/moebytes/soundcloud.ts/master/images/soundcloud.tslogo.gif" width="500" /></a>
   </p>
   <p>
     <a href="https://nodei.co/npm/soundcloud.ts/"><img src="https://nodei.co/npm/soundcloud.ts.png" /></a>
@@ -21,7 +21,7 @@ npm install soundcloud.ts
 ### Useful Links
 
 -   [**SoundCloud API Documentation**](https://developers.soundcloud.com/docs/api/reference)
--   [**Soundcloud.ts Documentation**](https://moebits.github.io/soundcloud.ts/)
+-   [**Soundcloud.ts Documentation**](https://moebytes.github.io/soundcloud.ts/)
 
 ### Getting Started
 
