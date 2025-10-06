@@ -13,7 +13,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/Moebits/soundcloud.ts"
+        "url": "https://github.com/Moebytes/soundcloud.ts"
     },
     "keywords": [
         "soundcloud",
@@ -27,7 +27,7 @@
         "download",
         "downloader"
     ],
-    "author": "Moebits",
+    "author": "Moebytes",
     "contributors": [
         "Skick (https://github.com/skick1234)",
         "Lioncat6 (https://github.com/Lioncat6)"
