@@ -19,6 +19,7 @@ export interface SoundcloudPlaylist {
     license: SoundcloudLicense
     tracks: SoundcloudTrack[]
     id: number
+    urn: string
     release_date: string | null
     display_date: string
     sharing: "public" | "private"
