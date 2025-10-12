@@ -43,5 +43,8 @@
         "ts-mocha": "^10.0.0",
         "typedoc": "^0.25.13",
         "typescript": "^5.4.5"
+    },
+    "dependencies": {
+        "browser-id3-writer": "^6.3.1"
     }
 }
