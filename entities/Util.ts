@@ -1,6 +1,7 @@
 import type {SoundcloudTrack, SoundcloudTranscoding} from "../types"
 import * as fs from "fs"
 import * as path from "path"
+import {ID3Writer} from "browser-id3-writer"
 import {API} from "../API"
 import {Tracks, Users, Playlists} from "./index"
 import {Readable} from "stream"
@@ -157,7 +158,7 @@ export class Util {
             for (let i = 0; i < urls.length; i++) {
                 const arrayBuffer = await fetch(urls[i], {headers}).then(r => r.arrayBuffer())
                 const chunkPath = path.join(destDir, `${i}.${transcoding.type}`)
-                fs.writeFileSync(chunkPath, Buffer.from(arrayBuffer))
+                fs.writeFileSync(chunkPath, new Uint8Array(Buffer.from(arrayBuffer)))
                 chunks.push(chunkPath)
             }
             await this.mergeFiles(chunks, output)
@@ -211,25 +212,52 @@ export class Util {
     /**
      * Downloads a track on Soundcloud.
      */
-    public downloadTrack = async (trackResolvable: string | SoundcloudTrack, dest?: string) => {
+    public downloadTrack = async (trackResolvable: string | SoundcloudTrack, dest?: string, metadata: boolean = true) => {
         if (!dest) dest = "./"
         const folder = path.extname(dest) ? path.dirname(dest) : dest
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
+        let output = ""
         if (track.downloadable === true) {
             try {
                 const downloadObj = await this.api.getV2(`/tracks/${track.id}/download`) as any
                 const result = await fetch(downloadObj.redirectUri)
                 dest = path.extname(dest) ? dest : path.join(dest, `${track.title.replace(/[\\/:*?\"<>|]/g, "")}.${result.headers["x-amz-meta-file-type"]}`)
                 const arrayBuffer = await result.arrayBuffer() as any
-                fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
-                return dest
+                fs.writeFileSync(dest, new Uint8Array(Buffer.from(arrayBuffer, "binary")))
+                output = dest
             } catch {
-                return this.downloadTrackStream(track, track.title.replace(/[\\/:*?\"<>|]/g, ""), dest)
+                output = await this.downloadTrackStream(track, track.title.replace(/[\\/:*?\"<>|]/g, ""), dest)
             }
         } else {
-            return this.downloadTrackStream(track, track.title.replace(/[\\/:*?\"<>|]/g, ""), dest)
+            output = await this.downloadTrackStream(track, track.title.replace(/[\\/:*?\"<>|]/g, ""), dest)
         }
+        if (metadata) {
+            const coverLink = await this.downloadSongCover(track, "", true)
+            const imageBuffer = await fetch(coverLink).then(r => r.arrayBuffer())
+            const buffer = new Uint8Array(fs.readFileSync(output)).buffer
+            const writer = new ID3Writer(buffer)
+            writer.setFrame("TIT2", track.title)
+                .setFrame("TPE1", [track.user.username])
+                .setFrame("TLEN", track.duration)
+                .setFrame("TYER", new Date(track.created_at).getFullYear())
+                .setFrame("TCON", [track.genre])
+                .setFrame("COMM", {
+                    description: "Description",
+                    text: track.description ?? "",
+                    language: "eng"
+                })
+                .setFrame("APIC", {
+                    type: 3,
+                    data: imageBuffer,
+                    description: track.title,
+                    useUnicodeEncoding: false
+                })
+            writer.addTag()
+            const taggedBuffer = await writer.getBlob().arrayBuffer()
+            fs.writeFileSync(output, new Uint8Array(taggedBuffer))
+        }
+        return output
     }
 
     /**
@@ -289,7 +317,7 @@ export class Util {
     public downloadSongCover = async (trackResolvable: string | SoundcloudTrack, dest?: string, noDL?: boolean) => {
         if (!dest) dest = "./"
         const folder = dest
-        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        if (folder !== "./" && !fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const track = await this.resolveTrack(trackResolvable)
         const artwork = (track.artwork_url ? track.artwork_url : track.user.avatar_url).replace(".jpg", ".png").replace("-large", "-t500x500")
         const title = track.title.replace(/[\\/:*?\"<>|]/g, "")
@@ -298,7 +326,7 @@ export class Util {
         const url = `${artwork}?client_id=${client_id}`
         if (noDL) return url
         const arrayBuffer = await fetch(url).then(r => r.arrayBuffer())
-        fs.writeFileSync(dest, Buffer.from(arrayBuffer))
+        fs.writeFileSync(dest, new Uint8Array(Buffer.from(arrayBuffer)))
         return dest
     }
 
